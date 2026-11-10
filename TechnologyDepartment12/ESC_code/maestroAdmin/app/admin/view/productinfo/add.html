@@ -1,0 +1,102 @@
+{include file="header" /}
+<div class="row">
+    <div class="col-sm-12">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h5>{:lang("添加/修改")}</h5>
+            </div>
+            <div class="ibox-content">
+                <form class="form-horizontal m-t" id="dataForm" method="post" action="{:url('add')}">
+                    <div id="myTabContent" class="tab-content">
+                        <div class="tab-pane fade in active" id="home">
+                            <input type="hidden" name="id" value="{$info.id}"/>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">
+                                    {:lang("名称")}
+                                </label>
+                                <div class="input-group col-sm-4">
+                                    <input type="text" id="ptitle" name="ptitle" required
+                                           value="{$info.ptitle}" class="form-control">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">{:lang("图片")}：</label>
+                                <input name="logo" id="img" type="hidden" value="{$info['logo']}" />
+                                <div class="form-inline">
+                                    <div class="input-group col-sm-2">
+                                        <button type="button" class="layui-btn" id="uploader">
+                                            <i class="layui-icon">&#xe67c;</i>{:lang("上传图片")}
+                                        </button>
+                                    </div>
+                                    <div class="input-group col-sm-3">
+                                        <div id="sm">
+                                            <img src="{$info.logo|toMedia}" style="max-height: 40px;"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">{:lang("状态")}：</label>
+                                <div class="radio i-checks col-sm-4">
+                                    <label>
+                                        <input type="radio" value="0" {if $info.isopen == 0} checked="checked"{/if} name='isopen' /> <i></i>休市
+
+                                    </label>
+                                    <label>
+                                        <input type="radio" value="1" {if $info.isopen == 1} checked="checked"{/if} name='isopen' /> <i></i>开市
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-3 col-sm-offset-3">
+                                <button class="btn btn-primary btn-block" type="submit">{:lang("提交")}</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{include file="footer" /}
+<link href="/static/admin/css/css.css" rel="stylesheet">
+<script src="/static/admin/js/move.js"></script>
+<script src="/static/admin/js/publishImg.js"></script>
+<script type="text/javascript">
+    function deleteElement(Obj, tip) {
+        var ul = $(Obj).closest('ul');
+        $(Obj).closest('li').remove();
+        imgMove(ul.prop('id'));
+        $("#" + tip).text(ul.find('li').length);
+        mainPic();
+    }
+
+    function mainPic() {
+        var main_pic = [];
+        $("#imgMainList").find('li').each(function (i, e) {
+            main_pic.push($(e).data('path'));
+        })
+        $("#main_pic").val(main_pic.join(','));
+    }
+
+    $(document).ready(function(){
+        // 单张上传图片
+        layui.use('upload', function(){
+            var upload = layui.upload;
+            //上传驾照正面
+            var uploadInst = upload.render({
+                elem: '#uploader' //绑定元素
+                ,url: "{:url('upload/upload')}" //上传接口
+                ,done: function(res){
+                    //上传完毕回调
+                    $("#img").val(res.data.path);
+                    $("#sm").html('<img src="' + res.data.src + '" />');
+                }
+                ,error: function(){
+                    //请求异常回调
+                }
+            });
+        });
+    });
+</script>

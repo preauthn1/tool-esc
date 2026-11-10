@@ -1,0 +1,87 @@
+{include file="header" /}
+<style>
+    .layui-form-label {
+        box-sizing: content-box;
+    }
+</style>
+<div class="row">
+    <div class="col-sm-8">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h5>{:lang("添加/修改")}</h5>
+            </div>
+            <div class="ibox-content">
+                <form class="form-horizontal m-t layui-form" id="dataForm" method="post" action="{:url('add')}">
+                    <input type="hidden" name="id" value="{$info.id}">
+                    <div class="layui-form-item" id="other_icon_select">
+                        <label class="layui-form-label">图标</label>
+                        <div class="layui-input-block">
+                            <img class="" style="max-width:64px;max-height: 64px;border-radius: 6px;" src="{$info.image}"/>
+                            <input type="text" style="display:none;" name="image" value="{$info.image}" />
+                            <button type="button" class="layui-btn layui-btn-sm" id="image">
+                                <i class="layui-icon layui-icon-upload"></i>上传图片
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">客服名称</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="name" value="{$info.name}" lay-verify="required" class="layui-input">
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">链接</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="link" lay-verify="link" class="layui-input" value="{$info.link}">
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">排序</label>
+                        <div class="layui-input-block">
+                            <input type="number" name="sort" value="{$info.sort|default=0}" lay-verify="required" class="layui-input">
+                            <div class="layui-form-mid layui-word-aux">数字越小越靠前</div>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">是否启用</label>
+                        <input type="checkbox" name="status" title="启用|停用" lay-skin="switch" value="1"  {if $info.status == 1} checked {/if}>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-sm-4 col-sm-offset-6">
+                            <button class="btn btn-primary" type="submit">{:lang("提交")}</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="/static/admin/js/layui/module/xm-select.js"></script>
+<script>
+    $(document).ready(function () {
+
+        layui.use(["form", 'upload'], function() {
+            var form = layui.form
+
+            layui.upload.render({
+                elem: "#image",
+                value: "",
+                acceptMime: "image/gif,image/jpeg,image/jpg,image/png",
+                url: "{:url('upload/upload')}",
+                done: function (res) {
+                    layui.layer.msg(res.msg);
+                    this.item.prev().val(res.data.url).prev().attr("src", res.data.url);
+                }
+            });
+        })
+    })
+
+</script>
+{include file="footer" /}

@@ -1,0 +1,131 @@
+{include file="header" /}
+<div class="row">
+    <div class="col-sm-12">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h5>{:lang("奖项配置")} - {$turntable.title}</h5>
+            </div>
+            <div class="ibox-content">
+                <form class="form-horizontal" id="prizeForm" method="post" action="{:url('prize_save')}">
+                    <input type="hidden" name="turntable_id" value="{$turntable.id}">
+                    
+                    <!-- 表头说明部分 -->
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">配置项</label>
+                        <div class="col-sm-2">
+                            <label class="control-label">奖项名称<br><small class="text-muted">显示在转盘上的名称</small></label>
+                        </div>
+                        <div class="col-sm-2">
+                            <label class="control-label">奖品金额<br><small class="text-muted">中奖后实际发放金额(元)</small></label>
+                        </div>
+                        <div class="col-sm-2">
+                            <label class="control-label">中奖概率<br><small class="text-muted">总和需等于100</small></label>
+                        </div>
+                        <div class="col-sm-2">
+                            <label class="control-label">奖品类型<br><small class="text-muted">普通/大奖</small></label>
+                        </div>
+                    </div>
+                    <hr>
+
+                    {volist name="prizes" id="prize"}
+                    <div class="form-group">
+                        <input type="hidden" name="prizes[{$key}][id]" value="{$prize.id}">
+                        <label class="col-sm-2 control-label">奖项{$key+1}：</label>
+                        <div class="col-sm-2">
+                            <input type="text" class="form-control" name="prizes[{$key}][name]" value="{$prize.name}" placeholder="奖项名称">
+                        </div>
+                        <div class="col-sm-2">
+                            <input type="number" step="0.01" class="form-control" name="prizes[{$key}][value]" value="{$prize.value}" placeholder="奖品金额">
+                        </div>
+                        <div class="col-sm-2">
+                            <input type="number" step="0.01" class="form-control" name="prizes[{$key}][probability]" value="{$prize.probability}" placeholder="中奖概率">
+                        </div>
+                        <div class="col-sm-2">
+                            <select class="form-control" name="prizes[{$key}][is_big_prize]">
+                                <option value="0" {if $prize.is_big_prize eq 0}selected{/if}>普通奖品</option>
+                                <option value="1" {if $prize.is_big_prize eq 1}selected{/if}>大奖</option>
+                            </select>
+                        </div>
+                        {if $prize.is_big_prize eq 1}
+                        <div class="col-sm-2">
+                            <button type="button" class="layui-btn  btn-primary layui-btn-sm" onclick="configBigPrize({$prize.id})">配置大奖</button>
+                        </div>
+                        {/if}
+                    </div>
+                    {/volist}
+                    <div class="form-group">
+                        <div class="col-sm-4 col-sm-offset-5">
+                            <button class="btn btn-primary" type="button" onclick="submitForm()">{:lang("保存")}</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+function configBigPrize(prizeId) {
+    layer.open({
+        type: 2,
+        title: '大奖配置',
+        area: ['100%', '100%'],
+        maxmin: true,
+        content: '{:url("prize_config")}?id=' + prizeId
+    });
+}
+
+// 验证概率总和是否为100
+function validateProbability() {
+    let total = 0;
+    $('input[name$="[probability]"]').each(function() {
+        total += parseFloat($(this).val()) || 0;
+    });
+    return Math.abs(total - 100) < 0.01; // 允许0.01的误差
+}
+
+// 表单提交
+function submitForm() {
+    if (!validateProbability()) {
+        layer.msg('所有奖项概率之和必须等于100', {icon: 2});
+        return false;
+    }
+
+    let formData = $('#prizeForm').serialize();
+    
+    $.ajax({
+        url: '{:url("prize_save")}',
+        type: 'POST',
+        data: formData,
+        dataType: 'json',
+        success: function(res) {
+            if (res.code == 1) {
+                layer.msg(res.msg, {icon: 1, time: 1000}, function() {
+                    // 刷新当前页
+                    window.location.reload();
+                });
+            } else {
+                layer.msg(res.msg, {icon: 2});
+            }
+        },
+        error: function() {
+            layer.msg('网络错误，请稍后重试', {icon: 2});
+        }
+    });
+}
+
+// 实时计算概率总和
+$(document).ready(function() {
+    $('input[name$="[probability]"]').on('input', function() {
+        let total = 0;
+        $('input[name$="[probability]"]').each(function() {
+            total += parseFloat($(this).val()) || 0;
+        });
+        if (Math.abs(total - 100) > 0.01) {
+            $(this).addClass('has-error');
+        } else {
+            $(this).removeClass('has-error');
+        }
+    });
+});
+</script>
+{include file="footer" /}

@@ -1,0 +1,158 @@
+{include file="header" /}
+<div class="row">
+    <div class="col-sm-12">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h5>{:lang("添加/修改")}</h5>
+            </div>
+            <div class="ibox-content">
+                <form class="form-horizontal m-t" id="dataForm" method="post" action="{:url('add')}">
+                    <div id="myTabContent" class="tab-content">
+                        <div class="tab-pane fade in active" id="home">
+                            <input type="hidden" name="id" value="{$info.id}"/>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label"><span
+                                    class="x-red">*</span>{:lang("名称")}：</label>
+                                <div class="input-group col-sm-4">
+                                    <input type="text" class="form-control" value="{$info.name}" name="name"
+                                           required/>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">
+                                    <span class="x-red">*</span>{:lang("广告位个数")}
+                                </label>
+                                <div class="input-group col-sm-4">
+                                    <input type="number" min="0" id="number" name="num" required value="{$info.num}"
+                                           class="form-control">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">
+                                    <span class="x-red">*</span>{:lang("投资天数")}
+                                </label>
+                                <div class="input-group col-sm-4">
+                                    <input type="number" min="1" id="cycle" name="cycle" required value="{$info.cycle}"
+                                           class="form-control">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">
+                                    <span class="x-red">*</span>{:lang("每日收益率")}
+                                </label>
+                                <div class="input-group col-sm-4">
+                                    <input type="number" min="1" id="profit" name="profit" required
+                                           value="{$info.profit}" class="form-control">
+                                    <span class="input-group-addon">%</span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">
+                                    <span class="x-red">*</span>{:lang("占余额比例")}
+                                </label>
+                                <div class="input-group col-sm-4">
+                                    <input type="number" min="1" id="rate" name="rate" required value="{$info.rate}"
+                                           class="form-control">
+                                    <span class="input-group-addon">%</span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label"><span
+                                    class="x-red">*</span>{:lang("任务类型")}：</label>
+                                <div class="input-group col-sm-6">
+                                    {foreach name='type_list' item='vo' key='key'}
+                                    <div class="radio i-checks col-sm-4">
+                                        {if condition="$info.type == $key"}
+                                        <label> <input type="radio" value="{$key}" checked name="type"> <i></i>{$vo|lang}</label>
+                                        {else}
+                                        <label> <input type="radio" value="{$key}" name="type">
+                                            <i></i>{$vo|lang}</label>
+                                        {/if}
+                                    </div>
+                                    {/foreach}
+                                    <div class="input-group col-sm-12">
+                                        <span>任务类型：1.单控，需要选择用户。 2.群控，不需要选择用户在规定时间内匹配广告位即可触发，广告位个数以VIP配置为准。</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">
+                                    <span class="x-red">*</span>{:lang("开始时间")}
+                                </label>
+                                <div class="input-group col-sm-4">
+                                    <input type="text" min="1" id="start_time" name="start_time" required
+                                           value="{$info.start_time|default='00:00:00'}" class="form-control">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">
+                                    <span class="x-red">*</span>{:lang("结束时间")}
+                                </label>
+                                <div class="input-group col-sm-4">
+                                    <input type="text" min="1" id="end_time" name="end_time" required
+                                           value="{$info.end_time|default='23:59:59'}" class="form-control">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">{:lang("状态")}：</label>
+                                <div class="input-group col-sm-4">
+                                    <div class="layui-form">
+                                        <input type="checkbox" name="status" title="开启|关闭" lay-skin="switch" value="1" {if
+                                               $info.status== 1} checked {/if}>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-3 col-sm-offset-3">
+                                <button class="btn btn-primary btn-block" type="submit">{:lang("提交")}</button>
+                            </div>
+                        </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{include file="footer" /}
+<link href="/static/admin/css/css.css" rel="stylesheet">
+<script src="/static/admin/js/move.js"></script>
+<script src="/static/admin/js/publishImg.js"></script>
+<script type="text/javascript">
+  function deleteElement(Obj, tip) {
+    var ul = $(Obj).closest('ul');
+    $(Obj).closest('li').remove();
+    imgMove(ul.prop('id'));
+    $("#" + tip).text(ul.find('li').length);
+    mainPic();
+  }
+
+  function mainPic() {
+    var main_pic = [];
+    $("#imgMainList").find('li').each(function (i, e) {
+      main_pic.push($(e).data('path'));
+    })
+    $("#main_pic").val(main_pic.join(','));
+  }
+
+  $(document).ready(function () {
+    var editor = UE.getEditor('container', {
+      serverUrl: "{:url('articles/uploadimg')}",
+    });
+    $('#myTab a').click(function (e) {
+      e.preventDefault()
+      $(this).tab('show')
+    })
+  });
+
+  layui.use('laydate', function () {
+    var laydate = layui.laydate;
+    laydate.render({
+      elem: '#start_time'
+      , type: 'time'
+    });
+    laydate.render({
+      elem: '#end_time'
+      , type: 'time'
+    });
+  });
+</script>

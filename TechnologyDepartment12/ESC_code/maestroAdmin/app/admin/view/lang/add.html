@@ -1,0 +1,103 @@
+{include file="header" /}
+<div class="row">
+    <div class="col-sm-8">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h5>{:lang("添加语言")}</h5>
+            </div>
+            <div class="ibox-content">
+                <form class="form-horizontal m-t" id="dataForm" method="post" action="{:url('add')}">
+                    <input type="hidden" name="id" value="{$info.id|default=''}"/>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">{:lang("语言名称")}：</label>
+                        <div class="input-group col-sm-4">
+                            <input id="title" type="text" class="form-control" value="{$info.title|default=''}" name="title" required="" aria-required="true">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">{:lang("语言标识")}：</label>
+                        <div class="input-group col-sm-4">
+                            <input id="lang" type="text" class="form-control" value="{$info.lang|default=''}" name="lang" required="" aria-required="true">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">{:lang("国旗")}：</label>
+                        <input name="flag" id="flag" value="{$info.flag|default=''}" type="hidden" />
+                        <div class="form-inline">
+                            <div class="input-group col-sm-2">
+                                <button type="button" class="layui-btn" id="test1">
+                                    <i class="layui-icon">&#xe67c;</i>{:lang("上传图片")}
+                                </button>
+                            </div>
+                            <div class="input-group col-sm-3">
+                                <div id="sm">{if isset($info.flag) && $info.flag}<img src="{$info.flag|toMedia}" style="width:40px; height: 40px;"/>{/if}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">{:lang("备注")}：</label>
+                        <div class="input-group col-sm-4">
+                            <input id="remark" type="text" class="form-control" value="{$info.remark|default=''}" name="remark" required="" aria-required="true">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">{:lang("默认语言")}：</label>
+                        <div class="input-group col-sm-4">
+                            <select class="form-control" name="is_default_lang" id="is_default_lang" required="" aria-required="true">
+                                <option value="0" {if isset($info.is_default_lang) && $info.is_default_lang neq 1} selected{/if}>否</option>
+                                <option value="1" {if isset($info.is_default_lang) && $info.is_default_lang eq 1} selected{/if}>是</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">{:lang("默认地区")}：</label>
+                        <div class="input-group col-sm-4">
+                            <select class="form-control" name="is_default" id="is_default" required="" aria-required="true">
+                                <option value="0" {if isset($info.is_default) && $info.is_default neq 1} selected{/if}>否</option>
+                                <option value="1" {if isset($info.is_default) && $info.is_default eq 1} selected{/if}>是</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">{:lang("状态")}：</label>
+                        <div class="input-group col-sm-4">
+                            <select class="form-control" name="status" required="" aria-required="true">
+                                <option value="0" {if isset($info.status) && $info.status neq 1} selected{/if}>禁用</option>
+                                <option value="1" {if isset($info.status) && $info.status eq 1} selected{/if}>{:lang("启用")}</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-sm-4 col-sm-offset-6">
+                            <button class="btn btn-primary" type="submit">{:lang("提交")}</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>
+<script>
+    $(document).ready(function(){
+        // 单张上传图片
+        layui.use('upload', function(){
+            var upload = layui.upload;
+            //上传驾照正面
+            var uploadInst = upload.render({
+                elem: '#test1' //绑定元素
+                ,url: "{:url('upload/upload')}" //上传接口
+                ,done: function(res){
+                    //上传完毕回调
+                    $("#flag").val(res.data.path);
+                    $("#sm").html('<img src="' + res.data.src + '" />');
+                }
+                ,error: function(){
+                    //请求异常回调
+                }
+            });
+        });
+    });
+</script>
+{include file="footer" /}

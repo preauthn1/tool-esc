@@ -1,0 +1,172 @@
+{include file="header" /}
+<style>
+    .layui-form-label {
+        box-sizing: content-box;
+    }
+</style>
+<div class="row">
+    <div class="col-sm-8">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h5>{:lang("添加/修改")}</h5>
+            </div>
+            <div class="ibox-content">
+                <form class="form-horizontal m-t layui-form" id="dataForm" method="post" action="{:url('add')}">
+                    <input type="hidden" name="id" value="{$info.id}">
+                    <div class="layui-form-item" id="other_icon_select">
+                        <label class="layui-form-label">{:lang("产品图片")}</label>
+                        <div class="layui-input-block">
+                            <img class="" style="max-width:64px;max-height: 64px;border-radius: 6px;" src="{$info.image}"/>
+                            <input type="text" style="display:none;" name="image" value="{$info.image}" />
+                            <button type="button" class="layui-btn layui-btn-sm" id="image">
+                                <i class="layui-icon layui-icon-upload"></i>{:lang("上传图片")}
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">{:lang("产品名称")}</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="product_name" value="{$info.product_name}" lay-verify="required" class="layui-input" required>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">{:lang("投资金额")}</label>
+                        <div class="layui-input-block">
+                            <input type="number" min="1" name="amount" value="{$info.amount}" lay-verify="required" class="layui-input" required>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">{:lang("投资天数")}</label>
+                        <div class="layui-input-block">
+                            <input type="number" min="1" name="cycle" value="{$info.cycle}" lay-verify="required" class="layui-input" required>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">{:lang("每日收益率")}(%)：</label>
+                        <div class="layui-input-block">
+                            <input type="number" min="0.01" step="0.01" name="profit" value="{$info.profit}" lay-verify="required" class="layui-input" required>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">{:lang("手续费")}(%)：</label>
+                        <div class="layui-input-block">
+                            <input type="number" min="0.01" step="0.01" name="fee_rate" value="{$info.fee_rate}" lay-verify="required" class="layui-input" required>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">{:lang("占余额比例")}：</label>
+                        <div class="layui-input-block">
+                            <input type="number" min="1" name="rate" value="{$info.rate}" lay-verify="required" class="layui-input" required>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">{:lang("广告位个数")}：</label>
+                        <div class="layui-input-block">
+                            <input type="number" min="1" name="cycle" value="{$info.num}" lay-verify="required" class="layui-input" required>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">{:lang("开始时间")}：</label>
+                        <div class="layui-input-block">
+                            <input type="text" class="form-control" id="start_time" name="start_time" value="{$config.start_time|default='00:00:00'}"  placeholder="H点m分">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">{:lang("结束时间")}：</label>
+                        <div class="layui-input-block">
+                            <input type="text" class="form-control" id="end_time" name="end_time" value="{$config.end_time|default='23:59:59'}"  placeholder="H点m分">
+                        </div>
+                    </div>
+<!--                    <div class="layui-form-item">-->
+<!--                        <label class="layui-form-label">销售状态</label>-->
+<!--                        <input type="checkbox" name="sales_status" title="启用|停用" lay-skin="switch" value="1"  {if $info.sales_status == 1} checked {/if}>-->
+                        <input type="hidden" name="sales_status" value="1">
+<!--                    </div>-->
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">状态</label>
+                        <input type="checkbox" name="status" title="启用|停用" lay-skin="switch" value="1"  {if $info.status == 1} checked {/if}>
+                    </div>
+<!--                    <div class="layui-form-item">-->
+<!--                        <label class="layui-form-label">最低可购买VIP</label>-->
+<!--                        <div class="layui-input-block">-->
+<!--                            <input type="text" name="level_id" value="{$info.level_id}" lay-verify="required" class="layui-input">-->
+                            <input type="hidden" name="level_id" value="{$info.level_id? $info.level_id : $level_id}" lay-verify="required" class="layui-input" required>
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                    <div class="layui-form-item">-->
+<!--                        <label class="layui-form-label">收益类型</label>-->
+<!--                        <div class="layui-input-block">-->
+<!--                            <input type="text" name="profit_type" value="{$info.profit_type}" lay-verify="required" class="layui-input">-->
+                            <input type="hidden" name="profit_type" value="2" lay-verify="required" class="layui-input" required>
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                    <div class="layui-form-item">-->
+<!--                        <label class="layui-form-label">派息类型</label>-->
+<!--                        <div class="layui-input-block">-->
+                            <input type="hidden"  name="rebate_type" value="1" lay-verify="required" class="layui-input" required>
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                    <div class="layui-form-item">-->
+<!--                        <label class="layui-form-label">是否立马派息一次</label>-->
+<!--                        <input type="checkbox" name="is_shortly_rebate" title="启用|停用" lay-skin="switch" value="1"  {if $info.is_shortly_rebate == 1} checked {/if}>-->
+                            <input type="hidden" name="is_shortly_rebate" value="0" lay-verify="required" class="layui-input" required>
+<!--                    </div>-->
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">排序</label>
+                        <div class="layui-input-block">
+                            <input type="number" name="sort" value="{$info.sort|default=0}" lay-verify="required" class="layui-input">
+                            <div class="layui-form-mid layui-word-aux">数字越小越靠前</div>
+                        </div>
+                    </div>
+
+
+                    <div class="form-group">
+                        <div class="col-sm-4 col-sm-offset-6">
+                            <button class="btn btn-primary" type="submit">{:lang("提交")}</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="/static/admin/js/layui/module/xm-select.js"></script>
+<script>
+    $(document).ready(function () {
+
+        layui.use(["form", 'upload'], function() {
+            var form = layui.form
+
+            layui.upload.render({
+                elem: "#image",
+                value: "",
+                acceptMime: "image/gif,image/jpeg,image/jpg,image/png",
+                url: "{:url('upload/upload')}",
+                done: function (res) {
+                    layui.layer.msg(res.msg);
+                    this.item.prev().val(res.data.url).prev().attr("src", res.data.url);
+                }
+            });
+        })
+
+      layui.use('laydate', function(){
+        var laydate = layui.laydate;
+        laydate.render({
+          elem: '#start_time'
+          ,type: 'time'
+        });
+        laydate.render({
+          elem: '#end_time'
+          ,type: 'time'
+        });
+      });
+
+
+
+    })
+
+</script>
+{include file="footer" /}

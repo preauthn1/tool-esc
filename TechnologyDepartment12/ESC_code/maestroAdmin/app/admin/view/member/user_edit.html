@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>编辑用户</title>
+    <link rel="shortcut icon" href="{$admin_icon|toMedia}">
+    <link href="/static/admin/css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
+    <link href="/static/admin/css/font-awesome.min.css?v=4.4.0" rel="stylesheet">
+    <link href="/static/admin/css/animate.min.css" rel="stylesheet">
+    <link href="/static/admin/css/plugins/iCheck/custom.css" rel="stylesheet">
+    <link href="/static/admin/css/style.min.css?v=4.1.0" rel="stylesheet">
+    <link href="/static/admin/js/layui/css/layui.css" rel="stylesheet">
+    <link href="/static/libs/select2-4.0.7/css/select2.min.css" rel="stylesheet">
+    <style>
+        .layui-form-label {
+            box-sizing: content-box;
+        }
+    </style>
+</head>
+<body class="">
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="layui-tab layui-tab-brief">
+        <ul class="layui-tab-title">
+            <li class="layui-this">会员编辑</li>
+<!--            <li>会员账单</li>-->
+<!--            <li>提币账单</li>-->
+<!--            <li>充币账单</li>-->
+<!--            <li>会员日志</li>-->
+        </ul>
+        <div class="layui-tab-content">
+            <div class="layui-tab-item layui-show">
+                <!-------------------会员编辑------------------->
+                <form class="layui-form"  id="commentForm" method="post" action="{:url('member/userEdit')}">
+                    <input type="hidden" name="id" value="{$user.id}">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">用户账号</label>
+                        <div class="layui-input-block">
+                            <input type="text" id="user_name" name="user_name" readonly=""
+                                   value="{$user.user_name}" class="layui-input">
+                        </div>
+                    </div>
+
+
+                    <div class="layui-form-item ">
+                        <label class="layui-form-label">用户密码</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="password" placeholder="为空表示不修改用户密码" value=""
+                                   class="layui-input">
+                            <tip style="color: red">##### 为空表示不修改用户密码 ######</tip>
+                        </div>
+                    </div>
+                    <div class="layui-form-item ">
+                        <label class="layui-form-label">安全密码</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="paypwd" placeholder="为空表示不修改用户安全密码" value=""
+                                   class="layui-input">
+                            <tip style="color: red">##### 为空表示不修改用户安全密码 ######</tip>
+                        </div>
+                    </div>
+                    <div class="layui-form-item ">
+                        <label class="layui-form-label">TRC20提现钱包</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="withdraw_address" value="{$user.withdraw_address}"
+                                   class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item ">
+                        <label class="layui-form-label">BEP20提现钱包</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="bsc_withdraw_address" value="{$user.bsc_withdraw_address}"
+                                   class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item ">
+                        <label class="layui-form-label">提现银行名称</label>
+                        <div class="layui-input-inline" style="width: 10%">
+                            <select name="bank_code" lay-search>
+                                <option value="">选择银行</option>
+                                {if !empty($banks)}
+                                {foreach name="banks" item="vo"}
+                                <option value="{$vo.bank_code}" {if $vo.bank_code eq $user.bank_code} selected{/if}>{$vo.name}</option>
+                                {/foreach}
+                                {/if}
+                            </select>
+                            <input type="hidden" name="bank_name" value="{$user.bank_name}"
+                                   class="layui-input">
+                        </div>
+                        <label class="layui-form-label">账户类型</label>
+                        <div class="layui-input-inline" style="width: 5%">
+                            <select name="document_type" lay-search>
+                                <option value="">选择类型</option>
+                                <option value="CPF" {if $user.document_type eq 'CPF'} selected{/if}>CPF</option>
+                                <option value="CNPJ" {if $user.document_type eq 'CNPJ'} selected{/if}>CNPJ</option>
+                                <option value="PHONE" {if $user.document_type eq 'PHONE'} selected{/if}>PHONE</option>
+                                <option value="EMAIL" {if $user.document_type eq 'EMAIL'} selected{/if}>EMAIL</option>
+                                <option value="EVP" {if $user.document_type eq 'EVP'} selected{/if}>EVP</option>
+                            </select>
+                            <input type="hidden" name="bank_name" value="{$user.bank_name}"
+                                   class="layui-input">
+                        </div>
+                        <label class="layui-form-label">账户账号</label>
+                        <div class="layui-input-inline" style="width: 15%">
+                            <input type="text" name="document_id" value="{$user.document_id}"
+                                   class="layui-input">
+                        </div>
+                        <label class="layui-form-label">真实姓名</label>
+                        <div class="layui-input-inline" style="width: 20%">
+                            <input type="text" name="true_name" value="{$user.true_name}"
+                                   class="layui-input">
+                        </div>
+                        <label class="layui-form-label">银行卡号</label>
+                        <div class="layui-input-inline" style="width: 15%">
+                            <input type="text" name="bank_number" value="{$user.bank_number}"
+                                   class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item ">
+                        <label class="layui-form-label">充值钱包</label>
+                        <div class="layui-input-inline" style="width: 60%">
+                            <input type="text" name="recharge_address" value="{$user.recharge_address}"
+                                   readonly=""
+                                   class="layui-input">
+                        </div>
+<!--                        <div class="layui-form-mid" style="padding: 0!important;">-->
+<!--                            <button type="button" class="layui-btn layui-btn-normal" id="update_recharge">-->
+<!--                                更换充值钱包-->
+<!--                            </button>-->
+<!--                        </div>-->
+                    </div>
+
+                    <div class="layui-form-item ">
+                        <label class="layui-form-label">bep20充值钱包</label>
+                        <div class="layui-input-inline" style="width: 60%">
+                            <input type="text" name="bsc_address"
+                                   value="{$user.bsc_address}" readonly=""
+                                   class="layui-input">
+                        </div>
+<!--                        <div class="layui-form-mid" style="padding: 0!important;">-->
+<!--                            <button type="button" class="layui-btn layui-btn" id="update_recharge_bep20">-->
+<!--                                更换充值钱包-->
+<!--                            </button>-->
+<!--                        </div>-->
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">注册ip</label>
+                        <div class="layui-input-block">
+                            <input type="text" readonly=""
+                                   value="{$user.ip}" class="layui-input">
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">最后登录ip</label>
+                        <div class="layui-input-block">
+                            <input type="text" readonly=""
+                                   value="{$user.last_login_ip}" class="layui-input">
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item ">
+                        <label class="layui-form-label">联系方式</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="mobile" value="{$user.mobile}"
+                                   class="layui-input">
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item ">
+                        <label class="layui-form-label">用户备注</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="remark" value="{$user.remark}"
+                                   class="layui-input">
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item ">
+                        <label class="layui-form-label">vip等级</label>
+                        <div class="layui-input-inline">
+                            <select name="level_id" lay-search>
+                                <option value="0">{:lang("普通会员")}</option>
+                                {if !empty($level)}
+                                {foreach name="level" item="vo"}
+                                <option value="{$vo.level_id}" {if condition="$user['level_id'] eq $vo['level_id']"}selected{/if} >{$vo.level_name}</option>
+                                {/foreach}
+                                {/if}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="layui-form-item ">
+                        <label class="layui-form-label">邀请多少下线解锁提现</label>
+                        <div class="layui-input-inline">
+                            <input type="number" name="withdraw_rec_count" value="{$user.withdraw_rec_count|default=0}"
+                                   class="layui-input">
+                        </div>
+                        <label class="layui-form-label">邀请充值多少解锁提现</label>
+                        <div class="layui-input-inline">
+                            <input type="number" name="withdraw_rec_recharge" value="{$user.withdraw_rec_recharge|default=0.00}"
+                                   class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item ">
+                        <label class="layui-form-label">最大提现金额</label>
+                        <div class="layui-input-block">
+                            <input type="number" name="withdraw_max_usdt" value="{$user.withdraw_max_usdt|default=0.00}"
+                                   class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item ">
+                        <label class="layui-form-label">广告计划</label>
+                        <div class="layui-input-inline">
+                            <select name="ad_plan_id" lay-search>
+                                <option value=''></option>
+                                {if !empty($ad_plan_list)}
+                                {foreach name="ad_plan_list" item="vo"}
+                                <option value="{$vo.id}" {if condition="$user['ad_plan_id'] eq $vo['id']"}selected{/if} >{$vo.name}</option>
+                                {/foreach}
+                                {/if}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="layui-form-item ">
+                        <label class="layui-form-label">流水限制</label>
+                        <div class="layui-input-inline">
+                            <select name="user_water_status" lay-search>
+                                <option value="0" {if condition="$user['user_water_status'] eq 0"}selected{/if} >不限制</option>
+                                <option value="1" {if condition="$user['user_water_status'] eq 1"}selected{/if} >默认</option>
+                                <option value="2" {if condition="$user['user_water_status'] eq 2"}selected{/if} >限制</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">用户状态</label>
+                        <div class="layui-input-inline">
+                            <input type="checkbox" name="status" lay-skin="switch" lay-text="启用|禁用" value="1"
+                                   {if $user['status'] == 1}checked{/if}>
+                        </div>
+                        <label class="layui-form-label">提现状态</label>
+                        <div class="layui-input-inline">
+                            <input type="checkbox" name="withdraw_status" lay-skin="switch" value="1"
+                                   lay-text="启用|禁用"
+                                   {if $user['withdraw_status'] == 1}checked{/if}>
+                        </div>
+                        <label class="layui-form-label">kyc状态</label>
+                        <div class="layui-input-inline">
+                            <input type="checkbox" name="kyc_status" lay-skin="switch" value="1"
+                                   lay-text="已认证|未认证" {if $user['kyc_status'] == 1}checked{/if}>
+                        </div>
+
+                        <label class="layui-form-label">邀请码状态</label>
+                        <div class="layui-input-inline">
+                            <input type="checkbox" name="invite_code_status" lay-skin="switch" value="1"
+                                   lay-text="有效|无效" {if $user['invite_code_status'] == 1}checked{/if}>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">是否代理</label>
+                        <div class="layui-input-inline">
+                            <input type="checkbox" name="is_proxy" lay-skin="switch" lay-text="是|否"  value="1"
+                                   {if $user['is_proxy'] == 1}checked{/if}>
+                        </div>
+                        <label class="layui-form-label">是否总代理 <i class="layui-icon layui-icon-help"
+                                                                      style="font-size: 10px;"
+                                                                      onmouseover="showTips(this,1,3)"
+                                                                      onmouseleave="close_tips()"></i></label>
+                        <div class="layui-input-inline">
+                            <input type="checkbox" name="is_total_proxy" lay-skin="switch" lay-text="是|否"  value="1"
+                                   {if $user['is_total_proxy'] == 1}checked{/if}
+                            >
+                        </div>
+                        <label class="layui-form-label">升级才能做任务</label>
+                        <div class="layui-input-inline">
+                            <input type="checkbox" name="is_upgrade" lay-skin="switch" lay-text="是|否"  value="1"
+                                   {if $user['is_upgrade'] == 1}checked{/if}
+                            >
+                        </div>
+                        {if $user['is_xuni'] == 1}
+                        <label class="layui-form-label">是否显示假数据</label>
+                        <div class="layui-input-inline">
+                            <input type="checkbox" name="show_virtual_data" lay-skin="switch" lay-text="是|否"  value="1"
+                                   {if $user['show_virtual_data'] == 1}checked{/if}
+                            >
+                        </div>
+                        {/if}
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">是否可以购买广告位</label>
+                        <div class="layui-input-inline">
+                            <input type="checkbox" name="do_task_status" lay-skin="switch" lay-text="是|否"  value="1"
+                                   {if $user['do_task_status'] == 1}checked{/if}>
+                        </div>
+                        <label class="layui-form-label">团队数据是否每月重新统计</label>
+                        <div class="layui-input-inline">
+                            <input type="checkbox" name="team_info_month_reset" lay-skin="switch" lay-text="是|否"  value="1"
+                                   {if $user['team_info_month_reset'] == 1}checked{/if}>
+                        </div>
+                        <label class="layui-form-label">是否开启广告位缓冲倒计时的阶段</label>
+                        <div class="layui-input-inline">
+                            <input type="checkbox" name="is_finance_product_count_down" lay-skin="switch" lay-text="是|否"  value="1"
+                                   {if $user['is_finance_product_count_down'] == 1}checked{/if}>
+                        </div>
+                        <label class="layui-form-label">是否可以转账给其他用户</label>
+                        <div class="layui-input-inline">
+                            <input type="checkbox" name="transfer_money_status" lay-skin="switch" lay-text="是|否"  value="1"
+                                   {if $user['transfer_money_status'] == 1}checked{/if}>
+                        </div>
+                    </div>
+<!--                    <div class="layui-form-item">-->
+<!--                        <label class="layui-form-label">邀请用户才能做任务</label>-->
+<!--                        <div class="layui-input-inline">-->
+<!--                            <input type="checkbox" name="is_invite_do_task" lay-filter="is_invite_do_task"  value="1"-->
+<!--                                   lay-skin="switch" lay-text="是|否" {if $user['is_invite_do_task'] == 1}checked{/if}-->
+<!--                            >-->
+<!--                        </div>-->
+<!--                        <div id="is_invite_do_task" hidden>-->
+<!--                            <label class="layui-form-label">邀请几个用户</label>-->
+<!--                            <div class="layui-input-inline">-->
+<!--                                <input type="number" name="invite_do_task_num" min="0"-->
+<!--                                       value="{$user['invite_do_task_num']}" class="layui-input">-->
+<!--                            </div>-->
+<!--                            <label class="layui-form-label">邀请用户充值满多少</label>-->
+<!--                            <div class="layui-input-inline">-->
+<!--                                <input type="number" name="invite_do_task_money" min="0"-->
+<!--                                       value="{$user['invite_do_task_money']}" class="layui-input">-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                    </div>-->
+
+<!--                    <div class="layui-form-item ">-->
+<!--                        <label class="layui-form-label">已签到天数</label>-->
+<!--                        <div class="layui-input-inline">-->
+<!--                            <input type="number" name="sign_in_day" min="0" value="{$user['sign_in_day']}"-->
+<!--                                   class="layui-input">-->
+<!--                        </div>-->
+
+<!--                        <label class="layui-form-label">最后签到时间</label>-->
+<!--                        <div class="layui-input-inline">-->
+<!--                            <input type="text" name="sign_last_time" value="{$user['sign_last_time']}" disabled-->
+<!--                                   class="layui-input">-->
+<!--                        </div>-->
+<!--                    </div>-->
+
+<!--                    <div class="layui-form-item ">-->
+<!--                        <label class="layui-form-label">注册抽奖次数</label>-->
+<!--                        <div class="layui-input-inline">-->
+<!--                            <input type="number" name="lottery_num" min="0" value="{$user['lottery_num']}"-->
+<!--                                   class="layui-input">-->
+<!--                        </div>-->
+
+<!--                        <label class="layui-form-label">邀请抽奖次数</label>-->
+<!--                        <div class="layui-input-inline">-->
+<!--                            <input type="number" name="lottery_num_invite" min="0"-->
+<!--                                   value="{$user['lottery_num_invite']}" class="layui-input">-->
+<!--                        </div>-->
+<!--                    </div>-->
+
+<!--                    <div class="layui-form-item">-->
+<!--                        <label class="layui-form-label">信用分<i class="layui-icon layui-icon-help"-->
+<!--                                                                 style="font-size: 10px;"-->
+<!--                                                                 onmouseover="showTips(this,2,3)"-->
+<!--                                                                 onmouseleave="close_tips()"></i></label>-->
+<!--                        <div class="layui-input-inline">-->
+<!--                            <input type="number" name="credit_score" min="1" value="{$user['credit_score']}"-->
+<!--                                   class="layui-input">-->
+<!--                        </div>-->
+<!--                        <div>-->
+<!--                            <label class="layui-form-label">分配一次任务扣多少分</label>-->
+<!--                            <div class="layui-input-inline">-->
+<!--                                <input type="number" name="one_task_buckle" min="0"-->
+<!--                                       value="{$user['one_task_buckle']}" class="layui-input">-->
+<!--                            </div>-->
+<!--                            <label class="layui-form-label">总共扣几次</label>-->
+<!--                            <div class="layui-input-inline">-->
+<!--                                <input type="number" name="buckle_score_num" min="0"-->
+<!--                                       value="{$user['buckle_score_num']}" class="layui-input">-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                    </div>-->
+                    <div class="layui-form-item">
+                        <div class="layui-input-block">
+                            <button type="button" class="layui-btn" id="configExcessAdRatioBtn">超额单控广告位比例配置</button>
+                            <button type="button" class="layui-btn" id="setButtonLoadingTime">广告缓冲倒计时单控</button>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <div class="layui-input-block">
+                            <button class="layui-btn" lay-submit="" lay-filter="saveBtn">
+                                确认保存
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+<!--            <div class="layui-tab-item">-->
+<!--                <iframe src="{:url('member/money')}?uid={$user.id}" frameborder="0" style="width: 100%;height: 100%;"></iframe>-->
+<!--            </div>-->
+<!--            <div class="layui-tab-item">提币账单</div>-->
+<!--            <div class="layui-tab-item">充币账单</div>-->
+<!--            <div class="layui-tab-item">会员日志</div>-->
+        </div>
+    </div>
+</div>
+<script src="/static/admin/js/jquery.min.js?v=2.1.4"></script>
+<script src="/static/admin/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="/static/admin/js/content.min.js?v=1.0.0"></script>
+<script src="/static/admin/js/plugins/validate/jquery.validate.min.js"></script>
+<script src="/static/admin/js/plugins/validate/messages_zh.min.js"></script>
+<script src="/static/admin/js/plugins/iCheck/icheck.min.js"></script>
+<script src="/static/admin/js/plugins/layer/layer.min.js"></script>
+<script src="/static/admin/js/layui/layui.js"></script>
+<script src="/static/admin/js/jquery.form.js"></script>
+<script src="/static/libs/select2-4.0.7/js/select2.min.js"></script>
+<script type="text/javascript">
+
+    layui.use(['form'],function() {
+        var form = layui.form
+
+        form.on("switch(is_invite_do_task)", function (data) {
+            //console.log(this.checked)
+            if (this.checked == true) {
+                $('#is_invite_do_task').show();
+            } else {
+                $('#is_invite_do_task').hide();
+            }
+        });
+    });
+    var index = '';
+    function showStart(){
+        index = layer.load(0, {shade: false});
+        return true;
+    }
+
+    function showSuccess(res){
+        layer.ready(function(){
+            layer.close(index);
+            if(1 == res.code){
+                layer.alert(res.msg, {title: "{:lang('友情提示')}", icon: 1, closeBtn: 0}, function(){
+                    // window.location.href = res.data;
+                    var index = parent.layer.getFrameIndex(window.name); // 先得到当前 iframe 层的索引
+                    parent.layer.close(index);
+                    parent.location.reload();
+                });
+            }else if(111 == res.code){
+                window.location.reload();
+            }else{
+                layer.msg(res.msg, {anim: 6});
+            }
+        });
+    }
+
+    $(document).ready(function(){
+        $(".i-checks").iCheck({checkboxClass:"icheckbox_square-green",radioClass:"iradio_square-green",});
+
+        // 编辑用户
+        var options = {
+            beforeSubmit:showStart,
+            success:showSuccess
+        };
+
+        $('#commentForm').submit(function(){
+            $(this).ajaxSubmit(options);
+            return false;
+        });
+
+        // 上传图片
+        layui.use('upload', function(){
+            var upload = layui.upload;
+            //上传车辆照片
+            var uploadInst = upload.render({
+                elem: '#test1' //绑定元素
+                ,url: "{:url('upload/upload')}" //上传接口
+                ,done: function(res){
+                    //上传完毕回调
+                    $("#pic").val(res.data.path);
+                    $("#sm1").html('<img src="' + res.data.src + '" style="width:40px;height: 40px;"/>');
+                }
+                ,error: function(){
+                    //请求异常回调
+                }
+            });
+        });
+        $("#bank_name").select2();
+
+        $('#configExcessAdRatioBtn').click(function () {
+            var userId = $("input[name='id']").val();
+            layer.open({
+                type: 2, // iframe layer
+                title: '超额单控广告位比例配置',
+                shadeClose: true,
+                shade: 0.8,
+                area: ['1200px', '600px'], // Adjust size as needed
+                content: "{:url('home_user_excess_ad_ratio_config/index')}?uid=" + userId // URL for the dialog content
+            });
+        });
+
+      $('#setButtonLoadingTime').click(function () {
+        var userId = $("input[name='id']").val();
+
+        // 显示加载中
+        var loadingIndex = layer.load(1, {shade: [0.8, '#393D49']});
+
+        // 获取当前用户的缓冲倒计时配置
+        $.ajax({
+          url: "{:url('member/getAdBufferCountdownConfig')}",
+          type: "POST",
+          data: {id: userId},
+          dataType: 'json',
+          success: function(res) {
+            layer.close(loadingIndex);
+            if (res.code == 1) {
+              var config = res.data;
+
+              // 弹出配置编辑窗口
+              layer.open({
+                type: 1,
+                title: '广告缓冲倒计时单控',
+                area: ['700px', '550px'],
+                content: '<div class="layui-form" style="padding: 20px;">' +
+                  '<div class="layui-form-item">' +
+                  '<label class="layui-form-label">「否」是否可以点击</label>' +
+                  '<div class="layui-input-block">' +
+                  '<input type="radio" name="finance_product_no_can_click" value="1" title="可以" ' + (config.finance_product_no_can_click == 1 ? 'checked' : '') + '>' +
+                  '<input type="radio" name="finance_product_no_can_click" value="0" title="不可以" ' + (config.finance_product_no_can_click == 0 ? 'checked' : '') + '>' +
+                  '</div></div>' +
+                  '<div class="layui-form-item">' +
+                  '<label class="layui-form-label">「是」是否可以点击</label>' +
+                  '<div class="layui-input-block">' +
+                  '<input type="radio" name="finance_product_yes_can_click" value="1" title="可以" ' + (config.finance_product_yes_can_click == 1 ? 'checked' : '') + '>' +
+                  '<input type="radio" name="finance_product_yes_can_click" value="0" title="不可以" ' + (config.finance_product_yes_can_click == 0 ? 'checked' : '') + '>' +
+                  '</div></div>' +
+                  '<div class="layui-form-item">' +
+                  '<label class="layui-form-label">【是】按钮loading时长</label>' +
+                  '<div class="layui-input-block">' +
+                  '<input type="number" id="finance_product_button_count_down" class="layui-input" value="' + config.finance_product_button_count_down + '">' +
+                  '</div></div>' +
+                    '<div class="layui-form-item">' +
+                    '<label class="layui-form-label">【否】按钮loading时长</label>' +
+                    '<div class="layui-input-block">' +
+                    '<input type="number" id="finance_product_dialog_btn_cancel" class="layui-input" value="' + config.finance_product_dialog_btn_cancel + '">' +
+                    '</div></div>' +
+                  '<div class="layui-form-item">' +
+                  '<label class="layui-form-label">是否对下级生效</label>' +
+                  '<div class="layui-input-block">' +
+                  '<input type="checkbox" id="apply_to_subordinates" lay-skin="switch" lay-text="是|否" ' + (config.apply_to_subordinates == 1 ? 'checked' : '') + '>' +
+                  '</div></div>' +
+                  '</div>',
+                btn: ['保存', '取消'],
+                success: function(layero, index) {
+                  // 重新渲染layui表单
+                  layui.form.render();
+                },
+                yes: function(index) {
+                  var data = {
+                    id: userId,
+                    finance_product_no_can_click: $('input[name="finance_product_no_can_click"]:checked').val(),
+                    finance_product_yes_can_click: $('input[name="finance_product_yes_can_click"]:checked').val(),
+                      finance_product_button_count_down: $('#finance_product_button_count_down').val(),
+                      finance_product_dialog_btn_cancel: $('#finance_product_dialog_btn_cancel').val(),
+                    apply_to_subordinates: $('#apply_to_subordinates').is(':checked') ? 1 : 0
+                  };
+
+                  // 显示加载中
+                  var savingIndex = layer.load(1, {shade: [0.8, '#393D49']});
+
+                  // 保存配置
+                  $.ajax({
+                    url: "{:url('member/updateAdBufferCountdownConfig')}",
+                    type: "POST",
+                    data: data,
+                    dataType: 'json',
+                    success: function(res) {
+                      layer.close(savingIndex);
+                      if (res.code == 1) {
+                        layer.msg('保存成功', {icon: 1});
+                        layer.close(index);
+                      } else {
+                        layer.msg(res.msg || '保存失败', {icon: 2});
+                      }
+                    },
+                    error: function() {
+                      layer.close(savingIndex);
+                      layer.msg('网络错误，请重试', {icon: 2});
+                    }
+                  });
+                }
+              });
+            } else {
+              layer.msg(res.msg || '获取配置失败', {icon: 2});
+            }
+          },
+          error: function() {
+            layer.close(loadingIndex);
+            layer.msg('网络错误，请重试', {icon: 2});
+          }
+        });
+      });
+    });
+
+    // 表单验证
+    $.validator.setDefaults({
+        highlight: function(e) {
+            $(e).closest(".form-group").removeClass("has-success").addClass("has-error")
+        },
+        success: function(e) {
+            e.closest(".form-group").removeClass("has-error").addClass("has-success")
+        },
+        errorElement: "span",
+        errorPlacement: function(e, r) {
+            e.appendTo(r.is(":radio") || r.is(":checkbox") ? r.parent().parent().parent() : r.parent())
+        },
+        errorClass: "help-block m-b-none",
+        validClass: "help-block m-b-none"
+    });
+
+    $('#update_recharge').click(function () {
+        var index2 = layer.confirm('是否确认更换充值账户？原有充值账户将会被覆盖，无法恢复，请确保地址余额已归集后操作！', {offset: '100px'}, function () {		//提交按钮确认弹窗
+            var loading = layer.load(1, {shade: [0.8, '#393D49'], time: 0});
+            var url = "changeRechargeAddress?type=1&uid=" + $("#uid").val();
+            $.ajax({
+                url: url, // url---->地址
+                type: "GET", // type ---> 请求方式
+                async: true, // async----> 同步：false，异步：true
+                success: function (result) {
+                    //console.log(result);
+                    if (result.code == 0) {
+
+                        $('input[name=recharge_address]').val(result.data.recharge_address);
+                        layer.msg(result.msg, {icon: 1});
+                    } else {
+                        layer.msg(result.msg, {icon: 5});
+                    }
+                    layer.close(loading);
+                    //var index2 = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+                    parent.layer.close(index2);
+                }
+            });
+        })
+    });
+    $('#update_recharge_bep20').click(function () {
+        var index2 = layer.confirm('是否确认更换充值账户？原有充值账户将会被覆盖，无法恢复，请确保地址余额已归集后操作！', {offset: '100px'}, function () {		//提交按钮确认弹窗
+            var loading = layer.load(1, {shade: [0.8, '#393D49'], time: 0});
+            var url = "changeRechargeAddress?type=2&uid=" + $("#uid").val();
+            $.ajax({
+                url: url, // url---->地址
+                type: "GET", // type ---> 请求方式
+                async: true, // async----> 同步：false，异步：true
+                success: function (result) {
+                    //console.log(result);
+                    if (result.code == 0) {
+
+                        $('input[name=bsc_address]').val(result.data.recharge_address);
+                        layer.msg(result.msg, {icon: 1});
+                    } else {
+                        layer.msg(result.msg, {icon: 5});
+                    }
+                    layer.close(loading);
+                    //var index2 = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+                    parent.layer.close(index2);
+                }
+            });
+        })
+    });
+
+    function showTips(obj, type = 1, tips = 4) {
+        let tip_msg = "";
+        switch (type) {
+            case 1:
+                tip_msg = "总代理邀请的一级下级都自动成为代理";
+                break;
+            case 2:
+                tip_msg = "信用分和用户收益有关，用户做任务收益=等级收益x信用分%";
+
+        }
+        layer.tips(tip_msg, obj, {tips: [tips, 'gray'], time: 60000});
+    }
+
+    function close_tips() {
+        layer.closeAll('tips');
+    }
+
+</script>
+</body>
+</html>

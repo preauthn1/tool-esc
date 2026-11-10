@@ -1,0 +1,109 @@
+{include file="header" /}
+    <!-- Panel Other -->
+    <div class="ibox float-e-margins">
+        <div class="ibox-title">
+            <h5>{:lang("邀请有效用户-领奖倍数")}</h5>
+        </div>
+        <div class="ibox-content">
+            <div class="form-group pull-left">
+                {if authCheck('activitynew_multiplier/add')}
+                <a id="add" href="{:url('add')}">
+                    <button class="btn btn-outline btn-primary" type="button">{:lang("添加")}</button>
+                </a>
+                {/if}
+            </div>
+            <form id='commentForm' role="form" method="post" class="form-inline pull-right">
+                <div class="content clearfix m-b">
+                    <div class="form-group">
+                        <label>{:lang("用户名称")}：</label>
+                        <input type="text" class="form-control" id="username" name="user_name" placeholder="{:lang('用户账户/用户ID')}">
+                        <input type="text" id="activity_id" name="activity_id" value="{$activity_id}" style="display: none" >
+                    </div>
+                    <div class="form-group">
+                        <button class="btn btn-primary" type="button" style="margin-top:5px" id="search"><strong>{:lang('搜索')}</strong>
+                        </button>
+                    </div>
+                </div>
+            </form>
+            <div class="example-wrap">
+                <div class="example">
+                    <table id="cusTable">
+                        <thead>
+                        <th data-field="id">{:lang("用户 ID")}</th>
+                        <th data-field="user_name">{:lang("用户名称")}</th>
+                        <th data-field="reward_multiplier">{:lang("倍数")}</th>
+                        <th data-field="reward">{:lang("奖励")}</th>
+                        <th data-field="operate">{:lang("操作")}</th>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+            <!-- End Example Pagination -->
+        </div>
+    </div>
+    
+<script type="text/javascript">
+    function queryParams(params) {   //设置查询参数
+        params.activity_id= $('#activity_id').val(); 
+        params.username = $('#username').val();
+        return params;
+    }
+    
+    function del(id) {
+        layer.confirm('{:lang("确定要删除吗？")}', function(index){
+            $.ajax({
+                url: "{:url('del')}",
+                type: 'POST',
+                data: {id: id},
+                dataType: 'json',
+                success: function(res){
+                    if(res.code == 1){
+                        layer.msg(res.msg, {icon: 1, time: 1000}, function(){
+                            initTable();
+                        });
+                    }else{
+                        layer.msg(res.msg, {icon: 2});
+                    }
+                },
+                error: function(){
+                    layer.msg('{:lang("请求失败")}', {icon: 2});
+                }
+            });
+            layer.close(index);
+        });
+    }
+
+    $(document).ready(function () {
+        initTable();
+        //当点击查询按钮的时候执行
+        $("#search").bind("click", initTable);
+    });
+
+    function onLoadSuccess(res) {
+        $("#add").on('click', function (e) {
+            add(e.currentTarget.href)
+            return false;
+        });
+        $("td a").on('click', function (e) {
+            console.warn(e.currentTarget.href)
+            if (e.currentTarget.href.indexOf('javascript') === -1) {
+                add(e.currentTarget.href);
+                return false;
+            }
+            return true;
+        });
+    }
+
+    function add(url){
+        // Use layer popup like in articles page
+        layer.open({
+            type: 2,
+            area: ['50%', '50%'],
+            title: '添加/编辑',
+            maxmin: true, // 允许全屏最小化
+            anim: 0, // 0-6 的动画形式，-1 不开启
+            content: url
+        });
+    }
+</script>
+{include file="footer" /}

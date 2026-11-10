@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>系统设置</title>
+    <link rel="shortcut icon" href="{$admin_icon|toMedia}">
+    <link href="/static/admin/css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
+    <link href="/static/admin/css/font-awesome.min.css?v=4.4.0" rel="stylesheet">
+    <link href="/static/admin/css/animate.min.css" rel="stylesheet">
+    <link href="/static/admin/css/plugins/iCheck/custom.css" rel="stylesheet">
+    <link href="/static/admin/css/style.min.css?v=4.1.0" rel="stylesheet">
+    <link href="/static/admin/js/plugins/bootstrap-tagsinput/bootstrap-tagsinput.css" rel="stylesheet">
+    <link href="/static/admin/js/layui/css/layui.css" rel="stylesheet">
+</head>
+<form class="form-horizontal" role="form" method="post" action="{:url('config/index')}">
+    <div class="form-group">
+        <label class="col-sm-2 control-label">{:lang('广告位弹窗配置')}：</label>
+        <div class="col-sm-10">
+            <div class="finance-product-container">
+                <!-- 已有产品配置 -->
+                {volist name="finance_product_data" id="item" key="group_index"}
+                <div class="product-group" data-index="{$group_index-1}">
+                    <div class="input-group mb-3">
+                        <span class="input-group-addon">{:lang('标题')}</span>
+                        <input type="text" class="form-control" name="title[]" value="{$item.title}" placeholder="{:lang('请输入标题')}">
+                        <span class="input-group-addon">
+                            <label class="checkbox-inline">
+                                <input type="checkbox" name="enabled[]" value="1" {if isset($item.enabled) && $item.enabled}checked{/if}> {:lang('启用')}
+                            </label>
+                        </span>
+                        <span class="input-group-btn">
+                            <button type="button" class="btn btn-danger remove-group">{:lang('删除')}</button>
+                        </span>
+                    </div>
+                    <div class="content-list">
+                        {volist name="item.content" id="content_item" key="content_index"}
+                        <div class="input-group mb-2">
+                            <span class="input-group-addon">{:lang('内容项')}</span>
+                            <input type="text" class="form-control" name="content[{$group_index-1}][]" value="{$content_item}" placeholder="{:lang('请输入内容项')}">
+                            <span class="input-group-btn">
+                                <button type="button" class="btn btn-danger remove-content">{:lang('删除')}</button>
+                            </span>
+                        </div>
+                        {/volist}
+                        <div class="input-group mb-2">
+                            <button type="button" class="btn btn-info btn-sm add-content" data-group="{$group_index-1}">{:lang('添加内容项')}</button>
+                        </div>
+                    </div>
+                    <hr>
+                </div>
+                {/volist}
+            </div>
+            <div class="mt-3">
+                <button type="button" class="btn btn-primary add-product-group">{:lang('添加')}</button>
+            </div>
+            <!-- 添加隐藏字段，用于存储合并后的数据 -->
+            <input type="hidden" name="finance_product_data" id="finance_product_data" value="">
+        </div>
+    </div>
+
+    <!-- 添加提交按钮 -->
+    <div class="form-group">
+        <div class="col-sm-4 col-sm-offset-6">
+            <button type="button" id="submitBtn" class="btn btn-primary">{:lang('保存')}</button>
+        </div>
+    </div>
+</form>
+
+<script src="/static/admin/js/jquery.min.js?v=2.1.4"></script>
+<script src="/static/admin/js/layui/layui.js"></script>
+<script type="text/javascript">
+$(function() {
+    // 计算当前最大分组索引
+    let groupIndex = $('.product-group').length;
+
+    // 添加产品分组
+    $('.add-product-group').on('click', function() {
+        const html = `
+            <div class="product-group" data-index="${groupIndex}">
+                <div class="input-group mb-3">
+                    <span class="input-group-addon">{:lang('标题')}</span>
+                    <input type="text" class="form-control" name="title[]" placeholder="{:lang('请输入标题')}">
+                    <span class="input-group-addon">
+                        <label class="checkbox-inline">
+                            <input type="checkbox" name="enabled[]" value="1" checked> {:lang('启用')}
+                        </label>
+                    </span>
+                    <span class="input-group-btn">
+                        <button type="button" class="btn btn-danger remove-group">{:lang('删除')}</button>
+                    </span>
+                </div>
+                <div class="content-list">
+                    <div class="input-group mb-2">
+                        <span class="input-group-addon">{:lang('内容项')}</span>
+                        <input type="text" class="form-control" name="content[${groupIndex}][]" placeholder="{:lang('请输入内容项')}">
+                        <span class="input-group-btn">
+                            <button type="button" class="btn btn-danger remove-content">{:lang('删除')}</button>
+                        </span>
+                    </div>
+                    <div class="input-group mb-2">
+                        <button type="button" class="btn btn-info btn-sm add-content" data-group="${groupIndex}">{:lang('添加内容项')}</button>
+                    </div>
+                </div>
+                <hr>
+            </div>
+        `;
+        $('.finance-product-container').append(html);
+        groupIndex++;
+    });
+
+    // 添加内容项
+    $(document).on('click', '.add-content', function() {
+        const groupIndex = $(this).data('group');
+        const contentHtml = `
+            <div class="input-group mb-2">
+                <span class="input-group-addon">{:lang('内容项')}</span>
+                <input type="text" class="form-control" name="content[${groupIndex}][]" placeholder="{:lang('请输入内容项')}">
+                <span class="input-group-btn">
+                    <button type="button" class="btn btn-danger remove-content">{:lang('删除')}</button>
+                </span>
+            </div>
+        `;
+        $(this).closest('.content-list').find('.add-content').before(contentHtml);
+    });
+
+    // 删除内容项
+    $(document).on('click', '.remove-content', function() {
+        $(this).closest('.input-group').remove();
+    });
+
+    // 删除产品分组
+    $(document).on('click', '.remove-group', function() {
+        $(this).closest('.product-group').remove();
+    });
+
+    // 修改表单提交事件为AJAX提交
+    $('#submitBtn').on('click', function() {
+        // 合并广告位数据
+        mergeFinanceProductData();
+
+        // 获取表单数据
+        var formData = $('form').serialize();
+
+        // 显示加载提示
+        var loadIndex = layer.load(1, {
+            shade: [0.3, '#fff']
+        });
+
+        // 发送AJAX请求
+        $.ajax({
+            url: '{:url("config/index")}',
+            type: 'POST',
+            data: formData,
+            dataType: 'json',
+            success: function(res) {
+                layer.close(loadIndex);
+                if (res.code == 1) {
+                    layer.msg(res.msg || '保存成功', {icon: 1, time: 1500}, function() {
+                        // 如果需要刷新页面或跳转，可以在这里添加代码
+                        // 例如：window.location.reload();
+                    });
+                } else {
+                    layer.msg(res.msg || '保存失败', {icon: 2});
+                }
+            },
+            error: function() {
+                layer.close(loadIndex);
+                layer.msg('网络错误，请稍后重试', {icon: 2});
+            }
+        });
+    });
+
+    // 在表单提交前合并广告位数据
+    function mergeFinanceProductData() {
+        let productData = [];
+
+        // 遍历所有产品组
+        $('.product-group').each(function() {
+            const groupIndex = $(this).data('index');
+            const title = $(this).find('input[name="title[]"]').val();
+            const enabled = $(this).find('input[name="enabled[]"]').is(':checked') ? 1 : 0;
+            let contentItems = [];
+
+            // 获取该组的所有内容项
+            $(this).find('input[name^="content["]').each(function() {
+                if ($(this).val().trim() !== '') {
+                    contentItems.push($(this).val());
+                }
+            });
+
+            // 只有标题不为空时才添加到数组
+            if (title && title.trim() !== '') {
+                productData.push({
+                    title: title,
+                    enabled: enabled,
+                    content: contentItems
+                });
+            }
+        });
+
+        // 将合并后的数据存入隐藏字段
+        $('#finance_product_data').val(JSON.stringify(productData));
+    }
+});
+</script>

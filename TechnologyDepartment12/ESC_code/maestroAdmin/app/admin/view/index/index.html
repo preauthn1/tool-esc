@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{:lang('后台首页')}</title>
+    <link href="/static/admin/css/style.min.css?v=4.1.0" rel="stylesheet">
+    <link href="/static/admin/css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
+    <link href="/static/admin/css/font-awesome.min.css?v=4.7.0" rel="stylesheet">
+    <script src="/static/admin/js/jquery.min.js?v=2.1.4"></script>
+    <script src="/static/admin/js/bootstrap.min.js?v=3.3.6"></script>
+</head>
+<body class="gray-bg">
+<div class="wrapper wrapper-content container-fluid">
+    <div class="row white-bg p-md p-xl">
+        {if !$isAuthy}
+        <div class="alert alert-info" role="alert">
+            {:lang('您还未绑定谷歌验证码，为了您的账号安全')}
+            <a class="btn btn-link" href='{:url("index/authy")}'>{:lang('立即绑定')}</a>
+        </div>
+        {/if}
+        <div class="alert alert-warning" role="alert">
+            {:lang('数据缓存10分钟, 请勿随意清理缓存，会影响访问速度')}
+            <a class="btn btn-link" href='{:url("indexPage", ["clear" => 1])}' onclick="this.innerText='{:lang('清理中')}...'">{:lang('清理缓存')}</a>
+            <a class="btn btn-danger allQuery" href='javascript:;'>{:lang('一键查询')}</a>
+        </div>
+        {volist name='stats' id='row'}
+        <div class="col-md-4 col-xs-6 col-lg-3">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="panel-title">
+                        {$row.title|lang} {if isset($row.tips)} <i class="fa fa-question-circle-o" data-toggle="tooltip" title="{$row.tips|lang}"></i>{/if}
+                        <span class="label label-{$row.type} pull-right">{$row.label|lang}</span>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    {if $row.value !== ''}{$row.value|raw}{else}<a class="query" data-key="{$row.key}">{:lang('查询')}</a>{/if}
+                </div>
+            </div>
+        </div>
+        {/volist}
+    </div>
+</div>
+<script>
+$('[data-toggle="tooltip"]').tooltip();
+$(".query").on('click', function(){
+    var _this = $(this);
+    if (_this.hasClass('loading')) {
+        return;
+    }
+    _this.addClass('loading');
+    _this.prepend('<i class="fa fa-spinner fa-pulse"></i> ');
+
+    var key = $(this).data('key')
+    $.ajax({
+        url:'{:url("query")}',
+        dataType:"JSON",
+        data:{type:key},
+        success:function(res){
+            _this.removeClass('loading').find('i').remove();
+            if(res.code === 1) {
+                _this.parent().html(res.data);
+            }else{
+                layer.msg(res.msg);
+            }
+        }
+    })
+});
+$(".allQuery").on('click', function(){
+    var _this = $(this);
+    if (_this.hasClass('loading')) {
+        return;
+    }
+    _this.addClass('loading');
+    _this.prepend('<i class="fa fa-spinner fa-pulse"></i> ');
+    var delay = 0;
+    $(".query").each(function(){
+        var self = $(this);
+        window.setTimeout(function(){
+            self.click();
+        }, delay);
+        delay += 200;
+    });
+    window.setTimeout(function(){
+        $(".allQuery").removeClass('loading').find('i').remove();
+    }, delay + 2000);
+});
+</script>
+</body>
+</html>

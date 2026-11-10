@@ -1,0 +1,154 @@
+{include file="header" /}
+    <!-- Panel Other -->
+    <div class="ibox float-e-margins">
+        <div class="ibox-title">
+            <h5>广告位购买计划配置</h5>
+        </div>
+        <div class="ibox-content">
+            <div class="form-group clearfix col-sm-1">
+                <button class="btn btn-outline btn-primary" type="button" id="addPlanBtn">添加计划</button>
+            </div>
+
+            <div class="example-wrap">
+                <div class="example">
+                    <div id="planTable" lay-filter="planTable"></div>
+                </div>
+            </div>
+            <!-- End Example Pagination -->
+        </div>
+    </div>
+
+    <!-- Operation toolbar template -->
+    <script type="text/html" id="operationBar">
+        <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+    </script>
+
+    <!-- Status switch template -->
+    <script type="text/html" id="statusSwitch">
+        <input type="checkbox" name="status" value="{{d.id}}" lay-skin="switch" lay-text="启用|禁用" lay-filter="statusSwitch" {{ d.status == 1 ? 'checked' : '' }}>
+    </script>
+
+<script type="text/javascript">
+    layui.use(['table', 'form', 'layer'], function(){
+        var table = layui.table,
+            form = layui.form,
+            layer = layui.layer;
+
+        // Initialize Layui table with AJAX loading
+        var planTable = table.render({
+            elem: '#planTable',
+            url: '{:url("ad_plan/getList")}', // Load data via AJAX
+            method: 'post',
+            page: true, // Enable pagination
+            limits: [10, 20, 50, 100],
+            limit: 10, // Default is 10 items per page
+            cols: [[
+                {field: 'name', title: '计划名称'},
+                {field: 'period', title: '计划周期'},
+                {field: 'next_plan', title: '下一个计划'},
+                {field: 'sort', title: '排序'},
+                {field: 'status', title: '状态', templet: '#statusSwitch', width: 100},
+                {title: '操作', toolbar: '#operationBar', width: 150}
+            ]],
+            response: {
+                statusCode: 0 // Set the response status code that represents success
+            },
+            parseData: function(res){ // Parse incoming data from server
+                return {
+                    "code": res.code,
+                    "msg": res.msg,
+                    "count": res.count,
+                    "data": res.data
+                };
+            },
+            done: function(res, curr, count){
+                onLoadSuccess(res);
+            }
+        });
+
+        // 检查是否需要刷新表格（从编辑页面返回）
+        if (localStorage.getItem('adPlanNeedRefresh') === 'true') {
+            // 清除标记
+            localStorage.removeItem('adPlanNeedRefresh');
+            // 重新加载表格数据
+            table.reload('planTable');
+        }
+
+        // Handle table events
+        table.on('tool(planTable)', function(obj){
+            var data = obj.data;
+            if(obj.event === 'edit'){
+                // Open in layer popup instead of redirecting
+                add("{:url('ad_plan/edit')}?id=" + data.id);
+            } else if(obj.event === 'del'){
+                // Check if the plan is enabled
+                if(data.status == 1){
+                    layer.msg('启用状态的计划不允许删除', {icon: 2});
+                    return;
+                }
+
+                layer.confirm('确认删除该计划吗？', function(index){
+                    // Call delete API
+                    $.ajax({
+                        url: "{:url('ad_plan/delete')}",
+                        type: 'POST',
+                        data: {id: data.id},
+                        success: function(res){
+                            if(res.code === 1){
+                                layer.msg(res.msg, {icon: 1});
+                                // Instead of just removing the row, reload the entire table
+                                table.reload('planTable');
+                            } else {
+                                layer.msg(res.msg, {icon: 2});
+                            }
+                        }
+                    });
+                    layer.close(index);
+                });
+            }
+        });
+
+        // Status switch event
+        form.on('switch(statusSwitch)', function(obj){
+            var id = this.value;
+            $.ajax({
+                url: "{:url('ad_plan/changeStatus')}",
+                type: 'POST',
+                data: {id: id, status: obj.elem.checked ? 1 : 0},
+                success: function(res){
+                    layer.msg(res.msg);
+                }
+            });
+        });
+
+        // Add plan button event
+        $('#addPlanBtn').on('click', function(){
+            add("{:url('ad_plan/edit')}");
+        });
+
+        // Add onLoadSuccess function to handle dynamically added links
+        function onLoadSuccess(res) {
+            $("td a").on('click', function (e) {
+               if (e.currentTarget.href && e.currentTarget.href.indexOf('edit') !== -1) {
+                    add(e.currentTarget.href);
+                    return false;
+                }
+                return true;
+            });
+        }
+
+        function add(url){
+            // Use layer popup like in articles page
+            layer.open({
+                type: 2,
+                area: ['100%', '100%'],
+                title: '添加/编辑',
+                maxmin: true, // 允许全屏最小化
+                anim: 0, // 0-6 的动画形式，-1 不开启
+                content: url
+            });
+        }
+    });
+</script>
+{include file="footer" /}

@@ -1,0 +1,13 @@
+
+<div class="form-group">
+    <label class="col-sm-3 control-label">{:lang("APP入口/落地")}：</label>
+    <div class="input-group col-sm-4">
+        <textarea style="font-size: 20px;" class="form-control" name="app_entry_domain"rows='1'>{$config['app_entry_domain']|default=''}</textarea>
+        <p class="help-block">每行设置一个，格式：入口|落地，不需要 https://, 如：baidu.com|google.com 表示 访问 baidu.com 会跳转 google.com</p>
+    </div>
+    <label class="col-sm-3 control-label">{:lang("入口/落地域名")}：</label>
+    <div class="input-group col-sm-4">
+        <textarea style="font-size: 20px;" class="form-control" name="entry_domain" id="entry_domain" rows='15'>{$config['entry_domain']|default=''}</textarea>
+        <p class="help-block">每行设置一个，格式：入口|落地，不需要 https://, 如：baidu.com|google.com 表示 访问 baidu.com 会跳转 google.com</p>
+    </div>
+</div>

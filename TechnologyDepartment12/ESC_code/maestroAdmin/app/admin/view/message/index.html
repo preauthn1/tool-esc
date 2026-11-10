@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>在线客服</title>
+    <link rel="shortcut icon" href="{$admin_icon|toMedia}">
+    <link href="/static/admin/css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
+    <link href="/static/admin/css/font-awesome.min.css?v=4.4.0" rel="stylesheet">
+    <link href="/static/admin/css/plugins/bootstrap-table/bootstrap-table.min.css" rel="stylesheet">
+    <link href="/static/admin/css/animate.min.css" rel="stylesheet">
+    <link href="/static/admin/css/style.min.css?v=4.1.0" rel="stylesheet">
+    <link href="/static/admin/css/plugins/sweetalert/sweetalert.css" rel="stylesheet">
+    <link type="text/css" rel="stylesheet" href="/static/libs/bmbIframe/bmbIframe.css?{:css_version()}" />
+
+    <style>
+        .operateBox{
+            padding: 10px 15px;
+        }
+    </style>
+</head>
+<body class="gray-bg">
+<div class="wrapper wrapper-content animated fadeInRight">
+    <!-- Panel Other -->
+    <div class="ibox float-e-margins">
+        <div class="ibox-title">
+            <h5>{:lang("在线客服")}</h5>
+        </div>
+        <div class="ibox-content">
+
+            <div class="form-group clearfix col-sm-4">
+                <strong><span id='refreshTime' style='color:red'>10</span>{:lang("秒后刷新")}</strong>
+                <a id='startStopRefresh' class='btn btn-danger btn-xs'>{:lang("停止")}</a>
+            </div>
+            <!--搜索框开始-->
+            <form id='commentForm' role="form" method="post" class="form-inline pull-right" target="_blank">
+                <div class="content clearfix m-b">
+                    <div class="form-group">
+                        <label>{:lang("搜索")}：</label>
+                        <input type="text" class="form-control" id="realname" name="searchText" placeholder="用户账号">
+                    </div>
+                    <div class="form-group">
+                        <button class="btn btn-primary" type="button" style="margin-top:5px" id="search"><strong>{:lang('搜索')}</strong></button>
+                    </div>
+                </div>
+            </form>
+            <!--搜索框结束-->
+            <div class="example-wrap">
+                <div class="example">
+                    <table id="cusTable" class="table table-condensed table-striped table-hover table-bordered">
+                        <thead>
+                            <tr>
+                                <th data-field="user_id">{:lang("用户ID")}</th>
+                                <th data-field="mobile">{:lang("用户账号")}</th>
+                                <th data-field="message.content" data-formatter="contentFormatter">{:lang("消息内容")}</th>
+                                <th data-field="reply.content">{:lang("管理员回复内容")}</th>
+                                <th data-field="message.create_time">{:lang("发送时间")}</th>
+                                <th data-field="message.ip">{:lang("IP地址")}</th>
+                                <th data-field="reply.create_time">{:lang("回复时间")}</th>
+                                <th data-field="operate" data-formatter="operateFormatter">{:lang("操作")}</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+            <!-- End Example Pagination -->
+        </div>
+    </div>
+</div>
+<div class="modal" id="bmbModal">
+    <div class="modal-dialog">
+        <div class="modal-content bmd-modalContent">
+
+            <div class="modal-body">
+                <div class="close-button">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                </div>
+                <div class="embed-responsive embed-responsive-16by9">
+                    <iframe class="embed-responsive-item" frameborder="0"></iframe>
+                </div>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<script src="/static/admin/js/jquery.min.js?v=2.1.4"></script>
+<script src="/static/admin/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="/static/admin/js/content.min.js?v=1.0.0"></script>
+<script src="/static/admin/js/plugins/bootstrap-table/bootstrap-table.min.js"></script>
+<script src="/static/admin/js/plugins/bootstrap-table/bootstrap-table-mobile.min.js"></script>
+<script src="/static/admin/js/plugins/bootstrap-table/locale/bootstrap-table-zh-CN.min.js"></script>
+<script src="/static/admin/js/plugins/suggest/bootstrap-suggest.min.js"></script>
+<script src="/static/admin/js/plugins/sweetalert/sweetalert.min.js"></script>
+<script src="/static/admin/js/plugins/layer3/layer.js"></script>
+<script src="/static/admin/js/layui/layui.js"></script>
+<script src="/static/libs/bmbIframe/jquery.bmbIframe.js"></script>
+<script src="/static/admin/js/common.js"></script>
+<script type="text/javascript">
+    function operateFormatter(value, row, index) {
+        return [
+            '<button class="btn btn-primary bmd-modalButton toggle-tooltip" data-toggle="modal" data-bmdSrc="'+row.chat_url+'" data-bmdWidth="750" data-bmdHeight="500" data-target="#bmbModal" title="回复"><i class="fa fa-commenting"></i></button>',
+        ].join('');
+    }
+    function contentFormatter(val, row, index) {
+        return '<p class="bmd-modalButton" style="margin:0; '+row.style+'" data-toggle="modal" data-bmdSrc="'+row.chat_url+'" data-bmdWidth="750" data-bmdHeight="500" data-target="#bmbModal">'+val+'</p>'
+    }
+    var $table = $('#cusTable');
+    function initTable() {
+        //先销毁表格
+        $table.bootstrapTable('destroy');
+        //初始化表格,动态从服务器加载数据
+        $table.bootstrapTable({
+            method: "get",  //使用get请求到服务器获取数据
+            url: "./index", //获取数据的地址
+            striped: true,  //表格显示条纹
+            pagination: true, //启动分页
+            pageSize: 10,  //每页显示的记录数
+            pageNumber:1, //当前第几页
+            pageList: [10, 30, 50],  //记录数可选列表
+            sidePagination: "server", //表示服务端请求
+            paginationFirstText: "{:lang('首页')}",
+            paginationPreText: "{:lang('上一页')}",
+            paginationNextText: "{:lang('下一页')}",
+            paginationLastText: "{:lang('尾页')}",
+            queryParamsType : "undefined",
+            queryParams: function queryParams(params) {   //设置查询参数
+                params.searchText = $('#realname').val();
+                return params;
+            },
+            onLoadSuccess: function(res){  //加载成功时执行
+                if(111 == res.code){
+                    window.location.reload();
+                }
+                layer.msg("{:lang('加载成功')}", {time : 1000});
+            },
+            onLoadError: function(){  //加载失败时执行
+                layer.msg("{:lang('加载数据失败')}");
+            }
+        });
+    }
+
+    var refreshTime = 10, refreshTimer, refreshAuto = true;
+    function refreshAutoFunc() {
+        if(refreshAuto) {
+            refreshTimer = window.setInterval(function() {
+                if(refreshTime <= 0) {
+                    refreshTime = 10;
+                    initTable();
+                }else{
+                    refreshTime--;
+                    $("#refreshTime").text(refreshTime);
+                }
+            }, 1000);
+            $("#startStopRefresh").text("{:lang('停止')}");
+        }else{
+            window.clearInterval(refreshTimer);
+            $("#startStopRefresh").text("{:lang('开始')}");
+        }
+    }
+    $(document).ready(function () {
+        //调用函数，初始化表格
+        initTable();
+        //当点击查询按钮的时候执行
+        $("#search").bind("click", initTable);
+
+        refreshAutoFunc();
+        $(document).on("click", "#startStopRefresh", function() {
+            refreshAuto = !refreshAuto;
+            refreshAutoFunc();
+        });
+    });
+</script>
+</body>
+</html>

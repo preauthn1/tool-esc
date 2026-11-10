@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>平台规模配置</title>
+    <link rel="shortcut icon" href="{$admin_icon|toMedia}">
+    <link href="/static/admin/css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
+    <link href="/static/admin/css/font-awesome.min.css?v=4.4.0" rel="stylesheet">
+    <link href="/static/admin/css/animate.min.css" rel="stylesheet">
+    <link href="/static/admin/css/style.min.css?v=4.1.0" rel="stylesheet">
+    <link href="/static/admin/js/layui/css/layui.css" rel="stylesheet">
+</head>
+<form class="form-horizontal" role="form" method="post" action="{:url('config/index')}">
+    <div class="form-group">
+        <label class="col-sm-2 control-label">{:lang('平台规模配置')}：</label>
+        <div class="col-sm-10">
+            <div class="platform-scale-container">
+                <!-- 每日广告展示次数 -->
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">{:lang('每日广告展示次数')}：</label>
+                    <div class="col-sm-9">
+                        <input type="text" class="form-control" name="daily_impressions"
+                               value="{$platform_scale_data.daily_impressions|default=''}"
+                               placeholder="{:lang('例如: 1,000,000+')}">
+                    </div>
+                </div>
+
+                <!-- 每日处理的数据量 -->
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">{:lang('每日处理的数据量')}：</label>
+                    <div class="col-sm-9">
+                        <input type="text" class="form-control" name="daily_data_volume"
+                               value="{$platform_scale_data.daily_data_volume|default=''}"
+                               placeholder="{:lang('例如: 5TB/日')}">
+                    </div>
+                </div>
+
+                <!-- 办公地点 -->
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">{:lang('办公地点')}：</label>
+                    <div class="col-sm-9">
+                        <input type="text" class="form-control" name="office_locations"
+                               value="{$platform_scale_data.office_locations|default=''}"
+                               placeholder="{:lang('例如: 50+')}">
+                    </div>
+                </div>
+
+                <!-- 广告主投标金额 -->
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">{:lang('广告主投标金额')}：</label>
+                    <div class="col-sm-9">
+                        <input type="text" class="form-control" name="advertiser_bid_amount"
+                               value="{$platform_scale_data.advertiser_bid_amount|default=''}"
+                               placeholder="{:lang('例如: ¥100,000,000+')}">
+                    </div>
+                </div>
+
+                <!-- 直接发行商 -->
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">{:lang('直接发行商')}：</label>
+                    <div class="col-sm-9">
+                        <input type="text" class="form-control" name="direct_publishers"
+                               value="{$platform_scale_data.direct_publishers|default=''}"
+                               placeholder="{:lang('例如: 50+')}">
+                    </div>
+                </div>
+
+                <!-- 数据中心 -->
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">{:lang('数据中心')}：</label>
+                    <div class="col-sm-9">
+                        <input type="text" class="form-control" name="data_centers"
+                               value="{$platform_scale_data.data_centers|default=''}"
+                               placeholder="{:lang('例如: 50+')}">
+                    </div>
+                </div>
+                <!-- 数据中心 -->
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">{:lang('截止日期')}：</label>
+                    <div class="col-sm-9">
+                        <input type="text" class="form-control" name="deadline"
+                               value="{$platform_scale_data.deadline|default=''}"
+                               placeholder="{:lang('例如: 截止2025年3月11日')}">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 添加提交按钮 -->
+    <div class="form-group">
+        <div class="col-sm-4 col-sm-offset-6">
+            <button type="button" id="submitBtn" class="btn btn-primary">{:lang('保存')}</button>
+        </div>
+    </div>
+
+    <!-- 添加隐藏字段，用于存储合并后的数据 -->
+    <input type="hidden" name="platform_scale_data" id="platform_scale_data" value="">
+</form>
+
+<script src="/static/admin/js/jquery.min.js?v=2.1.4"></script>
+<script src="/static/admin/js/layui/layui.js"></script>
+<script type="text/javascript">
+$(function() {
+    // 表单提交
+    $('#submitBtn').on('click', function() {
+        // 合并平台规模数据
+        mergePlatformScaleData();
+
+        // 获取表单数据
+        var formData = $('form').serialize();
+
+        // 显示加载提示
+        var loadIndex = layer.load(1, {
+            shade: [0.3, '#fff']
+        });
+
+        // 发送AJAX请求
+        $.ajax({
+            url: '{:url("config/index")}',
+            type: 'POST',
+            data: formData,
+            dataType: 'json',
+            success: function(res) {
+                layer.close(loadIndex);
+                if (res.code == 1) {
+                    layer.msg(res.msg || '保存成功', {icon: 1, time: 1500}, function() {
+                        // 保存成功后的操作
+                    });
+                } else {
+                    layer.msg(res.msg || '保存失败', {icon: 2});
+                }
+            },
+            error: function() {
+                layer.close(loadIndex);
+                layer.msg('网络错误，请稍后重试', {icon: 2});
+            }
+        });
+    });
+
+    // 在表单提交前合并平台规模数据
+    function mergePlatformScaleData() {
+        let scaleData = {
+            daily_impressions: $('input[name="daily_impressions"]').val(),
+            daily_data_volume: $('input[name="daily_data_volume"]').val(),
+            advertiser_bid_amount: $('input[name="advertiser_bid_amount"]').val(),
+            direct_publishers: $('input[name="direct_publishers"]').val(),
+            office_locations: $('input[name="office_locations"]').val(),
+            data_centers: $('input[name="data_centers"]').val(),
+            deadline: $('input[name="deadline"]').val(),
+        };
+
+        // 将合并后的数据存入隐藏字段
+        $('#platform_scale_data').val(JSON.stringify(scaleData));
+    }
+});
+</script>

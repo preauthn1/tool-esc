@@ -1,0 +1,868 @@
+{include file="header" /}
+<div class="row animated fadeInRight">
+    <div class="col-sm-10">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h5>{:lang("添加")}</h5>
+            </div>
+            <div class="ibox-content">
+                <style>
+                    /* 设置表单标签宽度为100px */
+                    .layui-form-label {
+                        width: 100px;
+                    }
+
+                    .layui-table th,
+                    .layui-table td {
+                        text-align: center;
+                    }
+
+                    .invalid {
+                        border: 1px solid red;
+                    }
+
+                    .layui-form-hidden {
+                        padding: 20px;
+                    }
+                </style>
+                <form class="layui-form" method="post" action="{:url('add')}">
+                    <input type="hidden" name="id" value="{$info.id|default=0}"/>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">{:lang("活动标题")}</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="title" value="{$info.title|default=''}" lay-verify="required"
+                                   placeholder="请输入" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <div class="layui-inline">
+                            <label class="layui-form-label">{:lang("活动图片")}</label>
+                            <input name="thumb" id="img" value="{$info.thumb|default=''}" type="hidden"/>
+                            <div class="layui-input-block">
+                                <div style="display: flex;">
+                                    <button type="button" class="layui-btn" id="uploader">
+                                        <i class="layui-icon">&#xe67c;</i>{:lang("上传图片")}
+                                    </button>
+                                    <div id="sm" style="margin-left: 30px;">{if isset($info.thumb) && $info.thumb}<img
+                                            src="{$info.thumb|default=''|toMedia}" style="width:40px; height: 40px;"/>{/if}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">{:lang("活动时间")}</label>
+                        <div class="layui-input-block">
+                            <div id="ID-laydate-rangeLinked" style="display: flex;">
+                                <input type="text" class="form-control" value="{$info.start_time|default=''}"
+                                       id="start_time" name="start_time" placeholder="yyyy-MM-dd HH:mm:ss"
+                                       autocomplete="off" style="width: 170px;">
+                                <div class=" text-center" style="width: 20px; align-content: center">
+                                    -
+                                </div>
+                                <input type="text" class="form-control" value="{$info.end_time|default=''}"
+                                       id="end_time" name="end_time" placeholder="yyyy-MM-dd HH:mm:ss"
+                                       autocomplete="off" style="width: 170px;">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">{:lang("活动类型")}</label>
+                        <div class="layui-input-block">
+                            <select name="type" lay-filter="type">
+                                <option value="">选择活动类型</option>
+                                {volist name='activity_new_type' id='name'}
+                                <option value="{$key}" {if isset($info.type) && $info.type eq $key} selected {/if}>{$name}</option>
+                                {/volist}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="layui-form-item activity_amount_threshold"
+                         style="{if isset($info.type) && ($info.type == 7||$info.type == 9)} display:none; {/if}">
+                        <div class="layui-inline">
+                            <label class="layui-form-label">{:lang("活动设置")}</label>
+                            <div class="layui-input-block">
+                                <div style="display: flex;">
+                                    <button type="button" class="layui-btn" id="activity_amount_threshold">
+                                        {:lang("设置活动金额门槛")}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">{:lang("奖品类型")}</label>
+                        <div class="layui-input-block">
+                            <select name="reward_type" lay-filter="reward_type">
+                                {volist name='activity_reward_type' id='name'}
+                                <option value="{$key}" {if isset($info.reward_type) && $info.reward_type eq $key}
+                                        selected {
+                                /if}>{$name}</option>
+                                {/volist}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="layui-form-item reward"
+                         style="{if isset($info.type) && ($info.type == 8 || $info.type == 9)}display:none; {/if}">
+                        <label class="layui-form-label">{:lang("奖金")}</label>
+                        <div class="layui-input-block">
+                            <input type="number" min="0" name="reward" value="{$info.reward|default='0'}"
+                                   placeholder="请输入" autocomplete="off" class="layui-input">
+                        </div>
+                        <!-- 新增：设置奖金倍数按钮（默认隐藏） -->
+                        <div class="layui-input-block multiplier-btn" style="margin-top:10px; display:none;">
+                            <button type="button" class="layui-btn layui-btn-primary" id="setMultiplierBtn">{:lang("设置奖金倍数")}</button>
+                        </div>
+                    </div>
+                    <div class="layui-form-item experience_reward"
+                         style="{if isset($info.type) && $info.type != 9}display:none; {/if}">
+                        <label class="layui-form-label">{:lang("体验金")}</label>
+                        <div class="layui-input-block">
+                            <input type="number" min="0" name="experience_reward" value="{$info.reward|default=''}"
+                                   placeholder="请输入" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item expiration_time_field"
+                         style="{if isset($info.type) && $info.type != 9}display:none; {/if}">
+                        <label class="layui-form-label">{:lang("过期天数")}</label>
+                        <div class="layui-input-block">
+                            <input type="number" min="0" name="expiration_time"
+                                   value="{$info.expiration_time|default=''}" placeholder="请输入体验金过期天数（天）"
+                                   autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">{:lang("状态")}</label>
+                        <div class="layui-input-block">
+                            <input type="checkbox" name="status" value="1" lay-skin="switch" lay-text="启用|禁用" {if
+                                   condition="isset($info.status) && $info.status == 1" }checked{/if}>
+                        </div>
+                    </div>
+
+                    <div class="layui-form-item password"
+                         style="{if isset($info.type) && $info.type != 8 && $info.type != 9}display:none; {/if}">
+                        <label class="layui-form-label"></label>
+                        <div class="layui-input-block">
+                            <table class="layui-table" id="activityTable">
+                                <thead>
+                                <tr>
+                                    <th style="width: 150px;">活动名额</th>
+                                    <th style="width: 200px;">活动解锁编码</th>
+                                    <th style="width: 200px;">编码更新时间</th>
+                                    <th style="width: 150px;">备注</th>
+                                    <th style="width: 150px;">操作</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                            <div style="display: flex; justify-content: center ;align-items: center; margin-top: 10px;">
+                                <button type="button" class="layui-btn layui-bg-blue" id="addRow">+ 添加一行</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">{:lang("活动内容")}</label>
+                        <div class="layui-input-block">
+                            <!-- 编辑器容器 -->
+                            <div id="editor-wrapper">
+                                <div id="toolbar-container"><!-- 工具栏 --></div>
+                                <div id="editor-container"><!-- 编辑器 --></div>
+                            </div>
+                            <textarea type="text" name="content" id="content_textarea" rows="10" class="form-control"
+                                      style="display: none">{$info.content|default=''}</textarea>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <div class="layui-input-block">
+                            <button type="submit" class="layui-btn" lay-submit lay-filter="demo1">提交</button>
+
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>
+<!-- 引入 wangEditor 资源 -->
+<link href="/static/admin/js/plugins/wangeditor/style.css" rel="stylesheet">
+<style>
+    #editor-wrapper {
+        border: 1px solid #ccc;
+        z-index: 100; /* 按需定义 */
+    }
+
+    #toolbar-container {
+        border-bottom: 1px solid #ccc;
+    }
+
+    #editor-container {
+        height: 500px;
+    }
+</style>
+
+<script src="/static/admin/js/plugins/wangeditor/index.js"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        layui.use(['laydate', 'form'], function () {
+            var laydate = layui.laydate;
+            var form = layui.form;
+            var thresholdData;
+
+            // 日期范围 - 左右面板联动选择模式
+            laydate.render({
+                elem: '#ID-laydate-rangeLinked',
+                range: ['#start_time', '#end_time'],
+                rangeLinked: true, // 开启日期范围选择时的区间联动标注模式 ---  2.8+ 新增
+                type: 'datetime',
+                format: 'yyyy-MM-dd HH:mm:ss'
+            });
+
+            form.on('select(type)', function (data) {
+                var elem = data.elem; // 获得 select 原始 DOM 对象
+                var type = data.value; // 获得被选中的值
+                var othis = data.othis; // 获得 select 元素被替换后的 jQuery 对象
+                if (type == 8) {
+                    $(".activity_amount_threshold").show();
+                } else {
+                    $(".activity_amount_threshold").hide();
+                }
+                if (type == 9) {
+                    $(".reward").hide();
+                    $(".experience_reward").show();
+                    $(".expiration_time_field").show();
+                } else {
+                    $(".reward").show();
+                    $(".experience_reward").hide();
+                    $(".expiration_time_field").hide();
+                }
+                if (type == 8 || type == 9) {
+                    $(".password").show();
+                } else {
+                    $(".password").hide();
+                }
+                // 新增：倍数按钮显示控制
+                if (type == 7) {
+                    $(".multiplier-btn").show();
+                } else {
+                    $(".multiplier-btn").hide();
+                }
+            });
+
+            // 页面加载时触发一次，根据当前选中的类型显示对应字段
+            setTimeout(function () {
+                var currentType = $('select[name="type"]').val();
+                if (currentType) {
+                    // 手动调用处理逻辑
+                    var type = currentType;
+                    if (type == 8) {
+                        $(".activity_amount_threshold").show();
+                    } else {
+                        $(".activity_amount_threshold").hide();
+                    }
+                    if (type == 9) {
+                        $(".reward").hide();
+                        $(".experience_reward").show();
+                        $(".expiration_time_field").show();
+                    } else {
+                        $(".reward").show();
+                        $(".experience_reward").hide();
+                        $(".expiration_time_field").hide();
+                    }
+                    if (type == 8 || type == 9) {
+                        $(".password").show();
+                    } else {
+                        $(".password").hide();
+                    }
+                    // 新增：倍数按钮显示控制
+                    if (type == 7) {
+                        $(".multiplier-btn").show();
+                    } else {
+                        $(".multiplier-btn").hide();
+                    }
+                }
+            }, 100);
+
+            // 新增：设置奖金倍数按钮点击事件
+            $('#setMultiplierBtn').on('click', function() {
+                var activityId = $('input[name="id"]').val();
+                if (activityId == 0) {
+                    layer.msg('请先保存活动基本信息', {icon: 2});
+                    return;
+                }
+                var url = '{:url("activitynew_multiplier/index")}?activity_id=' + activityId;
+                layer.open({
+                    type: 2,
+                    area: ['100%', '100%'],
+                    title: '设置奖金倍数',
+                    maxmin: true,
+                    anim: 0,
+                    content: url
+                });
+            });
+
+            form.on('submit(demo1)', function (data) {
+                var loadIndex = layer.load(2); // 显
+                var field = data.field;
+                const rows = tableBody.querySelectorAll('tr');
+                let valid = true;
+
+                rows.forEach(row => {
+                    const inputs = row.querySelectorAll('input.required');
+                    inputs.forEach(input => {
+                        if (input.value.trim() === '' && input.type != 'hidden') {
+                            valid = false;
+                            input.classList.add('invalid');
+                        } else {
+                            input.classList.remove('invalid');
+                        }
+                    });
+                });
+
+                if (!valid) {
+                    layer.msg('活动名额和活动解锁编码不能为空，请补全信息');
+                    layer.close(loadIndex); // 关闭加载动画
+                    return false
+                }
+
+                $.ajax({
+                    url: "{:url('add')}",
+                    type: 'POST',
+                    data: {...field, passwords: initialData, recharge_bonuses: thresholdData},
+                    dataType: 'json',
+                    success: function (res) {
+                        layer.close(loadIndex); // 关闭加载动画
+                        if (res.code == 1) {
+                            layer.msg(res.msg, {icon: 1, time: 1500}, function () {
+                                // 如果是在iframe中，则关闭当前iframe
+                                var index = parent.layer.getFrameIndex(window.name);
+                                console.warn(index)
+                                if (index) {
+                                    parent.layer.close(index); // 关闭弹窗
+                                    parent.initTable()
+                                } else {
+                                    // 独立页面则设置一个标记并跳转回列表
+                                    localStorage.setItem('activitynewNeedRefresh', 'true');
+                                    window.location.href = '{:url("activitynew/index")}';
+                                }
+                            });
+                        } else {
+                            layer.msg(res.msg || '保存失败，请重试', {icon: 2});
+                        }
+
+                    },
+                    error: function () {
+
+                    }
+                });
+
+                return false;
+            });
+
+            // 初始化 wangEditor
+            const {createEditor, createToolbar} = window.wangEditor;
+
+            // 获取原始内容
+            const contentTextarea = document.querySelector('#content_textarea');
+            let originalContent = contentTextarea.value;
+
+            // 编辑器配置
+            const editorConfig = {
+                placeholder: '请输入内容...',
+                onChange(editor) {
+                    // 当编辑器内容变化时，更新到textarea
+                    const html = editor.getHtml();
+                    contentTextarea.value = html;
+                },
+                MENU_CONF: {
+                    // 配置图片上传
+                    uploadImage: {
+                        // 自定义上传方法
+                        customUpload(file, insertFn) {
+                            // 显示上传开始提示
+                            const loadingId = layer.msg('开始上传图片，请稍候...', {icon: 16, time: 0});
+
+                            // 第一步：获取预签名URL
+                            $.ajax({
+                                url: "{:url('upload/getPresignedUrl')}",
+                                type: 'POST',
+                                data: {
+                                    folder: 'activity',
+                                    filename: file.name
+                                },
+                                dataType: 'json',
+                                success: function (res) {
+                                    if (res.code === 1) {
+                                        // 第二步：使用预签名URL上传文件
+                                        uploadImageFile(file, res.data.url, res.data.key, insertFn, loadingId);
+                                    } else {
+                                        layer.close(loadingId);
+                                        layer.msg(res.msg || '获取上传链接失败', {icon: 2});
+                                    }
+                                },
+                                error: function () {
+                                    layer.close(loadingId);
+                                    layer.msg('获取上传链接请求失败', {icon: 2});
+                                }
+                            });
+
+                            // 阻止默认上传行为
+                            return true;
+                        }
+                    },
+
+                    // 配置视频上传
+                    uploadVideo: {
+                        // 自定义上传方法
+                        customUpload(file, insertFn) {
+                            // 显示上传开始提示
+                            const loadingId = layer.msg('开始上传视频，请稍候...', {icon: 16, time: 0});
+
+                            // 第一步：获取预签名URL
+                            $.ajax({
+                                url: "{:url('upload/getPresignedUrl')}",
+                                type: 'POST',
+                                data: {
+                                    folder: 'activity',
+                                    filename: file.name
+                                },
+                                dataType: 'json',
+                                success: function (res) {
+                                    if (res.code === 1) {
+                                        // 第二步：使用预签名URL上传文件
+                                        uploadVideoFile(file, res.data.url, res.data.key, insertFn, loadingId);
+                                    } else {
+                                        layer.close(loadingId);
+                                        layer.msg(res.msg || '获取上传链接失败', {icon: 2});
+                                    }
+                                },
+                                error: function () {
+                                    layer.close(loadingId);
+                                    layer.msg('获取上传链接请求失败', {icon: 2});
+                                }
+                            });
+
+                            // 阻止默认上传行为
+                            return true;
+                        }
+                    }
+                }
+            };
+
+            // 使用预签名URL上传图片文件
+            function uploadImageFile(file, presignedUrl, fileKey, insertFn, loadingId) {
+                // 创建XMLHttpRequest对象
+                var xhr = new XMLHttpRequest();
+
+                // 监听上传进度
+                xhr.upload.onprogress = function (e) {
+                    if (e.lengthComputable) {
+                        var percent = Math.floor(e.loaded / e.total * 100);
+                        layer.msg('上传进度: ' + percent + '%', {icon: 16, time: 0, shade: 0.2, id: loadingId});
+                    }
+                };
+
+                // 上传完成处理
+                xhr.onload = function () {
+                    if (xhr.status >= 200 && xhr.status < 300) {
+                        // 上传成功
+                        var baseUrl = '{$base_url}' || '';
+                        var fileUrl = baseUrl + '/' + fileKey;
+
+                        // 使用编辑器提供的insertFn回调将图片插入编辑器
+                        insertFn(fileUrl, file.name, fileUrl);
+
+                        layer.close(loadingId);
+                        layer.msg('图片上传成功', {icon: 1});
+                    } else {
+                        // 上传失败
+                        layer.close(loadingId);
+                        layer.msg('上传失败: ' + xhr.statusText, {icon: 2});
+                    }
+                };
+
+                // 上传出错
+                xhr.onerror = function () {
+                    layer.close(loadingId);
+                    layer.msg('网络错误，上传失败', {icon: 2});
+                };
+
+                // 发起上传请求
+                xhr.open('PUT', presignedUrl, true);
+                xhr.send(file);
+            }
+
+            // 使用预签名URL上传视频文件
+            function uploadVideoFile(file, presignedUrl, fileKey, insertFn, loadingId) {
+                // 创建上传进度展示区域
+                const progressHtml = `
+                <div class="upload-progress-container" style="margin-top: 10px;">
+                    <div class="progress progress-striped active">
+                        <div class="progress-bar" role="progressbar" style="width: 0%"></div>
+                    </div>
+                    <div style="margin-top: 5px;">
+                        <small>正在上传：<span class="upload-status">0%</span></small>
+                    </div>
+                </div>`;
+
+                // 在loading消息后添加进度条
+                layer.msg('上传视频中...', {
+                    icon: 16,
+                    time: 0,
+                    shade: 0.2,
+                    id: loadingId,
+                    content: progressHtml,
+                    success: function (layero, index) {
+                        $(layero).find('.layui-layer-content').css('padding-bottom', '20px');
+                    }
+                });
+
+                // 创建XMLHttpRequest对象
+                var xhr = new XMLHttpRequest();
+
+                // 监听上传进度
+                xhr.upload.onprogress = function (e) {
+                    if (e.lengthComputable) {
+                        var percent = Math.floor(e.loaded / e.total * 100);
+                        $('.progress-bar').css('width', percent + '%');
+                        $('.upload-status').text(percent + '%');
+                    }
+                };
+
+                // 上传完成处理
+                xhr.onload = function () {
+                    if (xhr.status >= 200 && xhr.status < 300) {
+                        // 上传成功
+                        var baseUrl = '{$base_url}' || '';
+                        var fileUrl = baseUrl + '/' + fileKey;
+
+                        // 使用编辑器提供的insertFn回调将视频插入编辑器
+                        insertFn(fileUrl);
+
+                        layer.close(loadingId);
+                        layer.msg('视频上传成功', {icon: 1});
+                    } else {
+                        // 上传失败
+                        layer.close(loadingId);
+                        layer.msg('上传失败: ' + xhr.statusText, {icon: 2});
+                    }
+                };
+
+                // 上传出错
+                xhr.onerror = function () {
+                    layer.close(loadingId);
+                    layer.msg('网络错误，上传失败', {icon: 2});
+                };
+
+                // 发起上传请求
+                xhr.open('PUT', presignedUrl, true);
+                xhr.send(file);
+            }
+
+            // 创建编辑器
+            const editor = createEditor({
+                selector: '#editor-container',
+                config: editorConfig,
+                mode: 'default', // 或 'simple' 简洁模式
+            });
+
+            // 确保编辑器创建后设置内容
+            setTimeout(() => {
+                editor.setHtml(originalContent);
+                contentTextarea.value = originalContent;
+            }, 100);
+
+            // 工具栏配置
+            const toolbarConfig = {};
+
+            // 创建工具栏
+            const toolbar = createToolbar({
+                editor,
+                selector: '#toolbar-container',
+                config: toolbarConfig,
+                mode: 'default', // 或 'simple' 简洁模式
+            });
+
+            // 表单提交前确保内容已更新
+            // document.querySelector('#dataForm').addEventListener('submit', function() {
+            //   const html = editor.getHtml();
+            //   contentTextarea.value = html;
+            // });
+            thresholdData = {$info['recharge_bonuses'] |default = [] | json_encode | raw};
+            ;
+
+            $('#activity_amount_threshold').on('click', function () {
+                // 先定义存储数据的变量（放在外层作用域）
+
+                layer.open({
+                    type: 1,
+                    title: '设置活动金额门槛',
+                    area: ['800px', '500px'],
+                    content: `
+            <div>
+                <form class="layui-form layui-form-hidden">
+                    <div class="layui-form-item">
+                        <div class="">
+                            <table id="thresholdTable" class="layui-table">
+                                <thead>
+                                    <tr>
+                                        <th>活动金额门槛</th>
+                                        <th>活动赠送比例</th>
+                                        <th>活动名额</th>
+                                        <th>活动名额说明文本</th>
+                                        <th>状态</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- 初始空行，回显时会动态填充 -->
+                                </tbody>
+                            </table>
+                            <div style="text-align: center;">
+                                <button type="button" id="addThresholdRow" class="layui-btn layui-bg-blue">+ 添加一行</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <div class="layui-input-block">
+                            <button type="button" id="submitThreshold" class="layui-btn">保存</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        `,
+                    success: function (layero, index) {
+                        const content = layero[0].querySelector('.layui-layer-content');
+                        const thresholdTableBody = content.querySelector('#thresholdTable tbody');
+
+                        // 1. 回显数据（如果有）
+                        if (thresholdData && thresholdData.length > 0) {
+                            thresholdTableBody.innerHTML = ''; // 清空默认行
+                            thresholdData.forEach(data => {
+                                const row = `
+                        <tr>
+                            <td><input type="hidden" value="${data.id || ''}" class="layui-input"><input type="text" value="${data.amount || ''}" class="layui-input"></td>
+                            <td><input type="text" value="${data.rate || ''}" class="layui-input"></td>
+                            <td><input type="text" value="${data.num || ''}" class="layui-input"></td>
+                            <td><input type="text" value="${data.remark || ''}" class="layui-input"></td>
+                            <td>
+                                <input type="checkbox" value="1" name="state"
+                                    lay-skin="switch"
+                                    ${data.status ? 'checked' : ''}
+                                    lay-filter="switchState">
+                            </td>
+                        </tr>
+                    `;
+                                thresholdTableBody.insertAdjacentHTML('beforeend', row);
+                            });
+                        } else {
+                            // 默认添加一个空行
+                            const defaultRow = `
+                    <tr>
+                        <td><input type="hidden" value="" class="layui-input"><input type="text" placeholder="请输入" class="layui-input"></td>
+                        <td><input type="text" placeholder="请输入%" class="layui-input"></td>
+                        <td><input type="text" placeholder="请输入" class="layui-input"></td>
+                        <td><input type="text" placeholder="请输入" class="layui-input"></td>
+                        <td>
+                            <input type="checkbox" name="state" lay-skin="switch" value="1" lay-filter="switchState">
+                        </td>
+                    </tr>
+                `;
+                            thresholdTableBody.innerHTML = defaultRow;
+                        }
+
+                        // 渲染表单组件
+                        form.render('checkbox');
+
+                        // 2. 绑定按钮事件
+                        const addThresholdRowBtn = content.querySelector('#addThresholdRow');
+                        const submitThresholdBtn = content.querySelector('#submitThreshold');
+                        const closeModalBtn = content.querySelector('#closeModal');
+
+                        addThresholdRowBtn.addEventListener('click', function () {
+                            const newRow = `
+                    <tr>
+                        <td><input type="hidden" value="" class="layui-input"><input type="text" placeholder="请输入" class="layui-input"></td>
+                        <td><input type="text" placeholder="请输入%" class="layui-input"></td>
+                        <td><input type="text" placeholder="请输入" class="layui-input"></td>
+                        <td><input type="text" placeholder="请输入" class="layui-input"></td>
+                        <td>
+                            <input type="checkbox" name="state" lay-skin="switch" value="1" lay-filter="switchState">
+                        </td>
+                    </tr>
+                `;
+                            thresholdTableBody.insertAdjacentHTML('beforeend', newRow);
+                            form.render('checkbox');
+                        });
+
+                        submitThresholdBtn.addEventListener('click', function () {
+                            const rows = thresholdTableBody.querySelectorAll('tr');
+                            thresholdData = []; // 清空旧数据
+
+                            rows.forEach(row => {
+                                const inputs = row.querySelectorAll('td>input:not([type="checkbox"])');
+                                const checkbox = row.querySelector('input[type="checkbox"]');
+
+                                thresholdData.push({
+                                    id: inputs[0].value,
+                                    amount: inputs[1].value,
+                                    rate: inputs[2].value,
+                                    num: inputs[3].value,
+                                    remark: inputs[4].value,
+                                    status: checkbox.checked ? 1 : 0
+                                });
+                            });
+
+                            // console.log('提交的活动金额门槛数据:', thresholdData);
+                            // layer.msg('活动金额门槛设置已提交！');
+                            layer.close(index);
+                        });
+                    }
+                });
+            })
+
+            const tableBody = document.querySelector('#activityTable tbody');
+            const addButton = document.querySelector('#addRow');
+            const templateRow = `
+                <tr>
+                    <td>
+                        <div class="layui-input-group amount-container">
+                            <input type="hidden" placeholder="活动名额" class="layui-input required" data-field="id">
+                            <input type="number" placeholder="活动名额" class="layui-input required" data-field="num">
+                            <div class="layui-input-split layui-input-suffix">
+                             个
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <input type="number" class="layui-input required" placeholder="活动解锁编码" data-field="password">
+                    </td>
+                    <td>
+                        <input type="text" class="layui-input" placeholder="编码更新时间" disabled data-field="password_update_time">
+                    </td>
+                    <td>
+                        <input type="text" class="layui-input" placeholder="备注" data-field="remark">
+                    </td>
+                    <td>
+                        <button type="button" class="layui-btn layui-bg-red" data-del>删除</button>
+                    </td> <!-- 新增删除按钮 -->
+                </tr>
+            `;
+
+
+            let initialData = {$info['passwords'] |default = [] | json_encode | raw};
+            initTable();
+
+            function initTable() {
+                tableBody.innerHTML = '';
+                initialData.forEach(rowData => {
+                    const row = tableBody.insertRow();
+                    const td1 = row.insertCell(0);
+                    const amountContainer = document.createElement('div');
+                    amountContainer.className = 'layui-input-group amount-container';
+
+                    const idInput = document.createElement('input');
+                    idInput.className = 'layui-input required';
+                    idInput.setAttribute('data-field', 'id');
+                    idInput.setAttribute('type', 'hidden');
+                    idInput.value = rowData.id;
+                    idInput.addEventListener('input', handleInput);
+                    amountContainer.appendChild(idInput);
+
+                    const numInput = document.createElement('input');
+                    numInput.className = 'layui-input required';
+                    numInput.setAttribute('placeholder', '数量');
+                    numInput.setAttribute('data-field', 'num');
+                    numInput.value = rowData.num;
+                    numInput.addEventListener('input', handleInput);
+                    amountContainer.appendChild(numInput);
+
+                    const suffixDiv = document.createElement('div');
+                    suffixDiv.className = 'layui-input-split layui-input-suffix';
+                    suffixDiv.innerHTML = '个';
+                    amountContainer.appendChild(suffixDiv);
+
+                    td1.appendChild(amountContainer);
+
+                    const td2 = row.insertCell(1);
+                    const passwordInput = document.createElement('input');
+                    passwordInput.className = 'layui-input required';
+                    passwordInput.setAttribute('placeholder', '活动解锁编码');
+                    passwordInput.setAttribute('data-field', 'password');
+                    passwordInput.value = rowData.password || '';
+                    passwordInput.addEventListener('input', handleInput);
+                    td2.appendChild(passwordInput);
+
+                    const td3 = row.insertCell(2);
+                    const timeInput = document.createElement('input');
+                    timeInput.className = 'layui-input';
+                    timeInput.setAttribute('placeholder', '编码更新时间');
+                    timeInput.setAttribute('data-field', 'password_update_time');
+                    timeInput.value = rowData.password_update_time || '';
+                    timeInput.setAttribute('disabled', 'disabled');
+                    timeInput.addEventListener('input', handleInput);
+                    td3.appendChild(timeInput);
+
+                    const td4 = row.insertCell(3);
+                    const remarkInput = document.createElement('input');
+                    remarkInput.className = 'layui-input';
+                    remarkInput.setAttribute('placeholder', '备注');
+                    remarkInput.setAttribute('data-field', 'remark');
+                    remarkInput.value = rowData.remark || '';
+                    remarkInput.addEventListener('input', handleInput);
+                    td4.appendChild(remarkInput);
+
+                    const td5 = row.insertCell(4);
+                    const delButton = document.createElement('button');
+                    delButton.className = 'layui-btn layui-bg-red'
+                    delButton.setAttribute('type', 'button')
+                    delButton.innerHTML = '删除';
+                    delButton.addEventListener('click', handleDeleteButton);
+                    td5.appendChild(delButton);
+                });
+            }
+
+            function handleInput(event) {
+                const input = event.target;
+                const field = input.getAttribute('data-field');
+                const rowIndex = Array.from(tableBody.children).indexOf(input.closest('tr'));
+                if (rowIndex !== -1) {
+                    initialData[rowIndex][field] = input.value;
+                }
+            }
+
+            function handleDeleteButton(event) {
+                event.preventDefault();
+                const row = event.target.closest('tr');
+                console.warn(row)
+                const rowIndex = Array.from(tableBody.children).indexOf(row);
+                console.warn(rowIndex)
+                if (rowIndex !== -1) {
+                    row.remove();
+                    initialData.splice(rowIndex, 1);
+                }
+            }
+
+            addButton.addEventListener('click', function (event) {
+                event.preventDefault();
+                tableBody.insertAdjacentHTML('beforeend', templateRow);
+                const newInputs = tableBody.lastElementChild.querySelectorAll('input');
+                newInputs.forEach(input => {
+                    input.addEventListener('input', handleInput);
+                });
+                const deleteButton = tableBody.lastElementChild.querySelector('button[data-del]');
+                deleteButton.addEventListener('click', handleDeleteButton);
+                initialData.push({
+                    id: '',
+                    num: '',
+                    password: '',
+                    password_update_time: '',
+                    remark: '',
+                });
+            });
+        });
+    })
+        ;
+</script>
+
+{include file="footer" /}

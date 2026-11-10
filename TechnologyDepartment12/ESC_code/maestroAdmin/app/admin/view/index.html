@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="renderer" content="webkit">
+<meta http-equiv="Cache-Control" content="no-siteapp"/>
+<title>{$app_name}-{:lang('后台管理系统')}</title>
+{if $app_icon}
+<link rel="shortcut icon" href="{$app_icon|toMedia}">
+{/if}
+
+<!--[if lt IE 9]>
+<meta http-equiv="refresh" content="0;ie.html"/>
+<![endif]-->
+
+<link rel="shortcut icon" href="{$admin_icon|toMedia}">
+<link href="/static/admin/css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
+<link href="/static/admin/css/font-awesome.min.css?v=4.4.0" rel="stylesheet">
+<link href="/static/admin/css/animate.min.css" rel="stylesheet">
+<link href="/static/admin/css/style.min.css?v=4.1.0" rel="stylesheet">
+</head>
+
+<body class="fixed-sidebar full-height-layout gray-bg" style="overflow:hidden">
+<div id="wrapper">
+    <!--左侧导航开始-->
+    <nav class="navbar-default navbar-static-side" role="navigation">
+        <div class="nav-close"><i class="fa fa-times-circle"></i>
+        </div>
+        <div class="sidebar-collapse">
+            <ul class="nav" id="side-menu">
+                <li class="nav-header">
+                    <div class="dropdown">
+                        <a data-toggle="dropdown" class="dropdown-toggle" href="#" style="background: none;">
+                            <span id="nowtime" data-time="{:time()}" style="color:#FFF;">{:timeToStr()}</span>
+                            <i class="fa fa-globe"></i>
+                        </a>
+                        <ul class="dropdown-menu animated fadeInRight m-t-xs">
+                            {volist name='langs' id='row'}
+                            <li>
+                                <a href="javascript:;" onclick="goLang('{$row.lang}')">{$row.title}</a>
+                            </li>
+                            {/volist}
+                        </ul>
+                    </div>
+                    <div class="dropdown profile-element">
+                        <a data-toggle="dropdown" class="dropdown-toggle" href="#">
+                            <span class="clear">
+                                <span class="block m-t-xs"><strong class="font-bold">{$username}</strong></span>
+                                <span class="text-muted text-xs block">{$rolename|lang}<b class="caret"></b></span>
+                            </span>
+                        </a>
+                        <ul class="dropdown-menu animated fadeInRight m-t-xs">
+                            <li>
+                                <a class="J_menuItem" href="{:url('index/authy')}">{:lang('绑定谷歌密钥')}</a>
+                            </li>
+                            {if authCheck('profile/headedit')}
+                            <li>
+                                <a class="J_menuItem" href="{:url('admin/profile/headedit')}">{:lang('修改信息')}</a>
+                            </li>
+                            {/if}
+                            <li>
+                                <a class="J_menuItem" href="{:url('admin/profile/index')}">{:lang('修改密码')}</a>
+                            </li>
+                            <li>
+                                <a href="{:url('admin/login/loginOut')}">{:lang('安全退出')}</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="logo-element">AD
+                    </div>
+                </li>
+                {if !empty($menu)}
+                {foreach name="menu" item="vo"}
+                <li class="menu">
+                    <a href="{$vo.href}">
+                        <i class="{$vo.style}"></i>
+                        <span class="nav-label">{$vo.node_name|lang} </span>
+                        <span class="fa arrow"></span>
+                    </a>
+                    <ul class="nav nav-second-level">
+                        {if !empty($vo['child'])}
+                        {foreach name="$vo['child']" item="v"}
+                        <li>
+                            <a class="J_menuItem" href="{$v.href}">{$v.node_name|lang}</a>
+                        </li>
+                        {/foreach}
+                        {/if}
+                    </ul>
+                </li>
+                {/foreach}
+                {/if}
+            </ul>
+            <div style="display: none">
+                <audio src="" id="audio" controls="controls" autoplay="autoplay"></audio>
+            </div>
+        </div>
+    </nav>
+    <!--左侧导航结束-->
+    <!--右侧部分开始-->
+    <div id="page-wrapper" class="gray-bg dashbard-1">
+        <div class="row content-tabs">
+            <button class="roll-nav roll-left J_tabLeft"><i class="fa fa-backward"></i>
+            </button>
+            <nav class="page-tabs J_menuTabs">
+                <div class="page-tabs-content">
+                    <a href="javascript:;" class="active J_menuTab" data-id="index_v1.html">{:lang('首页')}</a>
+                </div>
+            </nav>
+            <button class="roll-nav roll-right J_tabRight" style="right:221px;"><i class="fa fa-forward"></i>
+            </button>
+            <div class="btn-group roll-nav roll-right">
+                <button class="J_tabFresh" >
+                    {:lang('刷新')}
+                </button>
+<!--                <button class="dropdown J_tabFresh" data-toggle="dropdown">-->
+<!--                    {:lang('刷新')}<span class="caret"></span>-->
+<!--                </button>-->
+                <ul role="menu" class="dropdown-menu dropdown-menu-right">
+                    <li class="J_tabGo"><a>{:lang('前进')}</a>
+                    </li>
+                    <li class="J_tabBack"><a>{:lang('后退')}</a>
+                    </li>
+                    <li class="J_tabFresh"><a>{:lang('刷新')}</a>
+                    </li>
+                    <li class="divider"></li>
+                    <li class="J_tabShowActive"><a>{:lang('定位当前选项卡')}</a>
+                    </li>
+                    <li class="divider"></li>
+                    <li class="J_tabCloseAll"><a>{:lang('关闭全部选项卡')}</a>
+                    </li>
+                    <li class="J_tabCloseOther"><a>{:lang('关闭其他选项卡')}</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="btn-group roll-nav roll-right" style="right: 141px;">
+                <button class="dropdown J_tabClose" data-toggle="dropdown" style=" position: relative;">
+                    <span class="label label-danger hidden" id="unreadCount" style="position: absolute; right: 0;">0</span>
+                    {:lang('消息')}<span class="caret"></span>
+
+                </button>
+                <ul role="menu" class="dropdown-menu dropdown-menu-right">
+<!--                    <li><a class="J_menuItem" href="{:url('message/index')}">{:lang("客服消息")} <span class="label label-danger" id="unreadMessageCount">0</span></a></li>-->
+<!--                    <li><a class="J_menuItem" href="{:url('withdraw/index')}">{:lang("银行卡提现")} <span class="label label-danger" id="unreadWithdraw1Count">0</span></a></li>-->
+<!--                    <li><a class="J_menuItem" href="{:url('withdraw/usdt')}">{:lang("USDT提现")} <span class="label label-danger" id="unreadWithdraw4Count">0</span></a></li>-->
+                </ul>
+            </div>
+            <a href="{:url('admin/login/loginOut')}" class="roll-nav roll-right J_tabExit"><i class="fa fa fa-sign-out"></i>
+                {:lang('退出')}</a>
+        </div>
+        <div class="row J_mainContent" id="content-main">
+            <iframe class="J_iframe" name="iframe0" width="100%" height="100%"
+                    src="{:url('Index/indexPage')}" frameborder="0"
+                    data-id="index_v1.html" seamless></iframe>
+        </div>
+    </div>
+    <!--右侧部分结束-->
+    <div class="modal" id="bmbModal" style="z-index: 99999 !important;background: rgba(0,0,0,0.8);">
+        <div class="modal-dialog">
+            <div class="modal-content bmd-modalContent">
+
+                <div class="modal-body">
+                    <div class="close-button">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="embed-responsive embed-responsive-16by9">
+                        <iframe class="embed-responsive-item" frameborder="0"></iframe>
+                    </div>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+</div>
+<script src="/static/admin/js/jquery.min.js?v=2.1.4"></script>
+<script src="/static/admin/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="/static/admin/js/plugins/metisMenu/jquery.metisMenu.js"></script>
+<script src="/static/admin/js/plugins/slimscroll/jquery.slimscroll.min.js"></script>
+<script src="/static/admin/js/plugins/layer/layer.min.js"></script>
+<script src="/static/admin/js/hplus.min.js?v=4.1.0"></script>
+<script src="/static/admin/js/store.js?v=4.1.0"></script>
+<!--<script type="text/javascript" src="/static/admin/js/contabs.min.js"></script>-->
+<script type="text/javascript" src="/static/admin/js/contabs.js"></script>
+<script src="/static/admin/js/plugins/pace/pace.min.js"></script>
+<script src="/static/libs/bmbIframe/jquery.bmbIframe.js"></script>
+<link type="text/css" rel="stylesheet" href="/static/libs/bmbIframe/bmbIframe.css?{:css_version()}" />
+<script src="/static/admin/js/common.js?{:js_version()}"></script>
+<script>
+
+function gettime() {
+    setInterval(function(){
+        var date_str = new Date().toLocaleString("zh-CN", {timeZone: "{:config('app.default_timezone')}"});
+        // var date_str = date.getFullYear() + "-" + date.getMonth() + "-" + date.getDay() + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds()
+        $("#nowtime").text(date_str);
+    }, 1000);
+}
+
+gettime();
+
+function goLang(range){
+    $.ajax({
+        type: "GET",
+        url: '{:url("login/check_lang")}',
+        data:{lang:range},
+        dataType: 'json',
+        success: function(){
+            window.location.reload();
+        }
+    });
+}
+
+// 轮训查询
+var intervalTime = 10000;
+var rechargeCount = 0;
+checkRecharge()
+function checkRechargeInterval() {
+    // 5秒查询一次
+    setTimeout(() => {
+        checkRecharge()
+    }, intervalTime)
+}
+function checkRecharge() {
+    $.ajax({
+        type: 'GET',
+        url: '{:url("recharge/checkNew")}',
+        dataType: 'json',
+        success: function (res) {
+            let count = res.data
+            let old_count = rechargeCount;
+            if (count > old_count) {
+                rechargeCount = count
+                if (old_count != 0) {
+                    rechargeCount = count
+                    $('#audio').attr('src', "{$recharge_voice_file|toMedia}");
+                }
+            }
+        },
+        error: function (xhr, type) {
+
+        },
+    }).done(() => {
+        checkRechargeInterval()
+    });
+}
+
+var withdrawCount = 0;
+checkWithdraw() // 立即执行一次
+function checkWithdrawInterval() {
+    // 5秒查询一次
+    setTimeout(() => {
+        checkWithdraw()
+    }, intervalTime)
+}
+
+function checkWithdraw() {
+    $.ajax({
+        type: 'GET',
+        url: '{:url("withdraw/checkNew")}',
+        dataType: 'json',
+        success: function (res) {
+            let count = res.data
+            let old_count = withdrawCount;
+            if (count > old_count) {
+                withdrawCount = count
+                if (old_count != 0) {
+                    withdrawCount = count
+                    $('#audio').attr('src', "{$withdraw_voice_file|toMedia}");
+                }
+            }
+        },
+        error: function (xhr, type) {
+
+        },
+    }).done(() => {
+        checkWithdrawInterval()
+    });
+}
+
+</script>
+</body>
+
+</html>

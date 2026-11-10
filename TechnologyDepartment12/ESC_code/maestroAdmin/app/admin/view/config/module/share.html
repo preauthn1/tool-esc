@@ -1,0 +1,11 @@
+
+<div class="form-group">
+    <label class="col-sm-3 control-label">{:lang("分享审核")}：</label>
+    <div class="input-group col-sm-4">
+        <div class="layui-form">
+            <input type="radio" name="is_auto_check" value="1" title="自动" {if $config['is_auto_check'] == 1}checked{/if}>
+            <input type="radio" name="is_auto_check" value="2" title="手动审核" {if $config['is_auto_check'] == 2}checked{/if}>
+        </div>
+        <p class="help-block">is_auto_check：分享是否自动审核。1自动，2手动审核。</p>
+    </div>
+</div>

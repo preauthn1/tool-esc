@@ -1,0 +1,197 @@
+{include file="header" /}
+<div class="row">
+    <div class="col-sm-12">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h5>添加</h5>
+            </div>
+            <div class="ibox-content">
+                <form class="form-horizontal m-t" id="dataForm" method="post" action="{:url('add')}">
+                    <input type="hidden" name="id" value="{$info.id}"/>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">{:lang("图片")}：</label>
+                        <input name="image" id="image" type="hidden" value="{$info.image}"/>
+                        <div class="form-inline">
+                            <div class="input-group col-sm-2">
+                                <button type="button" class="layui-btn" id="test1">
+                                    <i class="layui-icon">&#xe67c;</i>{:lang("上传图片")}
+                                </button>
+                            </div>
+                            <div class="input-group col-sm-3">
+                                <div id="sm">
+                                    {if condition="$info['image']"}
+                                    <img src="{$info.image|toMedia}"/>
+                                    {/if}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">显示名称：</label>
+                        <div class="input-group col-sm-4">
+                            <input type="text" class="form-control" value="{$info.name}" name="name" required/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">{:lang("货币类型")}：</label>
+                        <div class="input-group col-sm-4">
+                            <div class="layui-form">
+                                <input type="radio" name="currency_type" value="1" title="虚拟币" {if $info['currency_type']
+                                == '1'}checked{/if}>
+                                <input type="radio" name="currency_type" value="2" title="货币" {if $info['currency_type']
+                                == '2'}checked{/if}>
+                                <input type="radio" name="currency_type" value="3" title="银行卡" {if $info['currency_type']
+                                == '3'}checked{/if}>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">通道代码：</label>
+                        <div class="input-group col-sm-4">
+                            <input type="text" class="form-control" value="{$info.currency_code}" name="currency_code"
+                                   required/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">货币单位：</label>
+                        <div class="input-group col-sm-4">
+                            <input type="text" class="form-control" value="{$info.unit}" name="unit" required/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">汇率：</label>
+                        <div class="input-group col-sm-4">
+                            <input type="text" class="form-control" value="{$info.exchange_rate}" name="exchange_rate"
+                                   required/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">排序：</label>
+                        <div class="input-group col-sm-4">
+                            <input type="number" class="form-control" value="{$info.sort|default=0}" name="sort"
+                                   required/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">充值：</label>
+                        <div class="input-group col-sm-4">
+                            <div class="layui-form">
+                                <input type="checkbox" name="recharge_is_show" title="开启|关闭" lay-skin="switch" value="1"
+                                       {if $info.recharge_is_show== 1} checked {/if}>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">提现：</label>
+                        <div class="input-group col-sm-4">
+                            <div class="layui-form">
+                                <input type="checkbox" name="withdraw_is_show" title="开启|关闭" lay-skin="switch" value="1"
+                                       {if $info.withdraw_is_show== 1} checked {/if}>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">首充渠道：</label>
+                        <div class="input-group col-sm-4">
+                            <div class="layui-form">
+                                <input type="checkbox" name="is_first_charge" title="开启|关闭" lay-skin="switch" value="1"
+                                       {if $info.is_first_charge== 1} checked {/if}>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">最小充值金额：</label>
+                        <div class="input-group col-sm-4">
+                            <input type="number" step="0.00000001" class="form-control"
+                                   value="{$info.min_recharge_money}" name="min_recharge_money" required/>
+                            <p class="help-block" style="color: red">用户充值低于这个金额不会生成充值订单</p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">最小提现金额：</label>
+                        <div class="input-group col-sm-4">
+                            <input type="number" step="0.0001" class="form-control" value="{$info.min_withdraw_money}"
+                                   name="min_withdraw_money" required/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">最大提现金额：</label>
+                        <div class="input-group col-sm-4">
+                            <input type="number" step="0.0001" class="form-control" value="{$info.max_withdraw_money}"
+                                   name="max_withdraw_money" required/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">{:lang("提款金额类型")}：</label>
+                        <div class="input-group col-sm-4">
+                            <div class="layui-form">
+                                <input type="radio" name="withdraw_money_type" value="1" title="用户自由输入" {if $info['withdraw_money_type']
+                                == '1'}checked{/if}>
+                                <input type="radio" name="withdraw_money_type" value="2" title="固定金额" {if $info['withdraw_money_type']
+                                == '2'}checked{/if}>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">快捷金额：</label>
+                        <div class="input-group col-sm-4">
+                            <input type="text" class="form-control" value="{$info.fast_amount}" name="fast_amount"/>
+                            <p class="help-block">用英文逗号隔开</p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">充值说明：</label>
+                        <div class="input-group col-sm-4">
+                            <textarea type="text" class="form-control" name="instruction"
+                                      rows="5">{$info.instruction}</textarea>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">配置信息：</label>
+                        <div class="input-group col-sm-4">
+                            <textarea type="text" class="form-control" name="config" rows="15">{$info.config}</textarea>
+                            <p class="help-block">输入标准json格式</p>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-sm-4 col-sm-offset-6">
+                            <input type="button" value="返回" class="btn" onclick="window.history.go(-1)"/>
+                            <button class="btn btn-primary" type="submit">提交</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        layui.use(function () {
+            var form = layui.form;
+            form.on('switch', function (data) {
+                data.elem.value = this.checked ? 1 : 0
+                console.warn(data.othis.prop('checked', false))
+            });
+        })
+        // 单张上传图片
+        layui.use('upload', function () {
+            var upload = layui.upload;
+            //上传图片
+            var uploadInst = upload.render({
+                elem: '#test1' //绑定元素
+                , url: "{:url('upload/upload')}" //上传接口
+                , done: function (res) {
+                    //上传完毕回调
+                    $("#image").val(res.data.path);
+                    $("#sm").html('<img src="' + res.data.src + '" />');
+                }
+                , error: function () {
+                    //请求异常回调
+                }
+            });
+        });
+    });
+</script>
+{include file="footer" /}

@@ -1,0 +1,151 @@
+{include file="header" /}
+<!-- Panel Other -->
+<div class="ibox float-e-margins">
+    <div class="ibox-title">
+        <h5>{:lang('任务汇总')}</h5>
+    </div>
+    <div class="ibox-content">
+        <!--搜索框开始-->
+        <form id='commentForm' role="form" method="post" class="form-inline pull-right" target="_blank" onkeydown="if (event.keyCode == 13) { return false; }">
+            <div class="content clearfix m-b">
+                <div class="form-group">
+                    <label>{:lang("用户名")}：</label>
+                    <input type="text" class="form-control" id="user_name" name="user_name" placeholder="{:lang('请输入用户名')}">
+                </div>
+                <div class="form-group layui-form">
+                    <label>{:lang("所属代理")}：</label>
+                    <div class="layui-inline">
+                        <select lay-search="" id="leader1" name="leader1">
+                            <option value="">所有</option>
+                            {foreach name="agent" item="vo"}
+                            <option value="{$vo.id}">{$vo.id}/{$vo.user_name}{$vo.remark? '('.$vo.remark.')' : ''}</option>
+                            {/foreach}
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>{:lang("日期")}：</label>
+                    <input type="text" class="form-control" id="date" name="date" placeholder="{:lang('请选择日期')}" readonly>
+                </div>
+<!--                <div class="form-group">-->
+<!--                    <label>{:lang("结算日期")}：</label>-->
+<!--                    <input type="text" class="form-control" id="rec_settle" name="rec_settle" placeholder="{:lang('请选择结算日期')}" readonly>-->
+<!--                </div>-->
+<!--                <div class="form-group">-->
+<!--                    <label>{:lang("结算状态")}：</label>-->
+<!--                    <select class="form-control" id="settle_status" name="settle_status">-->
+<!--                        <option value="">{:lang('全部')}</option>-->
+<!--                        <option value="1">{:lang('已结算')}</option>-->
+<!--                        <option value="0">{:lang('未结算')}</option>-->
+<!--                    </select>-->
+<!--                </div>-->
+<!--                <div class="form-group">-->
+<!--                    <label>{:lang("达标状态")}：</label>-->
+<!--                    <select class="form-control" id="task_status" name="task_status">-->
+<!--                        <option value="">{:lang('全部')}</option>-->
+<!--                        <option value="1">{:lang('已达标')}</option>-->
+<!--                        <option value="0">{:lang('未达标')}</option>-->
+<!--                    </select>-->
+<!--                </div>-->
+                <div class="form-group">
+                    <input type="hidden" value="1" name="export"/>
+                    <button class="btn btn-primary" type="button" style="margin-top:5px" id="search"><strong>{:lang('搜索')}</strong></button>
+                    <button class="btn btn-danger" type="submit" style="margin-top:5px" id="export"><strong>{:lang("导出")}</strong>
+                    </button>
+                </div>
+            </div>
+        </form>
+        <!--搜索框结束-->
+        <div class="example-wrap">
+            <div class="example">
+                <table id="cusTable"
+                       data-total-field="total"
+                       data-data-field="data">
+                    <thead>
+                    <th data-field="id">{:lang("id")}</th>
+                    <th data-field="user_info">{:lang("用户名")}</th>
+                    <th data-field="top_leader_remark">{:lang("所属代理")}</th>
+                    <th data-field="register">{:lang("注册人数")}</th>
+                    <th data-field="recharge">{:lang("有效充值人数")}</th>
+                    <th data-field="register_recharge">{:lang("当天注册并充值人数")}</th>
+<!--{/*                    <th data-field="direct_required">{:lang("任务要求一级下级有效人数")&cc;</th>*/}-->
+                    <th data-field="task_level1">{:lang("一级有效用户完成任务人数")}</th>
+                    <th data-field="task_level2">{:lang("二级有效用户完成任务人数")}</th>
+                    <th data-field="task_level3">{:lang("三级有效用户完成任务人数")}</th>
+                    <th data-field="task_count">{:lang("完成任务人数")}</th>
+<!--                    <th data-field="task_required">{:lang("任务要求完成任务人数")}</th>-->
+<!--                    <th data-field="task_status" data-formatter="taskStatusFormatter">{:lang("任务达标状态")}</th>-->
+<!--                    <th data-field="match_level">{:lang("可达到等级")}</th>-->
+<!--                    <th data-field="match_reward">{:lang("可达到等级奖励")}</th>-->
+                    <th data-field="date">{:lang("日期")}</th>
+<!--                    <th data-field="rec_settle">{:lang("直推奖励日期")}</th>-->
+<!--                    <th data-field="settle_status" data-formatter="taskStatusFormatter">{:lang("结算状态")}</th>-->
+                    </thead>
+                </table>
+            </div>
+        </div>
+        <!-- End Example Pagination -->
+    </div>
+</div>
+<!-- End Panel Other -->
+<script type="text/javascript">
+    function taskStatusFormatter(value, row, index) {
+        return value;
+    }
+
+    function initTable() {
+        //先销毁表格
+        $('#cusTable').bootstrapTable('destroy');
+        //初始化表格,动态从服务器加载数据
+        $("#cusTable").bootstrapTable({
+            method: "get",  //使用get请求到服务器获取数据
+            url: "{:url('task_summary/index')}", //获取数据的Servlet地址
+            striped: true,  //表格显示条纹
+            pagination: true, //启动分页
+            pageSize: 10,  //每页显示的记录数
+            pageNumber:1, //当前第几页
+            pageList: [5, 10, 15, 20, 25],  //记录数可选列表
+            search: false,  //是否启用查询
+            showColumns: false,  //显示下拉框勾选要显示的列
+            showRefresh: false,  //显示刷新按钮
+            sidePagination: "server", //表示服务端请求
+            //设置为undefined可以获取pageNumber，pageSize，searchText，sortName，sortOrder
+            //设置为limit可以获取limit, offset, search, sort, order
+            queryParamsType : "undefined",
+            queryParams: queryParams,
+        });
+    }
+
+    function queryParams(params) {
+        params.user_name = $('#user_name').val();
+        params.date = $('#date').val();
+        params.rec_settle = $('#rec_settle').val();
+        params.settle_status = $('#settle_status').val();
+        params.task_status = $('#task_status').val();
+        params.leader1 = $('#leader1').val();
+        return params;
+    }
+
+    $(document).ready(function () {
+        //调用函数，初始化表格
+        initTable();
+        //当点击查询按钮的时候执行
+        $("#search").bind("click", initTable);
+
+        // 初始化日期选择器
+        layui.use('laydate', function(){
+            var laydate = layui.laydate;
+
+            //日期
+            laydate.render({
+                elem: '#date'
+            });
+
+            //结算日期
+            laydate.render({
+                elem: '#rec_settle'
+            });
+        });
+    });
+</script>
+{include file="footer" /}

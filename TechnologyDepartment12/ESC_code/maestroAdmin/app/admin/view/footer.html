@@ -1,0 +1,148 @@
+</div>
+<script type="text/javascript">
+    if (typeof showStart != 'function') {
+        function showStart(){
+            index = layer.load(0, {shade: false});
+            return true;
+        }
+    }
+    if (typeof showSuccess != 'function') {
+        function showSuccess(res){
+            layer.ready(function(){
+                layer.close(index);
+                if(1 == res.code){
+                   layer.alert(res.msg, {title: "{:lang('友情提示')}", icon: 1, closeBtn: 0}, function(){
+                       if (res.data == 'close') {
+                           window.close();
+                           var index = parent.layer.getFrameIndex(window.name); // 先得到当前 iframe 层的索引
+                           parent.layer.close(index);
+                           parent.location.reload();
+                       }else{
+                           window.location.href = res.url;
+                       }
+                   });
+                }else if(111 == res.code){
+                    window.location.reload();
+                }else{
+                    layer.msg(res.msg, {anim: 6});
+                }
+            });
+        }
+    }
+    // 添加商品
+    var formSubmitOptions = {
+        beforeSubmit:showStart,
+        success:showSuccess
+    };
+
+    function initTable() {
+        //先销毁表格
+        $('#cusTable').bootstrapTable('destroy');
+        //初始化表格,动态从服务器加载数据
+        $("#cusTable").bootstrapTable({
+            method: "get",  //使用get请求到服务器获取数据
+            url: index_url, //获取数据的地址
+            striped: true,  //表格显示条纹
+            pagination: pagination, //启动分页
+            pageSize: 10,  //每页显示的记录数
+            pageNumber:1, //当前第几页
+            pageList: [10, 30, 50, 100, 500],  //记录数可选列表
+            sidePagination: "server", //表示服务端请求
+            paginationFirstText: "{:lang('首页')}",
+            paginationPreText: "{:lang('上一页')}",
+            paginationNextText: "{:lang('下一页')}",
+            paginationLastText: "{:lang('尾页')}",
+            queryParamsType : "undefined",
+            clickToSelect: true,  // 是否启用点击选中行
+            selectItemName: "ids",
+            // uniqueId: "id",       // 每一行的唯一标识，一般为主键列
+            // idField: "id",
+            columns: [{
+                checkbox: tableCheckbox,
+                visible:  true     // 是否显示复选框
+            }],
+            queryParams: function(params) {   //设置查询参数
+                if (typeof queryParams === 'function') {
+                    return queryParams(params);
+                }
+
+                return params;
+            },
+            onLoadSuccess: function(res){  //加载成功时执行
+                if(111 == res.code){
+                    window.location.reload();
+                }
+                layui.use(function(){
+                    var form = layui.form;
+                    // 当表单元素被动态插入时，需主动进行组件渲染才能显示
+                    form.render('checkbox'); // 渲染全部表单
+                })
+                if (typeof onLoadSuccess === 'function') {
+                    return onLoadSuccess(res);
+                }
+                layer.msg("{:lang('加载成功')}", {time : 1000});
+            },
+            onLoadError: function(){  //加载失败时执行
+                if (typeof onLoadError === 'function') {
+                    return onLoadError();
+                }
+                layer.msg("{:lang('加载数据失败')}");
+            }
+        });
+    }
+
+    function del(id){
+        layer.confirm("{:lang('确认删除')}?", {icon: 3, title:"{:lang('提示')}"}, function(index){
+            //do something
+            $.getJSON(del_url, {'id' : id}, function(res){
+                if(1 == res.code){
+                    layer.alert(res.msg, {title: "{:lang('友情提示')}", icon: 1, closeBtn: 0}, function(inx){
+                        layer.close(inx);
+                        initTable();
+                    });
+                }else if(111 == res.code){
+                    window.location.reload();
+                }else{
+                    layer.alert(res.msg, {title: "{:lang('友情提示')}", icon: 2});
+                }
+            });
+
+            layer.close(index);
+        })
+    }
+    $(document).ready(function(){
+        // 提交订单
+        $('#dataForm').submit(function(){
+            // console.log(formSubmitOptions);
+            $(this).ajaxSubmit(formSubmitOptions);
+            return false;
+        });
+        // 单张上传图片
+        layui.use('upload', function(){
+            var upload = layui.upload;
+            upload.render({
+                elem: '#uploader' //绑定元素
+                ,url: "{:url('upload/upload')}" //上传接口
+                ,done: function(res){
+                    //上传完毕回调
+                    if (typeof uploadDone === 'function') {
+                        uploadDone(res);
+                    }else{
+                        $("#img").val(res.data.path);
+                        $("#sm").html('<img src="' + res.data.src + '" style="height: 40px;"/>');
+                    }
+                }
+            });
+        });
+        $(".rate_input").on('input', function(){
+            var rate = $(this).val();
+            var rate_text = "0%";
+            if (rate > 0) {
+                rate_text = parseFloat((rate/100).toFixed(7).slice(0,-1)) + "%";
+            }
+            $(this).siblings('.rate_text').text(rate_text);
+        })
+    });
+</script>
+</body>
+</html>

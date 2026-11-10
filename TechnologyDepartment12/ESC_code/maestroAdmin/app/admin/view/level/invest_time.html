@@ -1,0 +1,132 @@
+{include file="header" /}
+<!-- Panel Other -->
+<div class="ibox float-e-margins">
+    <div class="ibox-title">
+        <h5>{$level.level_name} - {:lang("理财时段列表")}</h5>
+    </div>
+    <div class="ibox-content">
+        <div class="form-group clearfix col-sm-1">
+            {if authCheck('level/investTimeEdit')}
+            <a id="add" href="{:url('level/investTimeEdit', ['level_id' => $level.level_id])}">
+                <button class="btn btn-outline btn-primary" type="button">{:lang("添加时段")}</button>
+            </a>
+            {/if}
+        </div>
+        <div class="example-wrap">
+            <div class="example">
+                <table id="cusTable">
+                    <thead>
+                        <th data-field="start_time">{:lang("开始时间")}</th>
+                        <th data-field="end_time">{:lang("结束时间")}</th>
+                        <th data-field="invest_rate">{:lang("理财占余额比例")}(%)</th>
+                        <th data-field="profit_rate">{:lang("收益率")}(%)</th>
+                        <th data-field="status" data-formatter="statusFormatter">{:lang("状态")}</th>
+                        <th data-field="create_time">{:lang("创建时间")}</th>
+                        <th data-field="operate">{:lang("操作")}</th>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{include file="footer" /}
+<script type="text/javascript">
+    function statusFormatter(value, row, index) {
+        let checkbox = '';
+        let checked = row.status ? 'checked' : '';
+        checkbox = '<div class="layui-form"><input type="checkbox" name="status" value="1" title="开|关" lay-skin="switch" data-id="'+row.id+'" data-val="'+row.status+'" lay-filter="changeStatus"'+ checked +'></div>';
+        return checkbox;
+    }
+
+    function queryParams(params) {
+        return params;
+    }
+
+    $(document).ready(function () {
+        initTable();
+    });
+
+    function initTable() {
+        $('#cusTable').bootstrapTable({
+            url: "{:url('level/investTime')}?level_id={$level.level_id}",
+            method: 'post',
+            pagination: true,
+            pageSize: 10,
+            search: false,
+            showRefresh: false,
+            showToggle: false,
+            showColumns: false,
+            toolbar: false,
+            queryParams: queryParams,
+            onLoadSuccess: onLoadSuccess
+        });
+    }
+
+    function onLoadSuccess(res) {
+        $("#add").on('click', function (e) {
+            add(e.currentTarget.href)
+            return false;
+        });
+        $("td a").on('click', function (e) {
+            if (e.currentTarget.href.indexOf('javascript') === -1) {
+                add(e.currentTarget.href)
+                return false;
+            }
+            return true;
+        });
+
+        layui.use(['form'], function(){
+            var form = layui.form;
+            form.on('switch(changeStatus)', function(data){
+                var elem = data.elem;
+                let id = elem.dataset.id;
+                let val = elem.dataset.val;
+
+                $.ajax({
+                    url: "{:url('level/changeInvestTimeStatus')}",
+                    type: 'POST',
+                    data: {id: id},
+                    success: function(res) {
+                        if(res.code == 1) {
+                            layer.msg(res.msg);
+                            elem.dataset.val = val == '1' ? '0' : '1';
+                        } else {
+                            layer.msg(res.msg);
+                            $(elem).prop('checked', !data.elem.checked);
+                            form.render('checkbox');
+                        }
+                    }
+                });
+            });
+            form.render();
+        });
+    }
+
+    function add(url) {
+        layer.open({
+            type: 2,
+            area: ['800px', '500px'],
+            title: '{:lang("添加/编辑")}',
+            maxmin: true,
+            anim: 0,
+            content: url
+        });
+    }
+
+    function investTimeDel(id) {
+        layer.confirm('{:lang("确定删除此时段？")}', {
+            btn: ['{:lang("确定")}', '{:lang("取消")}']
+        }, function () {
+            $.getJSON("{:url('level/investTimeDel')}", {'id': id}, function (res) {
+                if (res.code == 1) {
+                    layer.msg(res.msg);
+                    setTimeout(function () {
+                        initTable();
+                    }, 1000);
+                } else {
+                    layer.msg(res.msg);
+                }
+            });
+        });
+    }
+</script>

@@ -1,0 +1,73 @@
+<?php
+
+return [
+    'vn168pay' => [
+        'name' => '丛林支付',
+        'app_id' => 'xx',
+        'app_key' => 'xx',
+        'transfer' => 0,
+        'ip' => ['x', '103.10.196.152']
+    ],
+    'fmpay' => [
+        'name' => '锋芒支付',
+        'app_id' => 'xx',
+        'app_key' => 'xx',
+        'transfer' => 0,
+        'ip' => ['xx', '103.10.196.152']
+    ],
+    'idrpay' => [
+        'name' => 'IDRPays',
+        'app_id' => 'xx',
+        'app_key' => 'xx',
+        'api_user' => 'xx.com',
+        'api_password' => 'xx',
+        'transfer' => 0,
+        'ip' => ['xxx', '103.10.196.152']
+    ],
+    'paytend' => [
+        'name' => 'Paytend',
+        'username' => 'tester79',
+        'password' => 'qwe23dsa',
+        'AGENT_ID' => '312009000000943',
+        'MERCHANT_ID' => '188001000000086',
+        'PAYTEND_RSA_KEY_PUBLIC' => 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzjteSPbuL/dMXdPaZq0GDpa1Y9g46bBJzst1s7Cu7DDsOJ3KjoLvIcK1oLj79qop4bZda//3BBwyIfRNwl6wsGypHIsz2JTOHas6XJH6hdD35S2zVktiquZPwAP/JvQqgGgQ8V3CN/0Q4FUl03494w84MV/fCSQP1zJIaSAN6A2XcoU+YbPelCwOhiGVOab5t+ZBbZ45nAxuvz6bKwqiKAaI8qIVNSKJ1ljRbDzWx24RXaMuP4bQyQTaavt/ziTdP5/6b58204k0kYuSNIH+YpAldNE4tJ4yshj1lItQAyxem8oPh0rruoCQd8hx5nK58aTe3AexzlldREXcqpjoTwIDAQAB',
+        'priKey' => __DIR__ . DIRECTORY_SEPARATOR . 'key' . DIRECTORY_SEPARATOR . 'priKey.pem',
+        'pubKey' => __DIR__ . DIRECTORY_SEPARATOR . 'key' . DIRECTORY_SEPARATOR . 'pubKey.pem',
+        'transfer' => 0,
+        'currency' => 'IDR',
+//        'ip' => ['223.255.159.119', '103.10.196.152']
+    ],
+    'bxchpay' => [
+        'name' => '长河支付',
+        'MEMBER_ID' => 'CH1003010',
+        'PAY_KEY' => '09bd152d992232de5f42ca6a7952ca74',
+        'PAID_KEY' => '47634d14dbec903c0417d359b6576d15',
+    ],
+    'dingpay' => [
+        'name' => 'dingpay',
+        'APP_ID' => '20467611',
+        'APP_KEY'=> '9D859115DB9D93068FB458894BE71CC1',
+        'transfer'  => 1
+    ],
+    'qepay' => [
+        'name'      => 'QEpay',
+        'MCH_ID'    => '600025198',
+        'PAY_KEY'   => '5f58d269d9854820bbcd0f3257af3251',
+        'PAID_KEY'  => 'HOVEKNUPCG3COZIAEHASG4GQGU2MBWPU',
+        'transfer'  => 0
+    ],
+    'seppay' => [
+        'name'      => 'SEPpay',
+        'MCH_ID'    => '600001013',
+        'PAY_KEY'   => 'J9RG1NZ86WON43QGZKO7AZVEH9GYB8OU',
+        'PAID_KEY'  => 'GPU95ZCZXRLOGDGYDPSXHT84CHAMNI0N',
+        'transfer'  => 0
+    ],
+    'uupay' => [
+        'name'      => 'UUPay',
+        'MCH_ID'    => '2022-TOP17',
+        'AESKEY'   => '9ef2c3005efd11ed92ab117fdd0d94d8',
+        'MD5KEY'  => 'bad11b8ffc4a4a4c9d98815c7d0ca490',
+        'transfer'  => 0
+    ]
+];

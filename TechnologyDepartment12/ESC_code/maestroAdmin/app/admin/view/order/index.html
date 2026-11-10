@@ -1,0 +1,77 @@
+{include file="header" /}
+    <!-- Panel Other -->
+    <div class="ibox float-e-margins">
+        <div class="ibox-title">
+            <h5>{:lang("订单列表")}</h5>
+        </div>
+        <div class="ibox-content">
+            <!--搜索框开始-->
+            <form id='commentForm' role="form" method="post" class="form-inline pull-right">
+                <div class="content clearfix m-b">
+                    <div class="form-group">
+                        <label>{:lang("选择时间")}：</label>
+                        <input type="text" class="form-control" id="start_time" name="start_time" placeholder="yyyy-MM-dd" lay-key="1" autocomplete="off">
+                        -
+                        <input type="text" class="form-control" id="end_time" name="end_time" placeholder="yyyy-MM-dd" lay-key="2" autocomplete="off">
+                    </div>
+                    <div class="form-group">
+                        <label>{:lang("订单号/手机号")}：</label>
+                        <input type="text" class="form-control" id="ordersn" name="ordersn">
+                    </div>
+                    <div class="form-group">
+                        <button class="btn btn-primary" type="button" style="margin-top:5px" id="search"><strong>{:lang('搜索')}</strong>
+                        </button>
+                    </div>
+                </div>
+            </form>
+            <!--搜索框结束-->
+            <div class="example-wrap">
+                <div class="example">
+                    <table id="cusTable">
+                        <thead>
+                        <th data-field="order_sn">{:lang("订单号")}</th>
+                        <th data-field="user_id">{:lang("用户ID")}</th>
+                        {if $grab_order_mode eq 1}
+                        <th data-field="specify_user_id">{:lang("分配订单用户ID")}</th>
+                        {/if}
+                        <th data-field="mobile">{:lang("手机号")}</th>
+                        <th data-field="retail_price">{:lang("支付金额")}</th>
+                        <th data-field="return_bonus">{:lang("返佣")}</th>
+                        <th data-field="create_time">{:lang("创建时间")}</th>
+                        <th data-field="status">{:lang("订单状态")}</th>
+                        <th data-field="re_users">{:lang("回购人数")}</th>
+                        <th data-field="operate">{:lang("操作")}</th>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+            <!-- End Example Pagination -->
+        </div>
+    </div>
+    
+{include file="footer" /}
+<script type="text/javascript">
+    $(document).ready(function () {
+        layui.use('laydate', function(){
+            var laydate = layui.laydate;
+            laydate.render({
+                elem: '#start_time'
+                ,trigger: 'click'
+            });
+            laydate.render({
+                elem: '#end_time'
+                ,trigger: 'click'
+            });
+        });
+        initTable();
+        //当点击查询按钮的时候执行
+        $("#search").bind("click", initTable);
+    });
+    function queryParams(params) {   //设置查询参数
+        params.searchText = $('#ordersn').val()
+        params.startTime = $('#start_time').val()
+        params.endTime = $('#end_time').val()
+        return params;
+    }
+
+</script>

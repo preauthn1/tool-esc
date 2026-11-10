@@ -1,0 +1,84 @@
+{include file="header" /}
+<!-- Panel Other -->
+<div class="ibox float-e-margins">
+    <div class="ibox-title">
+        <h5>{:lang("会员列表")}</h5>
+    </div>
+    <div class="ibox-content">
+        <div class="form-group clearfix col-sm-7">
+            <a href="javascript:;" onclick="delAll();">
+                <button class="btn btn-outline btn-danger" type="button">{:lang("删除")}</button>
+            </a>
+        </div>
+        <!--搜索框开始-->
+        <form id='commentForm' role="form" method="post" class="form-inline pull-right">
+            <div class="form-group">
+                <button class="btn btn-primary" type="button" style="margin-top:5px" id="search">
+                    <strong>{:lang('搜索')}</strong>
+                </button>
+            </div>
+        </form>
+        <!--搜索框结束-->
+        <div class="example-wrap">
+            <div class="example">
+                <table id="cusTable">
+                    <thead>
+                    <th data-checkbox="true"></th><!--复选框-->
+                    <th data-field="id">{:lang("ID")}</th>
+                    <th data-field="user_info">{:lang("用户账号")}</th>
+                    <th data-field="user_money">{:lang("基础余额")}</th>
+                    <th data-field="brokerage_money">{:lang("佣金金额")}</th>
+                    <th data-field="tyj_money">{:lang("理财金额")}</th>
+                    <th data-field="recharge">{:lang("充值金额")}</th>
+                    <th data-field="withdraw">{:lang("提现金额")}</th>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    tableCheckbox = true;
+    index_url = "{:url('member')}";
+    $(document).ready(function () {
+        initTable();
+        //当点击查询按钮的时候执行
+        $("#search").bind("click", initTable);
+    });
+
+    function queryParams(params) {   //设置查询参数
+        params['plan_id'] = "{$plan_id}";
+        return params;
+    }
+
+    function delAll() {
+        var getSelectRows = $("#cusTable").bootstrapTable('getSelections', function (row) {
+            return row;
+        });
+        var ids = new Array();  // 定义js数组用于存放自己所需的值
+        for (var i = 0; i < getSelectRows.length; i++) {
+            ids[i] = getSelectRows[i].id;
+        }
+        if (ids.length <= 0) {
+            layer.msg('请选择要操作的计划');
+            return;
+        }
+        layer.confirm('确认操作吗?', {icon: 3, title: '提示'}, function (index) {
+            $.getJSON("{:url('plan/memberdel')}", {'id': ids}, function (res) {
+                if (1 == res.code) {
+                    layer.alert(res.msg, {title: "{:lang('友情提示')}", icon: 1, closeBtn: 0}, function (inx) {
+                        layer.close(inx);
+                        initTable();
+                    });
+                } else if (111 == res.code) {
+                    window.location.reload();
+                } else {
+                    layer.alert(res.msg, {title: "{:lang('友情提示')}", icon: 2});
+                }
+            });
+
+            layer.close(index);
+        })
+    }
+</script>
+{include file="footer" /}

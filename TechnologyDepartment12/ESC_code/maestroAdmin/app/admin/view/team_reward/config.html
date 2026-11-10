@@ -1,0 +1,319 @@
+{include file="header" /}
+<div style="padding: 20px;">
+    <label>{$title}</label>
+    <table id="mainTable" class="layui-table">
+        <thead>
+        <tr>
+            <th>序号</th>
+            <th>名称</th>
+            <th>阶段数量</th>
+            <th>创建时间</th>
+            <th>操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        {volist name="team_reward_config" id="item" key="k"}
+        <tr>
+            <td>{$k}</td>
+            <td>{$item.name|default=''}</td>
+            <td>{:count($item.step??[])}</td>
+            <td>{$item.create_time|default=''}</td>
+            <td>
+                <button class="layui-btn layui-btn-normal" onclick="editItem({$k-1})">编辑</button>
+                <button class="layui-btn layui-btn-warm" onclick="viewSteps({$k-1})">查看阶段</button>
+                <button class="layui-btn layui-btn-danger" onclick="deleteItem({$k-1})">删除</button>
+            </td>
+        </tr>
+        {/volist}
+        </tbody>
+    </table>
+    <button id="addMainItemBtn" class="layui-btn" style="margin-top: 10px;">添加新项</button>
+</div>
+
+<!-- 编辑/添加弹窗 -->
+<div id="editDialog" style="display:none; padding: 20px;">
+    <div class="layui-form-item">
+        <label class="layui-form-label">名称</label>
+        <div class="layui-input-block">
+            <input type="text" id="edit_name" class="layui-input" placeholder="请输入名称">
+        </div>
+    </div>
+
+    <table id="stepTable" class="layui-table">
+        <thead>
+        <tr>
+            <th>阶段</th>
+            <th>最低直推人数</th>
+            <th>达成条件</th>   <!-- 此处如果需要固定文字，可直接写，或从PHP传入 -->
+            <th>最低活跃人数</th>
+            <th>直推用户首充金额</th>
+            <th>奖励金额</th>
+            <th>操作</th>
+        </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+    <button id="addStepBtn" class="layui-btn layui-btn-normal" style="margin-top: 10px;">添加阶段</button>
+    <button id="saveEditBtn" class="layui-btn" style="margin-top: 10px;">保存</button>
+</div>
+
+<!-- 查看阶段弹窗 -->
+<div id="viewDialog" style="display:none; padding: 20px;">
+    <h3 id="view_title"></h3>
+    <table id="viewTable" class="layui-table">
+        <thead>
+        <tr>
+            <th>阶段</th>
+            <th>最低直推人数</th>
+            <th>达成条件</th>
+            <th>最低活跃人数</th>
+            <th>直推用户首充金额</th>
+            <th>奖励金额</th>
+        </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+
+<script>
+    // 修复：补全PHP闭合标签，并添加JSON_UNESCAPED_UNICODE选项
+    var team_reward_config_json = '<?php echo $team_reward_config_json; ?>';
+    var allData  = [];
+    try {
+        allData = JSON.parse(team_reward_config_json, function (key, value) {
+            return value && value.constructor === String ? value.replace(/\\u[\dA-Fa-f]{4}/g, (s) => {
+                return String.fromCharCode(parseInt(s.slice(2), 16));
+            }) : value;
+        });
+    } catch (e) {
+        console.error('JSON parse error:', e);
+    }
+    var currentEditIndex = -1;
+    var isEditMode = false;
+
+    layui.use(['jquery', 'layer', 'form'], function () {
+        var $ = layui.jquery;
+        var layer = layui.layer;
+        var form = layui.form;
+
+        // 添加阶段行（支持0值）
+        function addStepRow(phase, direct_referral_num, active_num, recharge_money, amount) {
+            var phaseVal = (phase !== undefined && phase !== null) ? phase : '';
+            var directVal = (direct_referral_num !== undefined && direct_referral_num !== null) ? direct_referral_num : '';
+            var activeVal = (active_num !== undefined && active_num !== null) ? active_num : '';
+            var rechargeVal = (recharge_money !== undefined && recharge_money !== null) ? recharge_money : '';
+            var amountVal = (amount !== undefined && amount !== null) ? amount : '';
+
+            // 达成条件列直接显示固定文字，或从PHP传入，这里使用固定文字示例
+            var conditionTxt = '<?php echo $condition_txt; ?>';  // 与编辑弹窗保持一致
+
+            var newRow = `
+            <tr>
+                <td><input type="number" class="layui-input step-phase" value="${phaseVal}" placeholder="阶段【由小到大排序】"></td>
+                <td><input type="number" class="layui-input step-direct" value="${directVal}" placeholder="请输入人数"></td>
+                <td class="text-center">${conditionTxt}</td>
+                <td><input type="number" class="layui-input step-active" value="${activeVal}" placeholder="请输入最少活跃人数"></td>
+                <td><input type="number" class="layui-input step-recharge" value="${rechargeVal}" placeholder="请输入最低充值金额"></td>
+                <td><input type="number" class="layui-input step-amount" value="${amountVal}" placeholder="请输入奖励金额"></td>
+                <td><button class="layui-btn layui-btn-danger" onclick="deleteStepRow(this)">删除</button></td>
+            </tr>`;
+            $('#stepTable tbody').append(newRow);
+        }
+
+        // 删除阶段行
+        window.deleteStepRow = function(button) {
+            $(button).closest('tr').remove();
+        };
+
+        // 打开编辑弹窗
+        window.openEditDialog = function(index, isNew) {
+            currentEditIndex = index;
+            isEditMode = !isNew;
+
+            if (isEditMode) {
+                $('#edit_name').val(allData[index].name || '');
+                $('#stepTable tbody').empty();
+                if (allData[index].step && allData[index].step.length > 0) {
+                    allData[index].step.forEach(function(step) {
+                        addStepRow(step.phase, step.direct_referral_num, step.active_num, step.recharge_money, step.amount);
+                    });
+                }
+            } else {
+                $('#edit_name').val('');
+                $('#stepTable tbody').empty();
+            }
+
+            layer.open({
+                type: 1,
+                title: isNew ? '添加新项' : '编辑项',
+                area: ['90%', '90%'],
+                content: $('#editDialog'),
+                btn: ['关闭'],
+                btnAlign: 'c'
+            });
+        };
+
+        // 添加新项
+        $('#addMainItemBtn').on('click', function () {
+            openEditDialog(-1, true);
+        });
+
+        // 添加阶段按钮
+        $('#addStepBtn').on('click', function () {
+            addStepRow('', '', '', '', '');
+        });
+
+        // 保存编辑
+        $('#saveEditBtn').on('click', function () {
+            var name = $('#edit_name').val();
+            if (!name) {
+                layer.msg('请输入名称', { icon: 2 });
+                return;
+            }
+
+            var steps = [];
+            $('#stepTable tbody tr').each(function () {
+                var phase = $(this).find('.step-phase').val();
+                var direct_referral_num = $(this).find('.step-direct').val();
+                var active_num = $(this).find('.step-active').val();
+                var recharge_money = $(this).find('.step-recharge').val();
+                var amount = $(this).find('.step-amount').val();
+
+                // 检查字段是否填写（允许0值）
+                if (phase.trim() !== '' && direct_referral_num.trim() !== '' && active_num.trim() !== '' && recharge_money.trim() !== '' && amount.trim() !== '') {
+                    steps.push({
+                        phase: phase,
+                        direct_referral_num: direct_referral_num,
+                        active_num: active_num,
+                        recharge_money: recharge_money,
+                        amount: amount
+                    });
+                }
+            });
+
+            if (steps.length === 0) {
+                layer.msg('请至少添加一个完整的阶段', { icon: 2 });
+                return;
+            }
+
+            // 生成标准日期时间 YYYY-MM-DD HH:MM:SS
+            var now = new Date();
+            var formattedDate = now.getFullYear() + '-' +
+                ('0' + (now.getMonth()+1)).slice(-2) + '-' +
+                ('0' + now.getDate()).slice(-2) + ' ' +
+                ('0' + now.getHours()).slice(-2) + ':' +
+                ('0' + now.getMinutes()).slice(-2) + ':' +
+                ('0' + now.getSeconds()).slice(-2);
+
+            var itemData = {
+                name: name,
+                step_length: steps.length,
+                step: steps,
+                create_time: isEditMode ? (allData[currentEditIndex].create_time || formattedDate) : formattedDate
+            };
+
+            if (isEditMode) {
+                allData[currentEditIndex] = itemData;
+            } else {
+                allData.push(itemData);
+            }
+
+            $.ajax({
+                url: '{:url("config/index")}',
+                type: "POST",
+                data: { "{$config_key}": JSON.stringify(allData) },
+                success: function (res) {
+                    if (res.code === 1) {
+                        layer.msg('保存成功', { icon: 1 }, function() {
+                            location.reload();
+                        });
+                    } else {
+                        layer.msg('保存失败：' + res.msg, { icon: 2 });
+                    }
+                },
+                error: function () {
+                    layer.msg('请求失败', { icon: 2 });
+                }
+            });
+        });
+    });
+
+    // 全局函数（用于按钮调用）
+    window.editItem = function(index) {
+        if (typeof layui !== 'undefined' && layui.jquery) {
+            window.openEditDialog(index, false);
+        } else {
+            layui.use(['jquery', 'layer'], function() {
+                window.openEditDialog(index, false);
+            });
+        }
+    };
+
+    window.viewSteps = function(index) {
+        layui.use(['jquery', 'layer'], function () {
+            var $ = layui.jquery;
+            var layer = layui.layer;
+
+            var item = allData[index];
+            $('#view_title').text((item.name || '无名称') + ' - 阶段详情');
+            $('#viewTable tbody').empty();
+
+            if (item.step && item.step.length > 0) {
+                item.step.forEach(function(step) {
+                    var conditionTxt = '<?php echo $condition_txt; ?>';  // 与编辑弹窗保持一致
+                    var row = `
+                    <tr>
+                        <td>${step.phase}</td>
+                        <td>${step.direct_referral_num}</td>
+                        <td class="text-center">${conditionTxt}</td>
+                        <td>${step.active_num}</td>
+                        <td>${step.recharge_money}</td>
+                        <td>${step.amount}</td>
+                    </tr>`;
+                    $('#viewTable tbody').append(row);
+                });
+            }
+
+            layer.open({
+                type: 1,
+                title: '查看阶段',
+                area: ['80%', '80%'],
+                content: $('#viewDialog'),
+                btn: ['关闭'],
+                btnAlign: 'c'
+            });
+        });
+    };
+
+    window.deleteItem = function(index) {
+        layui.use(['jquery', 'layer'], function () {
+            var $ = layui.jquery;
+            var layer = layui.layer;
+
+            layer.confirm('确定要删除此项吗？', { icon: 3, title: '提示' }, function (confirmIndex) {
+                allData.splice(index, 1);
+
+                $.ajax({
+                    url: '{:url("config/index")}',
+                    type: "POST",
+                    data: { "{$config_key}": JSON.stringify(allData) },
+                    success: function (res) {
+                        if (res.code === 1) {
+                            layer.msg('删除成功', { icon: 1 }, function() {
+                                location.reload();
+                            });
+                        } else {
+                            layer.msg('删除失败：' + res.msg, { icon: 2 });
+                        }
+                    },
+                    error: function () {
+                        layer.msg('请求失败', { icon: 2 });
+                    }
+                });
+
+                layer.close(confirmIndex);
+            });
+        });
+    };
+</script>
+{include file="footer" /}

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{$title}</title>
+    <link href="/static/admin/css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
+    <link href="/static/admin/css/font-awesome.min.css?v=4.7.0" rel="stylesheet">
+    <link href="/static/admin/css/plugins/bootstrap-table/bootstrap-table.min.css" rel="stylesheet">
+    <link href="/static/admin/css/animate.min.css" rel="stylesheet">
+    <link href="/static/admin/css/style.min.css?v=4.1.0" rel="stylesheet">
+    <link href="/static/admin/js/layui/css/layui.css" rel="stylesheet">
+    <link href="/static/admin/css/plugins/sweetalert/sweetalert.css" rel="stylesheet">
+    <link href="/static/admin/css/animate.min.css" rel="stylesheet">
+    <link href="/static/admin/css/plugins/iCheck/custom.css" rel="stylesheet">
+    <link href="/static/admin/js/plugins/bootstrap-tagsinput/bootstrap-tagsinput.css" rel="stylesheet">
+    <script src="/static/admin/js/jquery.min.js?v=2.1.4"></script>
+    <script src="/static/admin/js/bootstrap.min.js?v=3.3.6"></script>
+    <script src="/static/admin/js/content.min.js?v=1.0.0"></script>
+    <script src="/static/admin/js/plugins/bootstrap-table/bootstrap-table.min.js"></script>
+    <script src="/static/admin/js/plugins/bootstrap-table/bootstrap-table-mobile.min.js"></script>
+    <script src="/static/admin/js/plugins/bootstrap-table/locale/bootstrap-table-zh-CN.min.js"></script>
+    <script src="/static/admin/js/plugins/suggest/bootstrap-suggest.min.js"></script>
+    <script src="/static/admin/js/plugins/sweetalert/sweetalert.min.js"></script>
+    <script src="/static/admin/js/plugins/webuploader/webuploader.min.js"></script>
+    <script src="/static/admin/js/plugins/validate/jquery.validate.min.js"></script>
+    <script src="/static/admin/js/plugins/validate/messages_zh.min.js"></script>
+    <script src="/static/admin/js/plugins/iCheck/icheck.min.js"></script>
+    <script src="/static/admin/js/layui/layui.js"></script>
+    <script src="/static/admin/js/jquery.form.js"></script>
+    <script src="/static/admin/js/plugins/ueditor/ueditor.config.js?v3"></script>
+    <script src="/static/admin/js/plugins/ueditor/ueditor.all.js"></script>
+    <link type="text/css" rel="stylesheet" href="/static/libs/bmbIframe/bmbIframe.css?{:css_version()}" />
+    <script src="/static/libs/bmbIframe/jquery.bmbIframe.js"></script>
+    <script src="/static/admin/js/common.js"></script>
+    <script src="/static/admin/js/functions.js"></script>
+    <script type="text/javascript">
+        var index_url = "{:url('index')}"
+        var add_url = "{:url('add')}"
+        var del_url = "{:url('del')}"
+        var index = '';
+        var tableCheckbox = false;
+        var pagination = true;
+    </script>
+</head>
+<body class="gray-bg">
+<div class="wrapper wrapper-content">
+<div class="modal" id="bmbModal">
+    <div class="modal-dialog">
+        <div class="modal-content bmd-modalContent">
+
+            <div class="modal-body">
+                <div class="close-button">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                </div>
+                <div class="embed-responsive embed-responsive-16by9">
+                    <iframe class="embed-responsive-item" frameborder="0"></iframe>
+                </div>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->

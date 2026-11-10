@@ -1,0 +1,127 @@
+{include file="header" /}
+    <!-- Panel Other -->
+    <div class="ibox float-e-margins">
+        <div class="ibox-title">
+            <h5>会员账单详情</h5>
+        </div>
+        <div class="ibox-content">
+            <div id="toolbar">
+                <div id="stats" style=' float: left; padding: 8px 12px'></div>
+            </div>
+            <form id='commentForm' role="form" method="post" class="form-inline pull-right" target="_blank" onkeydown="if (event.keyCode == 13) { return false; }">
+                <div class="content clearfix m-b">
+                    <div class="form-group">
+                        <label>{:lang("选择时间")}：</label>
+                        <input type="text" class="form-control" id="start_time" name="startTime" value="{$start_time ? $start_time : getDateStr()}" placeholder="yyyy-MM-dd"  autocomplete="off">
+                        -
+                        <input type="text" class="form-control" id="end_time" name="endTime" value="{$end_time ? $end_time : getDateStr()}" placeholder="yyyy-MM-dd"  autocomplete="off">
+                    </div>
+                    <div class="form-group layui-form">
+                        <label>{:lang("所属代理")}：</label>
+                        <div class="layui-inline">
+                            <select lay-search="" id="leader1" name="leader1">
+                                <option value="">所有</option>
+                                {foreach name="agent" item="vo"}
+                                <option value="{$vo.id}">{$vo.id}/{$vo.user_name}{$vo.remark? '('.$vo.remark.')' : ''}</option>
+                                {/foreach}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>{:lang("进出类型")}：</label>
+                        <select class="form-control" name="detail_type" id="detail_type" >
+                            <option value="">所有</option>
+                            <option value="1">{:lang("充值")}</option>
+                            <option value="2">{:lang("提现")}</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>{:lang("用户类型")}：</label>
+                        <select class="form-control" id="is_xuni" name="is_xuni">
+                            <option value="-1">{:lang("所有")}</option>
+                            <option value="1">{:lang("虚拟用户")}</option>
+                            <option value="0">{:lang("真实用户")}</option>
+                        </select>
+                    </div>
+<!--                    <div class="form-group">-->
+<!--                        <label>{:lang("用户名称")}：</label>-->
+<!--                        <input type="text" class="form-control" id="username" name="user_name" value="{$user_name}" placeholder="{:lang('用户名')}">-->
+<!--                    </div>-->
+                    <div class="form-group">
+                        <label>{:lang("用户ID")}：</label>
+                        <input type="text" class="form-control" id="user_id" name="user_id" value="{$user_id|default=0}" placeholder="{:lang('用户ID')}">
+                    </div>
+                    <div class="form-group">
+                        <input type="hidden" value="1" name="export"/>
+                        <button class="btn btn-primary" type="button" style="margin-top:5px" id="search"><strong>{:lang('搜索')}</strong></button>
+                        <button class="btn btn-danger" type="submit" style="margin-top:5px" id="export"><strong>{:lang("导出")}</strong></button>
+                    </div>
+                </div>
+            </form>
+            <div class="example-wrap">
+                <div class="example">
+                    <table id="cusTable"
+                    data-total-field="total"
+                    data-data-field="data">
+                        <thead>
+                        <th data-field="id">{:lang("ID")}</th>
+<!--                        <th data-field="user_id">{:lang("用户ID")}</th>-->
+                        <th data-field="user_info">{:lang("用户信息")}</th>
+                        <th data-field="is_xuni_text">{:lang("是否是虚拟账号")}</th>
+                        <th data-field="top_leader_remark">{:lang("所属代理")}</th>
+                        <th data-field="title">{:lang("账单标题")}</th>
+                        <th data-field="type_str">{:lang("明细种类")}</th>
+                        <th data-field="user_money">{:lang("操作前金额")}</th>
+                        <th data-field="money">{:lang("操作金额")}</th>
+                        <th data-field="last_money">{:lang("用户余额")}</th>
+                        <th data-field="create_time">{:lang("添加时间")}</th>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+            <!-- End Example Pagination -->
+        </div>
+    </div>
+
+<script type="text/javascript">
+  index_url = "{:url('recharge_withdrawal')}"
+    function queryParams(params) {   //设置查询参数
+        params.type = $('#type').val();
+        params.username = $('#username').val();
+        params.user_id = $('#user_id').val();
+        params.startTime = $('#start_time').val();
+        params.endTime = $('#end_time').val();
+        params.detail_type = $('#detail_type').val();
+        params.leader1 = $('#leader1').val();
+      params.is_xuni = $('#is_xuni').val();
+        return params;
+    }
+    function onLoadSuccess(res) {
+        var stathtml = '';
+        if (res.stat) {
+            $.each(res.stat, function(i, v){
+                stathtml += '<span class="label label-success">'+v.text+'：'+v.total+'</span> ';
+            });
+        }
+        $("#stats").html(stathtml);
+
+    }
+    $(document).ready(function () {
+        layui.use('laydate', function(){
+            var laydate = layui.laydate;
+            laydate.render({
+                elem: '#start_time'
+                ,trigger: 'click'
+            });
+            laydate.render({
+                elem: '#end_time'
+                ,trigger: 'click'
+            });
+        });
+        initTable();
+        $("#search").on("click", function(){
+            initTable();
+        });
+    });
+</script>
+{include file="footer" /}

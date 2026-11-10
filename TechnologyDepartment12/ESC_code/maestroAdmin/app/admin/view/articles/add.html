@@ -1,0 +1,416 @@
+{include file="header" /}
+<div class="row">
+    <div class="col-sm-10">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h5>{:lang("编辑文章")}</h5>
+            </div>
+            <div class="ibox-content">
+                <form class="form-horizontal m-t" id="dataForm" method="post" action="{:url('articles/add')}">
+                    <input type="hidden" name="id" value="{$info['id']}"/>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">{:lang("文章类型")}：</label>
+                        <div class="input-group col-sm-4">
+                            <select class="form-control" name="type">
+                                {if !empty($article_types)}
+                                {foreach name="article_types" item="vo" key='key'}
+                                {if condition="$info.type == $key"}
+                                <option value="{$key}" selected>{$vo}</option>
+                                {else}
+                                <option value="{$key}">{$vo}</option>
+                                {/if}
+                                {/foreach}
+                                {/if}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">{:lang("语言")}：</label>
+                        <div class="input-group col-sm-4">
+                            <select class="form-control" name="lang">
+                                {if !empty($langs)}
+                                {foreach name="langs" item="vo" key='key'}
+                                {if condition="$info.lang == $vo.lang"}
+                                <option value="{$vo.lang}" selected>{$vo.remark}</option>
+                                {else}
+                                <option value="{$vo.lang}">{$vo.remark}</option>
+                                {/if}
+                                {/foreach}
+                                {/if}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">
+                            <span class="x-red">*</span>{:lang("标题原文")}
+                        </label>
+                        <div class="input-group col-sm-4">
+                            <input type="text" name="title"
+                                   value="{$info.title}" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">{:lang("状态")}：</label>
+                        <div class="input-group col-sm-4">
+                            <select class="form-control" name="status">
+                                {if $info.status eq 1}
+                                <option value="1" selected>{:lang("启用")}</option>
+                                <option value="0" >{:lang("停用")}</option>
+                                {/if}
+                                {if $info.status eq 0}
+                                <option value="1">{:lang("启用")}</option>
+                                <option value="0" selected>{:lang("停用")}</option>
+                                {/if}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">{:lang("排序")}：</label>
+                        <div class="input-group col-sm-4">
+                            <input type="number" class="form-control" value="{$info.sort|intval}" name="sort" required>
+                            <p class="help-block">{:lang("数字越小的排在前面")}</p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">{:lang("图片")}：</label>
+                        <input name="thumb" id="img" value="{$info.thumb}" type="hidden"/>
+                        <div class="form-inline">
+                            <div class="input-group col-sm-2">
+                                <button type="button" class="layui-btn" id="uploader">
+                                    <i class="layui-icon">&#xe67c;</i>{:lang("上传图片")}
+                                </button>
+                            </div>
+                            <div class="input-group col-sm-3">
+                                <div id="sm">{if $info.thumb}<img src="{$info.thumb|toMedia}" style="height: 40px;"/>{/if}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-4 col-sm-offset-8">
+                            <!--<input type="button" value="提交" class="btn btn-primary" id="postform"/>-->
+                            <button class="btn btn-primary" type="submit">{:lang("提交")}</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">{:lang("内容原文")}</label>
+                        <div class="input-group col-sm-7">
+                            <!-- 编辑器容器 -->
+                            <div id="editor-wrapper">
+                                <div id="toolbar-container"><!-- 工具栏 --></div>
+                                <div id="editor-container"><!-- 编辑器 --></div>
+                            </div>
+                            <textarea type="text" name="content" id="content_textarea" rows="10" class="form-control" style="display: none">{$info.content}</textarea>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{include file="footer" /}
+
+<!-- 引入 wangEditor 资源 -->
+<link href="/static/admin/js/plugins/wangeditor/style.css" rel="stylesheet">
+<style>
+  #editor-wrapper {
+    border: 1px solid #ccc;
+    z-index: 100; /* 按需定义 */
+  }
+  #toolbar-container {
+    border-bottom: 1px solid #ccc;
+  }
+  #editor-container {
+    height: 500px;
+  }
+</style>
+
+<script src="/static/admin/js/plugins/wangeditor/index.js"></script>
+<script type="text/javascript">
+    layui.use(['util', 'layer'], function () {
+        var util = layui.util;
+        var layer = layui.layer;
+
+        // 初始化 wangEditor
+        const { createEditor, createToolbar } = window.wangEditor;
+
+        // 获取原始内容
+        const contentTextarea = document.querySelector('#content_textarea');
+        let originalContent = contentTextarea.value;
+
+        // 编辑器配置
+        const editorConfig = {
+            placeholder: '请输入内容...',
+            onChange(editor) {
+                // 当编辑器内容变化时，更新到textarea
+                const html = editor.getHtml();
+                contentTextarea.value = html;
+            },
+            MENU_CONF: {
+                // 配置图片上传
+                uploadImage: {
+                    // 自定义上传方法
+                    customUpload(file, insertFn) {
+                        // 显示上传开始提示
+                        const loadingId = layer.msg('开始上传图片，请稍候...', {icon: 16, time: 0});
+
+                        // 第一步：获取预签名URL
+                        $.ajax({
+                            url: "{:url('upload/getPresignedUrl')}",
+                            type: 'POST',
+                            data: {
+                                folder: 'article',
+                                filename: file.name
+                            },
+                            dataType: 'json',
+                            success: function (res) {
+                                if (res.code === 1) {
+                                    // 第二步：使用预签名URL上传文件
+                                    uploadImageFile(file, res.data.url, res.data.key, insertFn, loadingId);
+                                } else {
+                                    layer.close(loadingId);
+                                    layer.msg(res.msg || '获取上传链接失败', {icon: 2});
+                                }
+                            },
+                            error: function () {
+                                layer.close(loadingId);
+                                layer.msg('获取上传链接请求失败', {icon: 2});
+                            }
+                        });
+
+                        // 阻止默认上传行为
+                        return true;
+                    }
+                },
+
+                // 配置视频上传
+                uploadVideo: {
+                    // 自定义上传方法
+                    customUpload(file, insertFn) {
+                        // 显示上传开始提示
+                        const loadingId = layer.msg('开始上传视频，请稍候...', {icon: 16, time: 0});
+
+                        // 第一步：获取预签名URL
+                        $.ajax({
+                            url: "{:url('upload/getPresignedUrl')}",
+                            type: 'POST',
+                            data: {
+                                folder: 'article',
+                                filename: file.name
+                            },
+                            dataType: 'json',
+                            success: function (res) {
+                                if (res.code === 1) {
+                                    // 第二步：使用预签名URL上传文件
+                                    uploadVideoFile(file, res.data.url, res.data.key, insertFn, loadingId);
+                                } else {
+                                    layer.close(loadingId);
+                                    layer.msg(res.msg || '获取上传链接失败', {icon: 2});
+                                }
+                            },
+                            error: function () {
+                                layer.close(loadingId);
+                                layer.msg('获取上传链接请求失败', {icon: 2});
+                            }
+                        });
+
+                        // 阻止默认上传行为
+                        return true;
+                    }
+                }
+            }
+        };
+
+        // 使用预签名URL上传图片文件
+        function uploadImageFile(file, presignedUrl, fileKey, insertFn, loadingId) {
+            // 创建XMLHttpRequest对象
+            var xhr = new XMLHttpRequest();
+
+            // 监听上传进度
+            xhr.upload.onprogress = function (e) {
+                if (e.lengthComputable) {
+                    var percent = Math.floor(e.loaded / e.total * 100);
+                    layer.msg('上传进度: ' + percent + '%', {icon: 16, time: 0, shade: 0.2, id: loadingId});
+                }
+            };
+
+            // 上传完成处理
+            xhr.onload = function () {
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    // 上传成功
+                    var baseUrl = '{$base_url}' || '';
+                    var fileUrl = baseUrl + '/' + fileKey;
+
+                    // 使用编辑器提供的insertFn回调将图片插入编辑器
+                    insertFn(fileUrl, file.name, fileUrl);
+
+                    layer.close(loadingId);
+                    layer.msg('图片上传成功', {icon: 1});
+                } else {
+                    // 上传失败
+                    layer.close(loadingId);
+                    layer.msg('上传失败: ' + xhr.statusText, {icon: 2});
+                }
+            };
+
+            // 上传出错
+            xhr.onerror = function () {
+                layer.close(loadingId);
+                layer.msg('网络错误，上传失败', {icon: 2});
+            };
+
+            // 发起上传请求
+            xhr.open('PUT', presignedUrl, true);
+            xhr.send(file);
+        }
+
+        // 使用预签名URL上传视频文件
+        function uploadVideoFile(file, presignedUrl, fileKey, insertFn, loadingId) {
+            // 创建上传进度展示区域
+            const progressHtml = `
+                <div class="upload-progress-container" style="margin-top: 10px;">
+                    <div class="progress progress-striped active">
+                        <div class="progress-bar" role="progressbar" style="width: 0%"></div>
+                    </div>
+                    <div style="margin-top: 5px;">
+                        <small>正在上传：<span class="upload-status">0%</span></small>
+                    </div>
+                </div>`;
+
+            // 在loading消息后添加进度条
+            layer.msg('上传视频中...', {
+                icon: 16,
+                time: 0,
+                shade: 0.2,
+                id: loadingId,
+                content: progressHtml,
+                success: function(layero, index) {
+                    $(layero).find('.layui-layer-content').css('padding-bottom', '20px');
+                }
+            });
+
+            // 创建XMLHttpRequest对象
+            var xhr = new XMLHttpRequest();
+
+            // 监听上传进度
+            xhr.upload.onprogress = function (e) {
+                if (e.lengthComputable) {
+                    var percent = Math.floor(e.loaded / e.total * 100);
+                    $('.progress-bar').css('width', percent + '%');
+                    $('.upload-status').text(percent + '%');
+                }
+            };
+
+            // 上传完成处理
+            xhr.onload = function () {
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    // 上传成功
+                    var baseUrl = '{$base_url}' || '';
+                    var fileUrl = baseUrl + '/' + fileKey;
+
+                    // 使用编辑器提供的insertFn回调将视频插入编辑器
+                    insertFn(fileUrl);
+
+                    layer.close(loadingId);
+                    layer.msg('视频上传成功', {icon: 1});
+                } else {
+                    // 上传失败
+                    layer.close(loadingId);
+                    layer.msg('上传失败: ' + xhr.statusText, {icon: 2});
+                }
+            };
+
+            // 上传出错
+            xhr.onerror = function () {
+                layer.close(loadingId);
+                layer.msg('网络错误，上传失败', {icon: 2});
+            };
+
+            // 发起上传请求
+            xhr.open('PUT', presignedUrl, true);
+            xhr.send(file);
+        }
+
+        // 创建编辑器
+        const editor = createEditor({
+            selector: '#editor-container',
+            config: editorConfig,
+            mode: 'default', // 或 'simple' 简洁模式
+        });
+
+        // 确保编辑器创建后设置内容
+        setTimeout(() => {
+            editor.setHtml(originalContent);
+            contentTextarea.value = originalContent;
+        }, 100);
+
+        // 工具栏配置
+        const toolbarConfig = {};
+
+        // 创建工具栏
+        const toolbar = createToolbar({
+            editor,
+            selector: '#toolbar-container',
+            config: toolbarConfig,
+            mode: 'default', // 或 'simple' 简洁模式
+        });
+
+        // 表单提交前确保内容已更新
+        document.querySelector('#dataForm').addEventListener('submit', function() {
+            const html = editor.getHtml();
+            contentTextarea.value = html;
+        });
+
+        // 原有的translate功能保留
+        util.on({
+            translate_title: function (othis) {
+                let title = $('input[name=title]').val()
+                // 发起翻译请求
+                let url = "{:url('articles/translate')}"
+                index = layer.load(0);
+                $.ajax({
+                    type: 'POST',
+                    url: url,
+                    data: {text: title},
+                    dataType: 'json',
+                    success: function (res) {
+                        layer.closeLast('loading');
+                        // 循环语言
+                        for (let key in res.data) {
+                            $('#title_' + key).val(res.data[key])
+                        }
+                    },
+                    error: function (xhr, type) {
+                        layer.closeLast('loading');
+                    }
+                });
+            },
+            translate_content: function (othis) {
+                // 获取当前编辑器内容
+                let content = editor.getHtml();
+                document.querySelector('textarea[name=content]').value = content;
+
+                // 发起翻译请求
+                let url = "{:url('articles/translate')}"
+                index = layer.load(0);
+                $.ajax({
+                    type: 'POST',
+                    url: url,
+                    data: {text: content},
+                    dataType: 'json',
+                    success: function (res) {
+                        layer.closeLast('loading');
+                        // 循环语言
+                        for (let key in res.data) {
+                            $('#content_' + key).val(res.data[key])
+                        }
+                    },
+                    error: function (xhr, type) {
+                        layer.closeLast('loading');
+                    }
+                });
+            },
+        });
+    });
+</script>
+

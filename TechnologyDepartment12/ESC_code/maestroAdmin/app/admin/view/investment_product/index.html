@@ -1,0 +1,174 @@
+{include file="header" /}
+    <!-- Panel Other -->
+    <div class="ibox float-e-margins">
+        <div class="ibox-title">
+            <h5>{:lang("AI智能托管")}</h5>
+        </div>
+        <div class="ibox-content">
+            <div class="form-group clearfix col-sm-4 col-md-8">
+                {if authCheck('investment_product/add') }
+                <a id="add" href="{:url('investment_product/add')}">
+                    <button class="btn btn-outline btn-primary" type="button">{:lang("新增")}</button>
+                </a>
+                {/if}
+                {if authCheck('investment_product_session/index') }
+                <a id="investment_product_session" href="{:url('investment_product_session/index')}">
+                    <button class="btn btn-outline btn-primary" type="button">{:lang("开放时间段")}</button>
+                </a>
+                {/if}
+                {if authCheck('investment_product_settlement_time/index') }
+                <a id="investment_product_settlement_time" href="{:url('investment_product_settlement_time/index')}">
+                    <button class="btn btn-outline btn-primary" type="button">{:lang("收益结算设置")}</button>
+                </a>
+                {/if}
+            </div>
+            <!--搜索框开始-->
+            <form id='commentForm' role="form" method="post" class="form-inline pull-right">
+                <div class="content clearfix m-b">
+                    <div class="form-group">
+                        <label>{:lang("产品名称")}：</label>
+                        <input type="text" lay-affix="clear" class="form-control" id="product_name" name="product_name">
+                    </div>
+                    <div class="form-group">
+                        <button class="btn btn-primary" type="button" style="margin-top:5px" id="search"><strong>{:lang('搜索')}</strong></button>
+                    </div>
+                </div>
+            </form>
+            <!--搜索框结束-->
+            <div class="example-wrap">
+                <div class="example">
+                    <table id="cusTable"
+                           data-total-field="total"
+                           data-data-field="data">
+                        <thead>
+                        <th data-field="id">{:lang("id")}</th>
+                        <th data-field="product_name">{:lang("托管名称")}</th>
+                        <th data-field="cycle">{:lang("托管周期（天）")}</th>
+                        <th data-field="profit">{:lang("收益率")}</th>
+                        <th data-field="min_balance">{:lang("最小余额限制")}</th>
+<!--                        <th data-field="start_time">{:lang("开始时间")}</th>-->
+<!--                        <th data-field="end_time">{:lang("结束时间")}</th>-->
+                        <th data-field="description">{:lang("托管说明")}</th>
+                        <th data-field="income_text">{:lang("托管收益文本")}</th>
+                        <th data-field="profit_type">{:lang("收益类型")}</th>
+<!--                        <th data-field="level_id">{:lang("VIP等级")}</th>-->
+                        <th data-field="sales_status" data-formatter="salesStatusFormatter">{:lang("销售状态")}</th>
+                        <th data-field="status" data-formatter="statusFormatter">{:lang("状态")}</th>
+                        <th data-field="sort">{:lang("排序")}</th>
+<!--                        <th data-field="rebate_type">{:lang("派息类型")}</th>-->
+<!--                        <th data-field="rebate_time">{:lang("派息时间")}</th>-->
+<!--                        <th data-field="is_shortly_rebate" data-formatter="isShortlyRebateFormatter">{:lang("立马派息")}</th>-->
+                        <th data-field="operate">{:lang("操作")}</th>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+            <!-- End Example Pagination -->
+        </div>
+    </div>
+<!-- End Panel Other -->
+
+{include file="footer" /}
+<script type="text/javascript">
+
+    function salesStatusFormatter(value, row, index) {
+        let checkbox = '';
+        let checked = row.sales_status ? 'checked' : ''
+        checkbox = '  <div class="layui-form"><input type="checkbox" name="sales_status" value="1" title="开启|关闭" lay-skin="switch" data-type="sales_status" data-id="'+row.id+'" data-val="'+row.sales_status+'" lay-filter="changeStatus"'+ checked +'></div>';
+        return [
+            checkbox
+        ].join('');
+    }
+    function statusFormatter(value, row, index) {
+        let checkbox = '';
+        let checked = row.status ? 'checked' : ''
+        checkbox = '  <div class="layui-form"><input type="checkbox" name="status" value="1" title="开启|关闭" lay-skin="switch" data-type="status" data-id="'+row.id+'" data-val="'+row.status+'" lay-filter="changeStatus"'+ checked +'></div>';
+        return [
+            checkbox
+        ].join('');
+    }
+    function isShortlyRebateFormatter(value, row, index) {
+        let checkbox = '';
+        let checked = row.status ? 'checked' : ''
+        checkbox = '  <div class="layui-form"><input type="checkbox" name="is_shortly_rebate" value="1" title="开启|关闭" lay-skin="switch" data-type="is_shortly_rebate" data-id="'+row.id+'" data-val="'+row.is_shortly_rebate+'" lay-filter="changeStatus"'+ checked +'></div>';
+        return [
+            checkbox
+        ].join('');
+    }
+    function queryParams(params) {
+        params.product_name = $('#product_name').val();
+        return params;
+    }
+    $(document).ready(function () {
+        initTable();
+        $("#search").bind("click", initTable);
+
+        layui.use(['util', 'form'], function() {
+            var util = layui.util;
+            var form = layui.form;
+
+            // checkbox 事件
+            form.on('switch(changeStatus)', function(data){
+              console.warn(data);
+                var elem = data.elem; // 获得 checkbox 原始 DOM 对象
+                let type = elem.dataset.type
+                let id = elem.dataset.id
+                let val = elem.dataset.val
+
+                // 发起请求
+                let url = "{:url('changeStatus')}"
+                index = layer.load(0);
+                $.ajax({
+                    type: 'POST',
+                    url: url,
+                    data: {
+                        id:id,
+                        type: type,
+                        val: val
+                    },
+                    dataType: 'json',
+                    success: function (res) {
+                        layer.closeLast('loading');
+                        // 循环语言
+                        layer.msg(res.msg)
+                    },
+                    error: function (xhr, type) {
+                        layer.closeLast('loading');
+                    }
+                });
+            });
+        });
+    });
+    function onLoadSuccess(res) {
+        $("#add").on('click',function (e){
+            add(e.currentTarget.href)
+            return false;
+        });
+        $("#investment_product_session").on('click',function (e){
+            add(e.currentTarget.href)
+            return false;
+        });
+        $("#investment_product_settlement_time").on('click',function (e){
+            add(e.currentTarget.href)
+            return false;
+        });
+        $("td a").on('click', function (e) {
+            if (e.currentTarget.href.indexOf('javascript') === -1) {
+                add(e.currentTarget.href)
+                return false;
+            }
+            return true;
+        });
+    }
+    function add(url){
+        // 在此处输入 layer 的任意代码
+        layer.open({
+            type: 2,
+            area: ['100%', '100%'],
+            title: '添加/编辑',
+            maxmin: true, // 允许全屏最小化
+            anim: 0, // 0-6 的动画形式，-1 不开启
+            content: url
+        });
+    }
+</script>

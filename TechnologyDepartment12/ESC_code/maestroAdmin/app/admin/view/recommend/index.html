@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>直推奖励配置</title>
+    <link rel="shortcut icon" href="{$admin_icon|toMedia}">
+    <link href="/static/admin/css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
+    <link href="/static/admin/css/font-awesome.min.css?v=4.4.0" rel="stylesheet">
+    <link href="/static/admin/css/animate.min.css" rel="stylesheet">
+    <link href="/static/admin/css/plugins/iCheck/custom.css" rel="stylesheet">
+    <link href="/static/admin/css/style.min.css?v=4.1.0" rel="stylesheet">
+    <link href="/static/admin/js/plugins/bootstrap-tagsinput/bootstrap-tagsinput.css" rel="stylesheet">
+    <link href="/static/admin/js/layui/css/layui.css" rel="stylesheet">
+</head>
+<body class="gray-bg">
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>{:lang("直推奖励配置")}</h5>
+                </div>
+                <form class="form-horizontal"  id="commentForm" method="post" action="{:url('recommend/index')}">
+                    <div id="myTabContent" class="tab-content ibox-content">
+                        <input name="id" value="{$recommend['id']}" hidden>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">{:lang("开关")}：</label>
+                            <div class="input-group col-sm-4">
+                                <div class="layui-form">
+                                    {if $recommend['status'] == 1}
+                                    <input type="radio" name="status" value="1" checked title="开启">
+                                    <input type="radio" name="status" value="2" title="关闭">
+                                    {/if}
+                                    {if $recommend['status'] == 2}
+                                    <input type="radio" name="status" value="1" checked title="开启">
+                                    <input type="radio" name="status" value="2" checked title="关闭">
+                                    {/if}
+                                </div>
+                                <p class="help-block">status：是否启用 ，启用时才结算推广佣金。</p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">{:lang("当日直推")}：</label>
+                                    <div class="input-group col-sm-4">
+                                        <div class="layui-form">
+                                            <input type="text" class="form-control" name="day_rec"
+                                                   value="{$recommend['day_rec']}">
+                                        </div>
+                                        <p class="help-block">day_rec：当日直推用户数，达到该数量，即可领取佣金</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">{:lang("当日直推奖励")}：</label>
+                                    <div class="input-group col-sm-4">
+                                        <div class="layui-form">
+                                            <input type="text" class="form-control" name="day_reward"
+                                                   value="{$recommend['day_reward']}">
+                                        </div>
+                                        <p class="help-block">day_reward：当日直推用户数，达到该数量，即可领取佣金奖励</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">{:lang("当周直推")}：</label>
+                                    <div class="input-group col-sm-4">
+                                        <div class="layui-form">
+                                            <input type="text" class="form-control" name="week_rec"
+                                                   value="{$recommend['week_rec']}">
+                                        </div>
+                                        <p class="help-block">day_rec：当周直推用户数，达到该数量，即可领取佣金</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">{:lang("当周直推奖励")}：</label>
+                                    <div class="input-group col-sm-4">
+                                        <div class="layui-form">
+                                            <input type="text" class="form-control" name="week_reward"
+                                                   value="{$recommend['week_reward']}">
+                                        </div>
+                                        <p class="help-block">week_reward：当周直推用户数，达到该数量，即可领取佣金奖励</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">{:lang("当月直推")}：</label>
+                                    <div class="input-group col-sm-4">
+                                        <div class="layui-form">
+                                            <input type="text" class="form-control" name="month_rec"
+                                                   value="{$recommend['month_rec']}">
+                                        </div>
+                                        <p class="help-block">day_rec：当月直推用户数，达到该数量，即可领取佣金</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">{:lang("当月直推奖励")}：</label>
+                                    <div class="input-group col-sm-4">
+                                        <div class="layui-form">
+                                            <input type="text" class="form-control" name="month_reward"
+                                                   value="{$recommend['month_reward']}">
+                                        </div>
+                                        <p class="help-block">month_reward：当月直推用户数，达到该数量，即可领取佣金奖励</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+{/*                        <hr>*/}
+{/*                        <div class="row">*/}
+{/*                            <div class="col-sm-4">*/}
+{/*                                <div class="form-group">*/}
+{/*                                    <label class="col-sm-4 control-label">第一级{:lang("日推广奖励")&cc;：</label>*/}
+{/*                                    <div class="input-group col-sm-4">*/}
+{/*                                        <div class="layui-form">*/}
+{/*                                            <input type="text" class="form-control" name="vip1"*/}
+{/*                                                   value="{$recommend['vip1']&cc;">*/}
+{/*                                        </div>*/}
+{/*                                        <p class="help-block">1：直推人数_活跃成员_奖励佣金 （例如:25_30_88）</p>*/}
+{/*                                    </div>*/}
+{/*                                </div>*/}
+{/*                            </div>*/}
+{/*                            <div class="col-sm-4">*/}
+{/*                                <div class="form-group">*/}
+{/*                                    <label class="col-sm-4 control-label">第二级{:lang("日推广奖励")&cc;：</label>*/}
+{/*                                    <div class="input-group col-sm-4">*/}
+{/*                                        <div class="layui-form">*/}
+{/*                                            <input type="text" class="form-control" name="vip2"*/}
+{/*                                                   value="{$recommend['vip2']&cc;">*/}
+{/*                                        </div>*/}
+{/*                                        <p class="help-block">2：直推人数_活跃成员_奖励佣金 （例如:25_30_88）</p>*/}
+{/*                                    </div>*/}
+{/*                                </div>*/}
+{/*                            </div>*/}
+{/*                            <div class="col-sm-4">*/}
+{/*                                <div class="form-group">*/}
+{/*                                    <label class="col-sm-4 control-label">第三级{:lang("日推广奖励")&cc;：</label>*/}
+{/*                                    <div class="input-group col-sm-4">*/}
+{/*                                        <div class="layui-form">*/}
+{/*                                            <input type="text" class="form-control" name="vip3"*/}
+{/*                                                   value="{$recommend['vip3']&cc;">*/}
+{/*                                        </div>*/}
+{/*                                        <p class="help-block">3：直推人数_活跃成员_奖励佣金 （例如:25_30_88）</p>*/}
+{/*                                    </div>*/}
+{/*                                </div>*/}
+{/*                            </div>*/}
+{/*                        </div>*/}
+{/*                        <div class="row">*/}
+{/*                            <div class="col-sm-4">*/}
+{/*                                <div class="form-group">*/}
+{/*                                    <label class="col-sm-4 control-label">第四级{:lang("日推广奖励")&cc;：</label>*/}
+{/*                                    <div class="input-group col-sm-4">*/}
+{/*                                        <div class="layui-form">*/}
+{/*                                            <input type="text" class="form-control" name="vip4"*/}
+{/*                                                   value="{$recommend['vip4']&cc;">*/}
+{/*                                        </div>*/}
+{/*                                        <p class="help-block">4：直推人数_活跃成员_奖励佣金 （例如:25_30_88）</p>*/}
+{/*                                    </div>*/}
+{/*                                </div>*/}
+{/*                            </div>*/}
+{/*                            <div class="col-sm-4">*/}
+{/*                                <div class="form-group">*/}
+{/*                                    <label class="col-sm-4 control-label">第五级{:lang("日推广奖励")&cc;：</label>*/}
+{/*                                    <div class="input-group col-sm-4">*/}
+{/*                                        <div class="layui-form">*/}
+{/*                                            <input type="text" class="form-control" name="vip5"*/}
+{/*                                                   value="{$recommend['vip5']&cc;">*/}
+{/*                                        </div>*/}
+{/*                                        <p class="help-block">5：直推人数_活跃成员_奖励佣金 （例如:25_30_88）</p>*/}
+{/*                                    </div>*/}
+{/*                                </div>*/}
+{/*                            </div>*/}
+{/*                            <div class="col-sm-4">*/}
+{/*                                <div class="form-group">*/}
+{/*                                    <label class="col-sm-4 control-label">第六级{:lang("日推广奖励")&cc;：</label>*/}
+{/*                                    <div class="input-group col-sm-4">*/}
+{/*                                        <div class="layui-form">*/}
+{/*                                            <input type="text" class="form-control" name="vip6"*/}
+{/*                                                   value="{$recommend['vip6']&cc;">*/}
+{/*                                        </div>*/}
+{/*                                        <p class="help-block">6：直推人数_活跃成员_奖励佣金 （例如:25_30_88）</p>*/}
+{/*                                    </div>*/}
+{/*                                </div>*/}
+{/*                            </div>*/}
+{/*                        </div>*/}
+
+{/*                        <div class="row">*/}
+{/*                            <div class="col-sm-4">*/}
+{/*                                <div class="form-group">*/}
+{/*                                    <label class="col-sm-4 control-label">第七级{:lang("日推广奖励")&cc;：</label>*/}
+{/*                                    <div class="input-group col-sm-4">*/}
+{/*                                        <div class="layui-form">*/}
+{/*                                            <input type="text" class="form-control" name="vip7"*/}
+{/*                                                   value="{$recommend['vip7']&cc;">*/}
+{/*                                        </div>*/}
+{/*                                        <p class="help-block">7：直推人数_活跃成员_奖励佣金 （例如:25_30_88）</p>*/}
+{/*                                    </div>*/}
+{/*                                </div>*/}
+{/*                            </div>*/}
+{/*                            <div class="col-sm-4">*/}
+{/*                                <div class="form-group">*/}
+{/*                                    <label class="col-sm-4 control-label">第八级{:lang("日推广奖励")&cc;：</label>*/}
+{/*                                    <div class="input-group col-sm-4">*/}
+{/*                                        <div class="layui-form">*/}
+{/*                                            <input type="text" class="form-control" name="vip8"*/}
+{/*                                                   value="{$recommend['vip8']&cc;">*/}
+{/*                                        </div>*/}
+{/*                                        <p class="help-block">8：直推人数_活跃成员_奖励佣金 （例如:25_30_88）</p>*/}
+{/*                                    </div>*/}
+{/*                                </div>*/}
+{/*                            </div>*/}
+{/*                        </div>*/}
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">{:lang("初始团队活跃奖")}：</label>
+                                    <div class="input-group col-sm-4">
+                                        <div class="layui-form">
+                                            <input type="text" class="form-control" name="level1"
+                                                   value="{$recommend['level1']}">
+                                        </div>
+                                        <p class="help-block">1：直推人数_活跃成员_初始奖励佣金_次数_下次直推_下次活跃_增加金额 （例如:6_10_150_20_1_2_20）</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">{:lang("成长团队活跃奖")}：</label>
+                                    <div class="input-group col-sm-4">
+                                        <div class="layui-form">
+                                            <input type="text" class="form-control" name="level2"
+                                                   value="{$recommend['level2']}">
+                                        </div>
+                                        <p class="help-block">2：直推人数_活跃成员_初始奖励佣金_次数_下次直推_下次活跃_增加金额 （例如:6_10_150_20_1_2_20）</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">{:lang("杰出团队活跃奖")}：</label>
+                                    <div class="input-group col-sm-4">
+                                        <div class="layui-form">
+                                            <input type="text" class="form-control" name="level3"
+                                                   value="{$recommend['level3']}">
+                                        </div>
+                                        <p class="help-block">3：直推人数_活跃成员_初始奖励佣金_次数_下次直推_下次活跃_增加金额 （例如:6_10_150_20_1_2_20）</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">{:lang("精英团队活跃奖")}：</label>
+                                    <div class="input-group col-sm-4">
+                                        <div class="layui-form">
+                                            <input type="text" class="form-control" name="level4"
+                                                   value="{$recommend['level4']}">
+                                        </div>
+                                        <p class="help-block">3：直推人数_活跃成员_初始奖励佣金_次数_下次直推_下次活跃_增加金额 （例如:6_10_150_20_1_2_20）</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-4 col-sm-offset-6">
+                                <!--<input type="button" value="提交" class="btn btn-primary" id="postform"/>-->
+                                <button class="btn btn-primary">{:lang("提交")}</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/static/admin/js/jquery.min.js?v=2.1.4"></script>
+<script src="/static/admin/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="/static/admin/js/content.min.js?v=1.0.0"></script>
+<script src="/static/admin/js/plugins/bootstrap-tagsinput/bootstrap-tagsinput.min.js"></script>
+<script src="/static/admin/js/plugins/validate/jquery.validate.min.js"></script>
+<script src="/static/admin/js/plugins/validate/messages_zh.min.js"></script>
+<script src="/static/admin/js/plugins/iCheck/icheck.min.js"></script>
+<script src="/static/admin/js/layui/layui.js"></script>
+<script src="/static/admin/js/jquery.form.js"></script>
+<script type="text/javascript">
+
+    var index = '';
+
+    function showStart() {
+        index = layer.load(0, {shade: false});
+        return true;
+    }
+
+    function showSuccess(res) {
+
+        layer.ready(function () {
+            layer.close(index);
+            if (1 == res.code) {
+                layer.alert(res.msg, {title: "{:lang('友情提示')}", icon: 1, closeBtn: 0}, function () {
+                    window.location.href = res.data;
+                });
+            } else if (111 == res.code) {
+                window.location.reload();
+            } else {
+                layer.msg(res.msg, {anim: 6});
+            }
+        });
+    }
+
+    function add(url) {
+        // 在此处输入 layer 的任意代码
+        layer.open({
+            type: 2,
+            area: ['100%', '100%'],
+            title: '添加/编辑',
+            maxmin: true, // 允许全屏最小化
+            anim: 0, // 0-6 的动画形式，-1 不开启
+            content: url
+        });
+    }
+</script>
+</body>
+</html>

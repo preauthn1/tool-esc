@@ -1,0 +1,309 @@
+{include file="header" /}
+    <!-- Panel Other -->
+    <div class="ibox float-e-margins">
+        <div class="ibox-title">
+            <h5>{:lang("广告位记录")}</h5>
+        </div>
+        <div class="ibox-content">
+            <!--搜索框开始-->
+            <form id='commentForm' role="form" method="post" class="form-inline pull-right" target="_blank" onkeydown="if (event.keyCode == 13) { return false; }">
+                <div class="content clearfix m-b">
+                    <div class="form-group" id="ID-laydate-rangeLinked">
+                        <label>{:lang("选择时间")}：</label>
+                        <input type="text" class="form-control" id="start_time" name="startTime" value="{:getYesterdayStr()} 00:00:00" placeholder="yyyy-MM-dd HH:mm:ss" autocomplete="off">
+                        -
+                        <input type="text" class="form-control" id="end_time" name="endTime" value="{:getDateStr()} 23:59:59" placeholder="yyyy-MM-dd HH:mm:ss" autocomplete="off">
+                    </div>
+                    <div class="form-group">
+                        <label>{:lang("选择时段")}：</label>
+                        <select class="form-control" name="session" id="session" >
+                            <option value="">所有</option>
+                            {volist name='session_list' id='v'}
+                            <option value="{$v['start_time']}-{$v['end_time']}">{$v['start_time']}-{$v['end_time']}</option>
+                            {/volist}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>{:lang("订单号")}：</label>
+                        <input type="text" class="form-control" id="order_no" name="order_no">
+                    </div>
+                    <div class="form-group">
+                        <label>{:lang("uid")}：</label>
+                        <input type="text" class="form-control" id="user_id" name="user_id">
+                    </div>
+                    <div class="form-group">
+                        <label>{:lang("用户名")}：</label>
+                        <input type="text" class="form-control" id="user_name" name="user_name">
+                    </div>
+                    <div class="form-group">
+                        <label>{:lang("广告位名称")}：</label>
+                        <select class="form-control" name="level_id" id="levelId" >
+                            <option value="">所有</option>
+                            {volist name='level_list' id='v'}
+                            <option value="{$key}">{$v}</option>
+                            {/volist}
+                        </select>
+                    </div>
+                    <div class="form-group layui-form">
+                        <label>{:lang("所属代理")}：</label>
+                        <div class="layui-inline">
+                            <select lay-search="" id="leader1" name="leader1">
+                                <option value="">所有</option>
+                                {foreach name="agent" item="vo"}
+                                <option value="{$vo.id}">{$vo.id}/{$vo.user_name}{$vo.remark? '('.$vo.remark.')' : ''}</option>
+                                {/foreach}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>{:lang("状态")}：</label>
+                        <select class="form-control" name="status" id="status" >
+                            <option value="">所有</option>
+                            {volist name='order_status' id='text'}
+                            <option value="{$key}">{$text}</option>
+                            {/volist}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>{:lang("用户类型")}：</label>
+                        <select class="form-control" id="is_xuni" name="is_xuni">
+                            <option value="-1">{:lang("所有")}</option>
+                            <option value="1">{:lang("虚拟用户")}</option>
+                            <option value="0">{:lang("真实用户")}</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <input type="hidden" value="1" name="export"/>
+                        <button class="btn btn-primary" type="button" style="margin-top:5px" id="search"><strong>{:lang('搜索')}</strong>
+                        </button>
+
+                        {if authCheck('financeProductOrder/export_file')}
+                        <button class="btn btn-danger" type="button" style="margin-top:5px" id="export_file"><strong>导出</strong>
+                        </button>
+                        <span id="export_file_msg" style="display: none"></span>
+                        <a class="btn btn-primary" download="" target="_blank" href="" style="margin-top:5px;display: none"
+                           id="afile_url">
+                        </a>
+                        {/if}
+                    </div>
+                </div>
+            </form>
+            <div class="form-group clearfix col-sm-7">
+<!--                <a href="javascript:;" >-->
+<!--                    <button class="btn btn-outline btn-primary" type="button">{:lang("批量派单")}</button>-->
+<!--                </a>-->
+<!--                <a href="javascript:;" onclick="checkStatus(0, 4);">-->
+<!--                    <button class="btn btn-outline btn-danger" type="button">{:lang("批量取消")}</button>-->
+<!--                </a>-->
+            </div>
+            <!--搜索框结束-->
+            <div class="example-wrap">
+                <div class="example">
+                    <table id="cusTable"
+                           data-total-field="total"
+                           data-data-field="data">
+                        <thead>
+<!--                        <th data-checkbox="true"></th>&lt;!&ndash;复选框&ndash;&gt;-->
+                        <th data-field="id">{:lang("ID")}</th>
+                        <th data-field="order_no">{:lang("订单号")}</th>
+                        <th data-field="level_name">{:lang("广告位名称")}</th>
+                        <th data-field="level_id">{:lang("广告位等级")}</th>
+                        <th data-field="user_info" data-formatter="userInfoFormatter">{:lang("用户信息")}</th>
+                        <th data-field="is_xuni_text">{:lang("虚拟账号")}</th>
+                        <th data-field="top_leader_remark">{:lang("所属代理")}</th>
+                        <th data-field="finance_product_name">{:lang("任务信息")}</th>
+                        <th data-field="session_no">{:lang("广告位批次")}</th>
+                        <th data-field="stock_range"  data-formatter="stockRangeFormatter">{:lang("金额区间")}</th>
+                        <th data-field="balance">{:lang("匹配时用户余额")}</th>
+                        <th data-field="invest_rate">{:lang("占余额比例")}</th>
+<!--                        <th data-field="price">{:lang("花费金额")}</th>-->
+                        <th data-field="money">{:lang("投资金额")}</th>
+                        <th data-field="profit">{:lang("收益率")}%</th>
+                        <th data-field="fee_rate">{:lang("手续费率")}%</th>
+                        <th data-field="fee">{:lang("手续费")}</th>
+                        <th data-field="cycle" data-formatter="investDayFormatter">{:lang("广告位周期")}</th>
+                        <th data-field="profit_money">{:lang("投资收益金额")}</th>
+                        <th data-field="match_time">{:lang("匹配时间")}</th>
+                        <th data-field="buy_time">{:lang("购买时间")}</th>
+                        <th data-field="start_time">{:lang("开始时间")}</th>
+                        <th data-field="end_time">{:lang("结束时间")}</th>
+                        <th data-field="status_str">{:lang("状态")}</th>
+                        <th data-field="match_type_str">{:lang("类型")}</th>
+                        <th data-field="create_time">{:lang("添加时间")}</th>
+                        <th data-field="settlement_time">{:lang("结算时间")}</th>
+                        <th data-field="operate">{:lang("操作")}</th>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+            <!-- End Example Pagination -->
+        </div>
+    </div>
+
+{include file="footer" /}
+<script>
+    var source = '';
+    const initSSEHandler = () => {
+        const cForm = $('#commentForm').serializeArray();
+        var queryString = $.param(cForm);
+        const export_url = '{:url("financeProductOrder/export_file")}?' + queryString;
+        source = new EventSource(export_url);
+        $("#export_file").hide();
+        $("#export_file_msg").show();
+        $("#export_file_msg").text("正在导出中...");
+        // 监听收到消息
+        source.onmessage = function (event) {
+            // console.log('收到数据块：', event.data);
+            $("#export_file_msg").text(JSON.parse(event.data).item +"/"+JSON.parse(event.data).total+" 正在导出中...");
+            // 分段写入页面
+        };
+        // 监听自定义结束事件
+        source.addEventListener('stream-end', (event) => {
+            // console.log('导出文件链接:', JSON.parse(event.data));
+            $("#afile_url").attr('href', JSON.parse(event.data).url);
+            $("#afile_url").text("点击下载 " + JSON.parse(event.data).file_name);
+            $("#afile_url").attr('download', JSON.parse(event.data).file_name);
+            $("#afile_url").show();
+            $("#export_file_msg").hide()
+            source.close(); // 主动关闭连接
+        });
+        source.onerror = function (event) {
+            if (source.readyState === EventSource.CLOSED) {
+                console.log('连接已正常关闭');
+            } else {
+                console.error('异常断开:', event);
+                // 在这里，你可能想要重新连接，或者通知用户连接丢失
+            }
+        };
+    }
+    $("#export_file").on("click", function () {
+        // console.log("开始导出")
+        initSSEHandler();
+    })
+    $("#search").on("click", function () {
+        $("#export_file").show();
+        $("#export_file_msg").hide();
+        $("#afile_url").hide();
+    })
+</script>
+<script type="text/javascript">
+function investDayFormatter(value, row, index) {
+    let unit = '';
+    switch (row.invest_period_type) {
+        case 'minute':
+            unit = '{:lang("分钟")}';
+            break;
+        case 'hour':
+            unit = '{:lang("小时")}';
+            break;
+        case 'day':
+            unit = '{:lang("天")}';
+            break;
+    }
+    return value + ' ' + unit;
+}
+
+// 用户信息
+function userInfoFormatter(value, row, index) {
+  var html = row.user_info;
+ if (row.is_xuni == 1) {
+    return "<span style='color:red'>" + html + "</span>";
+  }
+  return "<span>" + html + "</span>";
+}
+
+function stockRangeFormatter(value, row, index) {
+    return row.stock_range_min + '-' + row.stock_range_max;
+}
+    // tableCheckbox = true;
+    $(document).ready(function () {
+        layui.use('laydate', function(){
+            var laydate = layui.laydate;
+
+            // 日期范围 - 左右面板联动选择模式
+            laydate.render({
+                elem: '#ID-laydate-rangeLinked',
+                range: ['#start_time', '#end_time'],
+                rangeLinked: true, // 开启日期范围选择时的区间联动标注模式 ---  2.8+ 新增
+                type: 'datetime',
+            });
+        });
+        initTable();
+        //当点击查询按钮的时候执行
+        $("#search").bind("click", initTable);
+    });
+    function queryParams(params) {   //设置查询参数
+        params.user_id = $('#user_id').val()
+        params.user_name = $('#user_name').val()
+        params.order_no = $('#order_no').val()
+        params.startTime = $('#start_time').val()
+        params.endTime = $('#end_time').val()
+        params.level_id = $('#levelId').val()
+        params.status = $('#status').val()
+        params.task_type = $('#task_type').val()
+        params.order_type = $('#order_type').val()
+        params.leader1 = $('#leader1').val();
+        params.is_xuni = $('#is_xuni').val();
+        params.session = $('#session').val();
+        return params;
+    }
+
+    function onLoadSuccess(res) {
+      $("#add").on('click',function (e){
+        add(e.currentTarget.href)
+        return false;
+      });
+      $("td a").on('click', function (e) {
+        if (e.currentTarget.href.indexOf('javascript') === -1) {
+          add(e.currentTarget.href)
+          return false;
+        }
+        return true;
+      });
+
+      //重新渲染表单元素
+      layui.form.render();
+    }
+
+function add(url){
+  // 在此处输入 layer 的任意代码
+  layer.open({
+    type: 2,
+    area: ['100%', '100%'],
+    title: '添加/编辑',
+    maxmin: true, // 允许全屏最小化
+    anim: 0, // 0-6 的动画形式，-1 不开启
+    content: url
+  });
+}
+    // function checkStatus(status, type = 0){
+    //     var getSelectRows = $("#cusTable").bootstrapTable('getSelections', function (row) {
+    //         return row;
+    //     });
+    //     var ids = new Array();  // 定义js数组用于存放自己所需的值
+    //     for(var i=0;i<getSelectRows.length;i++){
+    //         ids[i] = getSelectRows[i].id;
+    //     }
+    //     if (ids.length <= 0) {
+    //         layer.msg('请选择要操作的任务');
+    //         return;
+    //     }
+    //     layer.confirm('确认操作吗?', {icon: 3, title:'提示'}, function(index){
+    //         $.getJSON("{:url('finance_order/checkStatus')}", {'id' : ids, 'status' : status, 'type' : type}, function(res){
+    //             if(1 == res.code){
+    //                 layer.alert(res.msg, {title: "{:lang('友情提示')}", icon: 1, closeBtn: 0}, function(inx){
+    //                     layer.close(inx);
+    //                     initTable();
+    //                 });
+    //             }else if(111 == res.code){
+    //                 window.location.reload();
+    //             }else{
+    //                 layer.alert(res.msg, {title: "{:lang('友情提示')}", icon: 2});
+    //             }
+    //         });
+    //
+    //         layer.close(index);
+    //     })
+    // }
+
+</script>

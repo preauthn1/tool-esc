@@ -1,0 +1,192 @@
+{include file="header" /}
+<style>
+      th .layui-table-cell { line-height: 120% !important; text-align: center; }
+        th .layui-table-cell { height: auto !important; white-space: normal !important; word-wrap: break-word; }
+        .layui-table-fixed tr .layui-table-col-special { height: 47.8px; }
+</style>
+    <!-- Panel Other -->
+    <div class="ibox float-e-margins">
+        <div class="ibox-title">
+            <h5>{:lang("日报表")}</h5>
+        </div>
+        <div class="ibox-content">
+            <!--搜索框开始-->
+            <form id='searchForm' role="form" method="post" class="form-inline pull-right">
+                <div class="content clearfix m-b">
+                    <div class="form-group layui-form">
+                        <label>{:lang("所属代理")}：</label>
+                        <div class="layui-inline">
+                            <select lay-search="" id="leader1" name="leader1">
+                                <option value="">所有</option>
+                            {foreach name="agent" item="vo"}
+                            <option value="{$vo.id}">{$vo.id}/{$vo.user_name}{$vo.remark? '('.$vo.remark.')' : ''}</option>
+                            {/foreach}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>{:lang("日期范围")}：</label>
+                        <div class="input-group" id="ID-laydate-rangeLinked">
+                            <input type="text" class="form-control" value="{$startDate}" id="startDate" placeholder="开始日期">
+                            <span class="input-group-addon">至</span>
+                            <input type="text" class="form-control" value="{$endDate}" id="endDate" placeholder="结束日期">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <button class="btn btn-primary" type="button" style="margin-top:5px" id="search"><strong>{:lang('搜索')}</strong>
+                        </button>
+                    </div>
+                </div>
+            </form>
+            <!--搜索框结束-->
+
+            <div class="example-wrap">
+                <div class="example">
+                    <table class="layui-hide" id="reportTable" lay-filter="reportTable"></table>
+                    <table class="layui-hide" id="reportTable2" lay-filter="reportTable2"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+    layui.use(['table', 'laydate'], function(){
+        var table = layui.table;
+        var laydate = layui.laydate;
+
+        // 日期范围 - 左右面板联动选择模式
+        laydate.render({
+            elem: '#ID-laydate-rangeLinked', // 绑定到第一个输入框
+            range: ['#startDate', '#endDate'],
+            rangeLinked: true // 开启日期范围选择时的区间联动标注模式
+        });
+
+        // 查询参数
+        function getQueryParams() {
+            return {
+                startDate: $('#startDate').val(),
+                endDate: $('#endDate').val(),
+                leader1: $('#leader1').val(),
+            };
+        }
+
+        // 初始渲染第一个表格
+        var tableIns1 = table.render({
+            elem: '#reportTable',
+            url: 'new_day_report', // 后端数据接口
+            where: getQueryParams(),
+            toolbar: '#toolbarDemo',
+            defaultToolbar: ['filter', 'exports'],
+            cellMinWidth: 110,
+            cols: [[
+                {field: 'date', title: '日期', width: '110'},
+                {field: 'totalAmount', title: '今日三方充值总额'},
+                {field: 'totalPeople', title: '今日三方充值总人数'},
+                {field: 'contractAmount', title: '今日合约充值总额'},
+                {field: 'contractPeople', title: '今日合约充值总人数'},
+                {field: 'manualAmount', title: '今日手动补单总额'},
+                {field: 'manualPeople', title: '今日手动补单总人数'},
+                // {field: 'withdrawPeople', title: '今日提现总人数'},
+                {field: 'withdrawApplicationAmount', title: '今日提现申请总额'},
+                {field: 'withdrawApplicationPeople', title: '今日提现申请总人数'},
+                {field: 'thirdWithdrawAmount', title: '今日三方提现总额'},
+                {field: 'adAmount', title: '今日广告位总额'},
+                {field: 'adIncome', title: '今日广告位收益'},
+                {field: 'activePeople', title: '今日活跃总人数'},
+                {field: 'aiAmount', title: 'Ai托管总额'},
+                {field: 'aiIncome', title: 'Ai托管总收益'},
+                {field: 'aiIncomePeople', title: 'Ai托管总人数'},
+                {field: 'wheelAmount', title: '轮盘奖励总金额'},
+                {field: 'wheelPeople', title: '轮盘领取总人数'},
+                // {field: 'signPeople', title: '今日签到总人数'},
+                // {field: 'signAmount', title: '今日签到总余额'},
+                // {field: 'directPushAmount', title: '直推达标总返利'},
+                // {field: 'directPushPeople', title: '直推达标总人数'},
+                {field: 'ActivityDirectPushAmount', title: '活动直推奖励领取总金额'},
+                {field: 'ActivityDirectPushPeople', title: '活动直推奖励领取人数'},
+                {field: 'teamActivePeople', title: '团队活跃返佣总额'},
+                {field: 'newRegisterPeople', title: '新增注册总人数'},
+                {field: 'newRegisterPeopleRecharge', title: '新增充值总人数'},
+                {field: 'newRegisterAmount', title: '新增注册总充值'},
+                {field: 'newRegisterAccount', title: '新增注册账户总余额'},
+                {field: 'platformAmount', title: '今日平台总余额', width: '150'}
+            ]],
+            response: {
+                statusCode: 1 // 重新规定成功的状态码为 200，table 组件默认为 0
+            },
+            // 将原始数据解析成 table 组件所规定的数据格式
+            parseData: function(res){
+                return {
+                    "code": res.code, //解析接口状态
+                    "msg": res.msg, //解析提示文本
+                    "data": res.data //解析数据列表
+                };
+            },
+        });
+
+        // 初始渲染第二个表格
+        var tableIns2 = table.render({
+            elem: '#reportTable2',
+            url: 'new_day_report2', // 后端数据接口
+            where: getQueryParams(),
+            toolbar: '#toolbarDemo',
+            defaultToolbar: ['filter', 'exports'],
+            cellMinWidth: 110,
+            cols: [[
+                {field: 'date', title: '日期', width: '110'},
+                {field: 'agentName', title: '代理名字'},
+                {field: 'totalAmount', title: '三方充值金额额'},
+                {field: 'totalPeople', title: '三方充值人数'},
+                {field: 'contractAmount', title: '合约充值'},
+                {field: 'contractPeople', title: '合约充值人数'},
+                {field: 'manualAmount', title: '补单金额'},
+                {field: 'manualPeople', title: '补单人数'},
+                {field: 'withdrawApplicationAmount', title: '提现申请总额'},
+                {field: 'withdrawApplicationPeople', title: '提现申请人数'},
+                {field: 'thirdWithdrawAmount', title: '三方提现总额'},
+                {field: 'adAmount', title: '广告位总额'},
+                {field: 'adIncome', title: '广告位收益'},
+                {field: 'activePeople', title: '活跃人数'},
+                {field: 'aiAmount', title: 'AI托管金额'},
+                {field: 'aiIncome', title: 'AI托管收益金额'},
+                {field: 'aiIncomePeople', title: 'AI托管人数'},
+                {field: 'wheelAmount', title: '轮盘奖励金额'},
+                {field: 'wheelPeople', title: '轮盘领取人数'},
+                // {field: 'signPeople', title: '签到人数'},
+                // {field: 'signAmount', title: '签到金额'},
+                // {field: 'directPushAmount', title: '直推达标返利'},
+                // {field: 'directPushPeople', title: '直推达标人数'},
+                {field: 'ActivityDirectPushAmount', title: '活动直推奖励领取总金额'},
+                {field: 'ActivityDirectPushPeople', title: '活动直推奖励领取人数'},
+                {field: 'teamActivePeople', title: '活跃返佣'},
+                {field: 'newRegisterPeople', title: '新增注册人数'},
+                {field: 'newRegisterPeopleRecharge', title: '新增充值人数'},
+                {field: 'newRegisterAmount', title: '新增注册充值'},
+                {field: 'newRegisterAccount', title: '新增注册账户余额'},
+                {field: 'teamBalance', title: '团队余额'}
+            ]],
+            response: {
+                statusCode: 1 // 重新规定成功的状态码为 200，table 组件默认为 0
+            },
+            // 将原始数据解析成 table 组件所规定的数据格式
+            parseData: function(res){
+                return {
+                    "code": res.code, //解析接口状态
+                    "msg": res.msg, //解析提示文本
+                    "data": res.data //解析数据列表
+                };
+            },
+        });
+
+        // 绑定搜索按钮点击事件
+        $('#search').on('click', function(){
+            tableIns1.reload({
+                where: getQueryParams()
+            });
+            tableIns2.reload({
+                where: getQueryParams()
+            });
+        });
+    });
+</script>
+{include file="footer" /}

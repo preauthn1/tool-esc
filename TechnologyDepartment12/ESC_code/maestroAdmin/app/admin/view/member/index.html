@@ -1,0 +1,760 @@
+{include file="header" /}
+<!-- Panel Other -->
+<style>
+    .layui-layer-tips {
+        width: fit-content !important;
+    }
+
+    .nav-tabs > li > a {
+        color: #000;
+    }
+</style>
+<div class="ibox float-e-margins">
+    <div class="ibox-title">
+        <h5>{:lang("会员列表")}</h5>
+    </div>
+    <div class="ibox-content">
+        <div id="toolbar">
+            {if authCheck('member/useradd') }
+            <button class="btn btn-outline btn-primary btn-sm" lay-on="add">{:lang('添加')}</button>
+            {/if}
+            <a href="javascript:void(0)" class="btn btn-outline layui-bg-red btn-sm" onclick="openEditUrl()">{:lang('批量操作')}</a>
+            <a href="javascript:void(0)" class="btn btn-outline layui-bg-red btn-sm" onclick="disableMember(2)">{:lang('禁用')}</a>
+            <a href="javascript:void(0)" class="btn btn-outline btn-primary btn-sm" onclick="disableMember(1)">{:lang('启用')}</a>
+        </div>
+{/*        <ul class="nav nav-tabs">*/}
+{/*            {volist name='levelAll' id='v'&cc;*/}
+{/*            <li role="presentation" style="color: #000" onclick="seletVIP('{$v.level_id&cc;')"*/}
+{/*                class="classvip{$v.level_id&cc;{if $level_id === $v.level_id&cc; active{/if&cc;"><a>{$v.level_name&cc;（{$v.num&cc;）</a>*/}
+{/*            </li>*/}
+{/*            {/volist&cc;*/}
+{/*        </ul>*/}
+        <!--搜索框开始-->
+        <form id='commentForm' role="form" method="post" class="form-inline pull-right" action="{$export_url}">
+            <div class="content clearfix m-b">
+                <div class="form-group">
+                    <label>{:lang("用户id")}：</label>
+                    <input type="text" class="form-control" id="uid" name="uid">
+                </div>
+                <div class="form-group">
+                    <label>{:lang("账号")}：</label>
+                    <input type="text" class="form-control" id="user_name" name="user_name">
+                </div>
+                <div class="form-group">
+                    <label>{:lang("邀请码")}：</label>
+                    <input type="text" class="form-control" id="invite_code" name="invite_code">
+                </div>
+                <div class="form-group">
+                    <label>{:lang("账户账号")}：</label>
+                    <input type="text" class="form-control" id="document_id" name="document_id">
+                </div>
+                <div class="form-group">
+                    <label>{:lang("真实姓名")}：</label>
+                    <input type="text" class="form-control" id="true_name" name="true_name">
+                </div>
+                <div class="form-group">
+                    <label>{:lang("选择时间")}：</label>
+                    <select class="form-control" id="time_type" name="time_type">
+                        <option value="0" selected>{:lang("注册时间")}</option>
+                        <option value="1">{:lang("登录时间")}</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <input type="text" class="form-control" id="start_time" name="startTime" placeholder="yyyy-MM-dd"
+                           lay-key="1" autocomplete="off">
+                    -
+                    <input type="text" class="form-control" id="end_time" name="endTime" placeholder="yyyy-MM-dd"
+                           lay-key="2" autocomplete="off">
+                </div>
+                <br>
+                <div class="form-group">
+                    <label>{:lang("用户类型")}：</label>
+                    <select class="form-control" id="is_xuni" name="is_xuni">
+                        <option value="-1">{:lang("所有")}</option>
+                        <option value="1">{:lang("虚拟用户")}</option>
+                        <option value="0">{:lang("真实用户")}</option>
+                        <option value="2">{:lang("未登录过的用户")}</option>
+                        <option value="3">{:lang("未绑定银行卡的用户")}</option>
+                        <option value="4">{:lang("已绑定银行卡的用户")}</option>
+                        <option value="5">{:lang("禁广告")}</option>
+                    </select>
+                </div>
+                <div class="form-group layui-form">
+                    <label>{:lang("所属代理")}：</label>
+                    <div class="layui-inline">
+                        <select lay-search="" id="leader1" name="leader1">
+                            <option value="">所有</option>
+                            {foreach name="agent" item="vo"}
+                            <option value="{$vo.id}">{$vo.id}/{$vo.user_name}{$vo.remark? '('.$vo.remark.')' : ''}
+                            </option>
+                            {/foreach}
+                        </select>
+                    </div>
+                </div>
+                <input type="text" class="form-control" id="level_id" name="level_id" value="{$level_id}"
+                       style="display: none">
+                <div class="form-group">
+                    <label>{:lang("IP")}：</label>
+                    <input type="text" class="form-control" id="ip" name="ip" style="width: 120px">
+                </div>
+                <div class="form-group">
+                    <label>{:lang("上级邀请码")}：</label>
+                    <input type="text" class="form-control" id="leader1_invite_code" name="leader1_invite_code" style="width: 120px">
+                </div>
+                <div class="form-group">
+                    <button class="btn btn-primary" type="button" style="margin-top:5px" id="search"><strong>{:lang('搜索')}</strong>
+                    </button>
+                    {if authCheck('member/export_file')}
+                    <button class="btn btn-danger" type="button" style="margin-top:5px" id="export_file"><strong>导出</strong>
+                    </button>
+                    <span id="export_file_msg" style="display: none"></span>
+                    <a class="btn btn-primary" download="" target="_blank" href="" style="margin-top:5px;display: none"
+                       id="afile_url">
+                    </a>
+                    {/if}
+                </div>
+            </div>
+        </form>
+        <!--搜索框结束-->
+        <div class="example-wrap">
+
+            <div class="example">
+                <table id="cusTable" data-toolbar="#toolbar">
+                    <thead>
+                    <th data-checkbox="true" data-formatter="stateFormatter">ID</th>
+                    <th data-field="userinfo" data-formatter="userInfoFormatter">{:lang("用户信息")}</th>
+                    {/*
+                    <th data-field="user_money" data-formatter="userMoneyFormatter">{:lang("余额")&cc;</th>
+                    */}
+                    <th data-field="recharge_withdraw" data-formatter="rechargeWithdrawFormatter">{:lang("充提/钱包")}
+                    </th>
+                    <th data-field="register_login" data-formatter="registerLoginFormatter">{:lang("注册/登录")}</th>
+                    <th data-field="agent" data-formatter="agentFormatter">{:lang("推广员")}</th>
+                    <th data-field="operate" data-formatter="operateFormatter">{:lang("操作")}</th>
+                    <th data-field="other" data-formatter="otherFormatter">{:lang("其他信息")}</th>
+                    <th data-field="vip_info" data-formatter="vipInfoFormatter">{:lang("VIP信息")}</th>
+                    </thead>
+                </table>
+            </div>
+        </div>
+        <!-- End Example Pagination -->
+    </div>
+
+    <div id="user-log-modal" style="display: none">
+        <table id="user-log" lay-filter="user-log"></table>
+    </div>
+
+    <div id="ip-count-modal" style="display: none">
+        <table id="ip-count" lay-filter="ip-count"></table>
+    </div>
+
+    <script type="text/html" id="toolEventDemo">
+        <a class="layui-btn layui-btn-xs" lay-event="detail">查看</a>
+    </script>
+
+</div>
+<script>
+    var source = '';
+    const initSSEHandler = () => {
+        const cForm = $('#commentForm').serializeArray();
+        var queryString = $.param(cForm);
+        const export_url = '{:url("member/export_file")}?' + queryString;
+        source = new EventSource(export_url);
+        $("#export_file").hide();
+        $("#export_file_msg").show();
+        $("#export_file_msg").text("正在导出中...");
+        // 监听收到消息
+        source.onmessage = function (event) {
+            // console.log('收到数据块：', event.data);
+            $("#export_file_msg").text(JSON.parse(event.data).item +"/"+JSON.parse(event.data).total+" 正在导出中...");
+            // 分段写入页面
+        };
+        // 监听自定义结束事件
+        source.addEventListener('stream-end', (event) => {
+          // console.log('导出文件链接:', JSON.parse(event.data));
+          $("#afile_url").attr('href', JSON.parse(event.data).url);
+            $("#afile_url").text("点击下载 " + JSON.parse(event.data).file_name);
+            $("#afile_url").attr('download', JSON.parse(event.data).file_name);
+            $("#afile_url").show();
+            $("#export_file_msg").hide()
+            source.close(); // 主动关闭连接
+        });
+        source.onerror = function (event) {
+            if (source.readyState === EventSource.CLOSED) {
+                console.log('连接已正常关闭');
+            } else {
+                console.error('异常断开:', event);
+                // 在这里，你可能想要重新连接，或者通知用户连接丢失
+            }
+        };
+    }
+    
+    $("#export_file").on("click", function () {
+        // console.log("开始导出")
+        initSSEHandler();
+    })
+    $("#search").on("click", function () {
+        $("#export_file").show();
+        $("#export_file_msg").hide();
+        $("#afile_url").hide();
+    })
+</script>
+<script type="text/javascript">
+    tableCheckbox = true;
+    var is_disable_member = 0;
+    $table = $("#cusTable");
+
+    function seletVIP(level_id) {
+        $(".nav-tabs").find("li").removeClass('active');
+        $(".classvip" + level_id).addClass('active');
+        window.location.href = "{:url('index')}?level_id=" + level_id
+        // $("#level_id").val(level_id);
+        // $("#search").click();
+        // $("#commentForm").submit();
+    }
+
+    function userInfoFormatter(value, row, index) {
+        // let url = "{:url('member/index')}?id=" + row.id;
+        let user_name = row.user_name;
+
+        var html = "";
+        // var onstr = openUrl('"+url+"');
+        html += "<p>ID:" + row.id + "<a onclick='openUrl(" + row.id + ")' style='color: #1aa094;'>查看下级</a></p>";
+        if (user_name.length > 20) {
+            user_name = row.user_name.substring(0, 20) + '...'
+            html += '<p onmouseover="show_name(this)" data-user_name="' + row.user_name + '">账号:' + user_name + "</p>";
+        } else {
+            html += "<p>账号:" + user_name + "</p>";
+        }
+
+        let online_status = row.online_status ? '<span style="color: mediumseagreen;font-weight: bold ">(在线)</span>' : '<span style="color: #c8c2b6">(离线)</span>';
+        let level_name = row.level_name;
+        if (level_name.length > 10) {
+            level_name = row.level_name.substring(0, 10) + '...'
+        }
+        html += "<p>等级:" + level_name + online_status + "</p>";
+        html += "<p>信用分:" + row.credit_score + "</p>";
+
+        let status = row.status == 2 ? '<span style="color:red;">|禁登</span>' : '';
+        let withdraw_status = row.withdraw_status == 0 ? '<span style="color:red;">|禁提</span>' : '';
+        let do_task_status = row.do_task_status == 0 ? '<span style="color:red;">|禁广告</span>' : '';
+        let is_upgrade = row.is_upgrade == 1 ? '<span style="color:red;">|必升</span>' : '';
+        let invite_code_status = row.invite_code_status == 0 ? '<span style="color:red;">|邀请码失效</span>' : '';
+        let user_water_status = '';
+        if (row.user_water_status == 0) {
+            user_water_status = '<span style="color:red;">|不限制流水</span>'
+        } else if (row.user_water_status == 2) {
+            user_water_status = '<span style="color:red;">|限制流水</span>'
+        }
+        let is_finance_product_count_down = row.is_finance_product_count_down == 1 ? '<span style="color:red;">|广告位缓冲倒计时</span>' : ''
+        let team_info_month_reset = row.team_info_month_reset == 1 ? '<span style="color:red;">|团队数据每月重新统计</span>' : ''
+        let plan_name = row.plan_name ? '<span style="color: red;">|(' + row.plan_name + ')</span>' : ''
+        let ad_plan_name = row.ad_plan_name ? '<span style="color: red;">|(' + row.ad_plan_name + ')</span>' : ''
+
+        html += "<p>语言:" + row.lang + status + withdraw_status + is_upgrade + do_task_status + invite_code_status + user_water_status + is_finance_product_count_down + team_info_month_reset + plan_name + ad_plan_name + "</p>";
+        if (row.is_xuni == 1) {
+            html += "<p>虚拟用户</p>";
+            return "<span style='color:red'>" + html + "</span>";
+        }
+        return "<span>" + html + "</span>";
+    }
+
+    function userMoneyFormatter(value, row, index) {
+        var html = "<div style='min-width: 150px'>";
+        html += "<p>基础:" + row.user_money + "</p>";
+        html += "<p>佣金:" + row.brokerage_money + "</p>";
+        html += "<p>体验:" + row.tyj_money + "</p>";
+        // html += "<p style='color: #dd6920ba;font-weight: bold'>能量:0</p>";
+        return "<span>" + html + "</span></div>";
+    }
+
+    function rechargeWithdrawFormatter(value, row, index) {
+        var html = "";
+        html += "<p>基础:" + row.user_money + "</p>";
+        html += "<p>总充值:" + row.recharge_money + "</p>";
+        html += "<p>总提现:" + row.withdrawal_amount + "</p>";
+        html += "<p>冻结资金:" + row.product_frozen_money + "</p>";
+        html += "<p>未出提现:" + row.frozen_money + "</p>";
+        html += "<p>上级划转金额:" + row.receive_from_other_user + "</p>";
+        // html += "<p>trx/usdt:" + row.trx_address_money + "/" + row.usdt_address_money + "</p>";
+        // html += "<p>bnb/usdt:0</p>";
+        return "<span>" + html + "</span>";
+    }
+
+    function registerLoginFormatter(value, row, index) {
+        var html = "<div style='min-width: 200px'>";
+        html += "<p>注册:" + row.create_time + "</p>";
+        html += "<p style='color: red;'>IP:" + row.reg_ip + "</p>";
+        html += "<p>最后:" + row.last_login_time + "</p>";
+        html += "<p style='color: red;'>IP:" + row.login_ip + "</p>";
+        html += "<p style='color: red;'>设备UUID:" + row.device_uuid + "</p>";
+        html += "<p>同IP用户:<span style='color: #0c80fe;cursor: pointer' class='user-log' data-user_id='" + row.id + "'>" + row.ip_count + "</span></p>";
+        return "<span>" + html + "</span></div>";
+    }
+
+    function agentFormatter(value, row, index) {
+        var html = "";
+        html += "<p>一级:" + row.leader1 + '/' + row.leader1_user_name + "</p>";
+        html += "<p>二级:" + row.leader2 + '/' + row.leader2_user_name + "</p>";
+        html += "<p>三级:" + row.leader3 + '/' + row.leader3_user_name + "</p>";
+        if (Object.keys(row.top_leader).length > 0) {
+            html += "<p data-user_name='" + row.top_leader.user_name + "' data-user_id='" + row.top_leader.id + "'" +
+                ">顶级代理：" + row.top_leader.id + "/" + row.top_leader.user_name + (row.top_leader.remark ? "（" + row.top_leader.remark + "）" : '') + "</p>";
+        }
+        if (Object.keys(row.second_leader_info).length > 0) {
+            html += "<p data-user_name='" + row.second_leader_info.user_name + "' data-user_id='" + row.second_leader_info.id + "'" +
+                ">初级代理：" + row.second_leader_info.id + "/" + row.second_leader_info.user_name + (row.second_leader_info.remark ? "（" + row.second_leader_info.remark + "）" : '') + "</p>";
+        }
+        html += "<p>邀请码:" + row.invite_code + "</p>";
+        html += "<p>下级人数:" + row.team_count + "</p>";
+        html += "<button class=\"btn btn-danger btn-xs\" lay-on='edit_parent' data-id='" + row.id + "''>修改上级</button>"
+        return "<span>" + html + "</span>";
+    }
+
+    function vipInfoFormatter(value, row, index) {
+        var html = "<div style='min-width: 200px'>";
+        // html += "<p>已做/剩余天数:</p>";
+        // html += "<p>有效类型: 按每24小时次数</p>";
+        let level_name = row.level_name;
+        if (level_name.length > 10) {
+            level_name = row.level_name.substring(0, 10) + '...'
+        }
+        // html += "<p>等级:" + level_name + "</p>";
+        // html += "<p>开始时间:" + row.level_star_time + "</p>";
+        // html += "<p>结束时间:" + row.level_end_time + "</p>";
+        html += "<p>最后广告位购买时间:" + row.last_finance_product_buy_time + "</p>";
+        html += "<p>最后广告位结束时间:" + row.last_finance_product_end_time + "</p>";
+        html += "<p>广告位当日交易次数:" + row.today_finance_product_count + "</p>";
+        html += "<p>累计交易天数:" + row.finance_product_order_day + "</p>";
+        html += "<p>累计未交易天数:" + row.finance_product_no_order_day + "</p>";
+        html += "<p>注册天数:" + row.register_days + "</p>";
+        return "<p>" + html + "</p><div>";
+    }
+
+    function otherFormatter(value, row, index) {
+        var html = "";
+
+        let user_mobile = row.mobile ? row.mobile : '';
+        if (user_mobile.length > 15) {
+            user_mobile = row.mobile.substring(0, 15) + '...'
+            html += '<p onmouseover="show_mobile(this)" data-user_mobile="' + row.mobile + '">联系方式:' + user_mobile + "</p>";
+        } else {
+            html += "<p>联系方式:" + user_mobile + "</p>";
+        }
+        // html += "<p>注册/邀请抽奖:"+ row.lottery_num + '/' + row.lottery_num_invite +"</p>";
+        // html += "<p>信用分: "+ row.credit_score +"</p>";
+        html += "<p>所在层级: <span style='color: #1aa094;font-weight: bolder'>" + row.tree_level + "</span></p>";
+        html += "<p>账户账号: <span style='color: #1aa094;font-weight: bolder'>" + (row.document_id ? row.document_id : '') + "</span></p>";
+        html += "<p>真实姓名: <span style='color: #1aa094;font-weight: bolder'>" + (row.true_name ? row.true_name : '') + "</span></p>";
+        html += "<p>备注:<span style='color: #1aa094;font-weight: bolder'>" + (row.remark ? row.remark : '') + "</span></p>";
+        return "<span>" + html + "</span>";
+    }
+
+    function operateFormatter(value, row, index) {
+
+        var html = '<div class="layui-btn-container     ">  \n' +
+            '  <button type="button" class="layui-btn layui-bg-blue layui-btn-sm" lay-on="edit" data-id="' + row.id + '">详情</button>\n' +
+            // '  <button type="button" class="layui-btn  layui-btn-sm" lay-on="queryRecharge" data-id="'+row.id+'">补单</button>\n' +
+            '  <button type="button" class="layui-btn layui-bg-blue layui-btn-sm" lay-on="money" data-id="' + row.id + '">资金流水</button>\n' +
+            '  <button type="button" class="layui-btn layui-bg-blue layui-btn-sm" lay-on="water" data-id="' + row.id + '">提现流水</button>\n' +
+            '  <button type="button" class="layui-btn layui-bg-blue layui-btn-sm" lay-on="level" data-id="' + row.id + '">广告位比例配置</button>\n';
+
+        // '  <button type="button" class="layui-btn layui-bg-blue layui-btn-sm" lay-on="usdt" data-id="'+row.id+'">查钱usdt</button>\n' +
+        // '  <button type="button" class="layui-btn layui-bg-red layui-btn-sm" lay-on="editMoney" data-id="'+row.id+'">改钱</button>\n' +
+        // '  <button type="button" class="layui-btn layui-bg-blue layui-btn-sm" lay-on="subordinateRecharge" data-id="'+row.id+'">下级充值</button>\n' +
+        // '  <button type="button" class="layui-btn  layui-btn-sm" lay-on="forceOffline" data-id="'+row.id+'">下线</button>\n'
+        if (row.is_xuni == 1) {
+            html += '  <button type="button" class="layui-btn layui-bg-blue layui-btn-sm" lay-on="virtual" data-id="' + row.id + '">虚拟用户数据</button>\n' + '</div> ';
+            return html;
+        } else {
+            html += '</div>';
+            return html;
+        }
+    }
+
+    function disableMember(val) {
+        is_disable_member = val;
+        var ids = getIdSelections();
+        var info = "禁用";
+        if (val == 1) {
+            info = "启用";
+        }
+        if (ids.length == 0) {
+            layer.msg('请勾选要禁用的用户');
+            return;
+        }
+        layer.confirm('确认' + info + '用户么?', {icon: 3, title: '提示'}, function (index) {
+            //do something
+            $.post("{:url('member/userBatch')}", {
+                'ids': ids.join(","),
+                'disable_member': is_disable_member
+            }, function (res) {
+                if (1 == res.code) {
+                    layer.alert(res.msg, {title: "{:lang('友情提示')}", icon: 1, closeBtn: 0}, function (inx) {
+                        layer.close(inx);
+                        initTable();
+                    });
+                } else if (111 == res.code) {
+                    window.location.reload();
+                } else {
+                    layer.alert(res.msg, {title: "{:lang('友情提示')}", icon: 2});
+                }
+            }, 'json');
+            layer.close(index);
+        })
+    }
+
+    var $remove = $("#remove");
+    $remove.click(function () {
+        var ids = getIdSelections();
+        userDel(ids.join(","));
+    });
+
+    function stateFormatter(value, row, index) {
+        if (row.user_money > 0) {
+            return {
+                //disabled: true
+            }
+        }
+        return value;
+    }
+
+    function getIdSelections() {
+        return $.map($table.bootstrapTable('getSelections'), function (row) {
+            console.log(row)
+            return row.id
+        })
+    }
+
+    function viewTopId(tree_id) {
+        var tree = tree_id.split('/');
+        var html = '<div style="padding:15px;">';
+        for (var i = 0; i < tree.length; i++) {
+            if (i == tree.length - 1) {
+//                html += '<p>自己:' + tree[i] + '</p>';
+            } else {
+                html += '<p>第' + (i + 1) + '级: <code>' + tree[i] + '</code></p>';
+            }
+        }
+        html += '</div>';
+        layer.open({
+            type: 1,
+            area: ['500px', '300px'],
+            title: '上级列表',
+            content: html //这里content是一个普通的String
+        });
+    }
+
+    $(document).ready(function () {
+        layui.use(['laydate', 'util', 'table'], function () {
+            var laydate = layui.laydate;
+            var util = layui.util;
+            var table = layui.table;
+            laydate.render({
+                elem: '#start_time'
+                , trigger: 'click'
+            });
+            laydate.render({
+                elem: '#end_time'
+                , trigger: 'click'
+            });
+
+            //单元格工具事件
+            table.on('tool(ip-count)', function (obj) {
+                var data = obj.data; //获得当前行数据
+                var layEvent = obj.event; //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
+                var tr = obj.tr; //获得当前行 tr 的 DOM 对象（如果有的话）
+
+                if (layEvent === 'detail') { //查看
+                    layer.closeAll('page')
+                    //     //do somehing
+                    page('{:url("member_log/index")}?user_id=' + data.user_id, '行为日志')
+                }
+            })
+
+            util.on({
+                edit: function (e) {
+                    let id = e.data('id')
+                    let url = "{:url('member/userEdit')}?id=" + id
+                    // 在此处输入 layer 的任意代码
+                    layer.open({
+                        type: 2,
+                        area: ['100%', '100%'],
+                        title: '详情',
+                        maxmin: true, // 允许全屏最小化
+                        anim: 0, // 0-6 的动画形式，-1 不开启
+                        content: url
+                    });
+                },
+                level: function (e) {
+                    let id = e.data('id')
+                    let url = "{:url('levelTeam/index')}?id=" + id
+                    // 在此处输入 layer 的任意代码
+                    layer.open({
+                        type: 2,
+                        area: ['100%', '100%'],
+                        title: '详情',
+                        maxmin: true, // 允许全屏最小化
+                        anim: 0, // 0-6 的动画形式，-1 不开启
+                        content: url
+                    });
+                },
+                money: function (e) {
+                    let id = e.data('id')
+                    let url = "{:url('member/money')}?uid=" + id
+                    layer.open({
+                        type: 2,
+                        area: ['100%', '100%'],
+                        title: '详情',
+                        maxmin: true, // 允许全屏最小化
+                        anim: 0, // 0-6 的动画形式，-1 不开启
+                        content: url
+                    });
+                },
+                water: function (e) {
+                    let id = e.data('id')
+                    let url = "{:url('member/water')}?uid=" + id
+                    layer.open({
+                        type: 2,
+                        area: ['100%', '100%'],
+                        title: '详情',
+                        maxmin: true, // 允许全屏最小化
+                        anim: 0, // 0-6 的动画形式，-1 不开启
+                        content: url
+                    });
+                },
+                virtual: function (e) {
+                    let id = e.data('id')
+                    let url = "{:url('member/edit_virtual')}?uid=" + id
+                    layer.open({
+                        type: 2,
+                        area: ['100%', '100%'],
+                        title: '详情',
+                        maxmin: true, // 允许全屏最小化
+                        anim: 0, // 0-6 的动画形式，-1 不开启
+                        content: url
+                    });
+                },
+                edit_parent: function (e) {
+                    let id = e.data('id')
+                    let url = "{:url('edit_parent')}?userid=" + id
+                    layer.open({
+                        type: 2,
+                        area: ['100%', '100%'],
+                        title: '修改上级',
+                        maxmin: true, // 允许全屏最小化
+                        anim: 0, // 0-6 的动画形式，-1 不开启
+                        content: url
+                    });
+                },
+                usdt: function (e) {
+                    let id = e.data('id')
+                    let url = "{:url('member/wallet_balance')}?id=" + id
+                    index = layer.load(0);
+                    $.ajax({
+                        type: 'GET',
+                        url: url,
+                        dataType: 'json',
+                        success: function (res) {
+                            layer.closeLast('loading');
+                            layer.msg(res.msg)
+                        },
+                        error: function (xhr, type) {
+                            layer.closeLast('loading');
+                        }
+                    });
+                }
+            });
+
+            $('body').on('click', '.user-log', function () {
+                var user_id = $(this).data('user_id')
+                openUserLog(user_id)
+            })
+
+            $('body').on('click', '.ip-count', function () {
+                layer.closeAll('page')
+                var ip = $(this).data('ip');
+                var user_id = $(this).data('user_id')
+                layer.open({
+                    type: 1, // page 层类型
+                    area: ['30%', '80%'],
+                    title: '查询用户行为日志',
+                    shade: 0.6, // 遮罩透明度
+                    shadeClose: true, // 点击遮罩区域，关闭弹层
+                    maxmin: true, // 允许全屏最小化
+                    anim: 0, // 0-6 的动画形式，-1 不开启
+                    content: $("#ip-count-modal"),
+                    success: function () {
+                        //执行渲染
+                        //第一个实例
+                        table.render({
+                            elem: '#ip-count'
+                            , url: '{:url("memberLog/getSameIpUser")}'
+                            , where: {
+                                'ip': ip,
+                                'user_id': user_id
+                            }//数据接口
+                            , cols: [[ //表头
+                                {field: 'user_name', width: 180, title: '用户名',}
+                                , {field: 'create_time', title: '时间', width: 200, sort: true}
+                                , {title: '操作', width: 100, templet: '#toolEventDemo'}
+                            ]],
+                        });
+                    },
+                    cancel: function (index, layero) {
+                        // 重新打开行为列表
+                        openUserLog(user_id)
+                    }
+                });
+            })
+
+            function openUserLog(user_id) {
+                layer.open({
+                    type: 1, // page 层类型
+                    area: ['850px', '80%'],
+                    title: '行为列表',
+                    shade: 0.6, // 遮罩透明度
+                    shadeClose: true, // 点击遮罩区域，关闭弹层
+                    maxmin: true, // 允许全屏最小化
+                    anim: 0, // 0-6 的动画形式，-1 不开启
+                    content: $("#user-log-modal"),
+                    success: function () {
+                        //执行渲染
+                        layui.use('table', function () {
+                            var table = layui.table;
+                            table.render({
+                                elem: '#user-log'
+                                , url: '{:url("getUserLog")}'
+                                , where: {
+                                    'user_id': user_id
+                                }//数据接口
+                                , cols: [[ //表头
+                                    {field: 'user_name', width: 180, title: '用户账号',}
+                                    , {field: 'ip', title: '登录IP', width: 200, sort: true}
+                                    , {
+                                        field: 'user_ip_count',
+                                        title: '同IP数',
+                                        width: 200,
+                                        sort: true,
+                                        templet: function (d) {
+                                            // 返回模板内容
+                                            return d.user_ip_count
+                                        }
+                                    }
+                                    , {field: 'create_time', title: '登录日期', width: 200, sort: true}
+                                ]],
+                            });
+                        })
+
+                    }
+                });
+            }
+        });
+
+        initTable();
+
+        $('#cusTable').on('check.bs.table uncheck.bs.table ' + 'check-all.bs.table uncheck-all.bs.table', function () {
+            $remove.prop('disabled', !$('#cusTable').bootstrapTable('getSelections').length);
+        })
+        //当点击查询按钮的时候执行
+        $("#search").bind("click", initTable);
+    });
+
+    function userDel(id) {
+        layer.confirm('确认删除此用户?', {icon: 3, title: '提示'}, function (index) {
+            //do something
+            $.getJSON("{:url('member/userDel')}", {'id': id}, function (res) {
+                if (1 == res.code) {
+                    layer.alert(res.msg, {title: "{:lang('友情提示')}", icon: 1, closeBtn: 0}, function (inx) {
+                        layer.close(inx);
+                        initTable();
+                    });
+                } else if (111 == res.code) {
+                    window.location.reload();
+                } else {
+                    layer.alert(res.msg, {title: "{:lang('友情提示')}", icon: 2});
+                }
+            });
+            layer.close(index);
+        })
+    }
+
+    function queryParams(params) {   //设置查询参数
+        params.uid = $('#uid').val();
+        params.user_name = $('#user_name').val();
+        params.invite_code = $('#invite_code').val();
+        params.document_id = $('#document_id').val();
+        params.true_name = $('#true_name').val();
+        params.startTime = $('#start_time').val();
+        params.endTime = $('#end_time').val();
+        params.level_id = $('#level_id').val();
+        params.time_type = $('#time_type').val();
+        params.is_xuni = $('#is_xuni').val();
+        params.ip = $('#ip').val();
+        params.repeatIP = $('#repeat_ip').val();
+        params.leader1 = $('#leader1').val();
+        params.leader1_invite_code = $('#leader1_invite_code').val();
+        return params;
+    }
+
+    $(document).ready(function () {
+        layui.use(['util'], function () {
+            var util = layui.util;
+            util.on({
+                add: function (e) {
+                    let url = "{:url('member/useradd')}"
+                    // 在此处输入 layer 的任意代码
+                    layer.open({
+                        type: 2,
+                        area: ['1000px', '700px'],
+                        title: '新增',
+                        maxmin: true, // 允许全屏最小化
+                        anim: 0, // 0-6 的动画形式，-1 不开启
+                        content: url,
+                    });
+                },
+            });
+        })
+    });
+
+    function show_name(t) {
+        let user_name = $(t).data().user_name
+        layer.tips(user_name, t, {
+            tips: 1
+        })
+    }
+
+    function show_mobile(t) {
+        let user_mobile = $(t).data().user_mobile
+        layer.tips(user_mobile, t, {
+            tips: 1
+        })
+    }
+
+    function openEditUrl() {
+        var url = "{:url('member/edit_batch')}";
+        // console.log(url);
+        layer.open({
+            type: 2,
+            area: ['100%', '100%'],
+            title: '批量操作',
+            maxmin: true, // 允许全屏最小化
+            anim: 0, // 0-6 的动画形式，-1 不开启
+            content: url
+        });
+    }
+
+    function openUrl(id) {
+        var url = "{:url('member/next_index')}?id=" + id;
+        // console.log(url);
+        layer.open({
+            type: 2,
+            area: ['100%', '100%'],
+            title: '添加/编辑',
+            maxmin: true, // 允许全屏最小化
+            anim: 0, // 0-6 的动画形式，-1 不开启
+            content: url
+        });
+    }
+</script>
+{include file="footer" /}

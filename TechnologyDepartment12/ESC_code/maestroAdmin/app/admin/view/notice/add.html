@@ -1,0 +1,147 @@
+    {include file="header" /}
+    <div class="row">
+        <div class="col-sm-10">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>{:lang("编辑公告")}</h5>
+                </div>
+                <div class="ibox-content">
+                    <form class="form-horizontal m-t" id="dataForm" method="post" action="{:url('notice/add')}">
+                        <input type="hidden" name="id" value="{$info['id']|default=0}"/>
+<!--                        <div class="form-group">-->
+<!--                            <label class="col-sm-3 control-label">{:lang("语言")}：</label>-->
+<!--                            <div class="input-group col-sm-4">-->
+<!--                                <select name='lang' class="form-control">-->
+<!--                                    {volist name='langs' id='lang'}-->
+<!--                                    <option value="{$lang.lang}" {if isset($info.lang) && $info.lang eq $lang.lang} selected{/if}>{$lang.title}</option>-->
+<!--                                    {/volist}-->
+<!--                                </select>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                        <div class="form-group">-->
+<!--                            <label class="col-sm-3 control-label">{:lang("用户ID")}：</label>-->
+<!--                            <div class="input-group col-sm-4">-->
+<!--                                <input type="number" class="form-control" name="user_id" value="{$info.user_id|default=0}">-->
+<!--                                <p class="help-block">用户ID为0时所有用户都会看到</p>-->
+<!--                            </div>-->
+<!--                        </div>-->
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">{:lang("发布时间")}</label>
+                            <div class="input-group col-sm-4">
+                                <input type="text" class="form-control" id="create_time" name="create_time" value="{$info.create_time|default=0}">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">{:lang("公告原文")}</label>
+                            <div class="input-group col-sm-7">
+                                <textarea type="text" name="content" rows="10" class="form-control">{$info.content|default=''}</textarea>
+                            </div>
+                            <div style="text-align: center;margin-top: 5px">
+                                <button type="button" class="layui-btn layui-btn-primary" id="translate" lay-on="translate">一键翻译</button>
+                                <br>
+                                <span style="color: red">如果翻译内容过大耐心等待，如果一直报错请到谷歌翻译网站进行翻译</span><br>
+                                <a target="_blank" href="https://translate.google.com/">谷歌翻译网址：https://translate.google.com/</a>
+                            </div>
+                        </div>
+                        {foreach name='langs' item='vo' key='key'}
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label"> {:lang($vo.remark)}</label>
+                            <div class="input-group col-sm-7">
+                                <textarea id="{$vo.lang}" type="text" name="tr_content[{$vo.lang}]" rows="10" class="form-control">{$tr_content[$vo.lang]}</textarea>
+                            </div>
+                        </div>
+                        {/foreach}
+
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">{:lang("是否启用")}：</label>
+                            <div class="input-group col-sm-4">
+                                {foreach name='status' item='vo' key='key'}
+                                <div class="radio i-checks col-sm-4">
+                                    {if condition="$key == $info['status']"}
+                                    <label><input type="radio" value="{$key}" checked name="status"> <i></i> {$vo}</label>
+                                    {else}
+                                    <label><input type="radio" value="{$key}" name="status"> <i></i> {$vo}</label>
+                                    {/if}
+                                </div>
+                                {/foreach}
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-4 col-sm-offset-8">
+                                <!--<input type="button" value="提交" class="btn btn-primary" id="postform"/>-->
+                                <button class="btn btn-primary" type="submit">{:lang("提交")}</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+{include file="footer" /}
+<script type="text/javascript">
+    // $(document).ready(function(){
+    //     var editor = UE.getEditor('container', {
+    //         serverUrl:"{:url('articles/uploadimg')}",
+    //     });
+    // });
+
+    layui.use(['util'], function(){
+        var util = layui.util;
+        var laydate = layui.laydate;
+        util.on({
+            translate: function (othis) {
+                let content = $('textarea[name=content]').val()
+                // 发起翻译请求
+                let url = "{:url('articles/translate')}"
+                index = layer.load(0);
+                $.ajax({
+                    type: 'POST',
+                    url: url,
+                    data:{text:content},
+                    dataType: 'json',
+                    success: function (res) {
+                        layer.closeLast('loading');
+                        // 循环语言
+                        for (let key in res.data) {
+                            $('#'+key).val(res.data[key])
+                        }
+                    },
+                    error: function (xhr, type) {
+                        layer.closeLast('loading');
+                    }
+                });
+            },
+        });
+
+
+        laydate.render({
+          elem: '#create_time'
+          ,type: 'datetime',
+          value: getRecentDay(0),
+        });
+
+      function getRecentDay(day){
+        debugger
+        var today = new Date();
+        var targetday_milliseconds=today.getTime() + 1000*60*60*24*day;
+        today.setTime(targetday_milliseconds);
+        var tYear = today.getFullYear();
+        var tMonth = today.getMonth();
+        var tDate = today.getDate();
+        var tHours = today.getHours();
+        var tMinutes = today.getMinutes();
+        var tSeconds = today.getSeconds();
+        tMonth = doHandleMonth(tMonth + 1);
+        tDate = doHandleMonth(tDate);
+        return tYear+"-"+tMonth+"-"+tDate+" "+tHours+":"+tMinutes+":"+tSeconds;
+      }
+      function doHandleMonth(month){
+        var m = month;
+        if(month.toString().length == 1){
+          m = "0" + month;
+        }
+        return m;
+      }
+    });
+</script>

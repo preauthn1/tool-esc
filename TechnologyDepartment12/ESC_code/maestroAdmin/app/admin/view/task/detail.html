@@ -1,0 +1,215 @@
+{include file="header" /}
+<div class="row">
+    <div class="col-sm-11">
+        <div class="ibox float-e-margins">
+            <blockquote class="layui-elem-quote" style="background: #ffffff">
+                <span class="orderNo">{:lang("拼单号")}：{$order.order_sn}</span>
+                <span style="float: right">
+                    {:getStatusText($order['status'], $order_status['status'][$order['status']])}
+                </span>
+            </blockquote>
+            
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="panel-title">{:lang("发起用户")}</div>
+                </div>
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-xs-2">
+                            <img src="{$order.user.avatar|toAvatar}" style="max-width: 100%">
+                        </div>
+                        <div class="col-xs-8 form-horizontal">
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label class="control-label col-xs-2">{:lang("用户ID")}：</label>
+                                <div class="col-xs-8">
+                                    <p class="form-control-static">{$order.user_id}</p>
+                                </div>
+                            </div>
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label class="control-label col-xs-2">{:lang("昵称")}：</label>
+                                <div class="col-xs-8">
+                                    <p class="form-control-static">{$order.user.nick_name}</p>
+                                </div>
+                            </div>
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label class="control-label col-xs-2">{:lang("手机号")}：</label>
+                                <div class="col-xs-8">
+                                    <p class="form-control-static">{$order.user.mobile}</p>
+                                </div>
+                            </div>
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label class="control-label col-xs-2">{:lang("注册时间")}：</label>
+                                <div class="col-xs-8">
+                                    <p class="form-control-static">{$order.user.create_time}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="panel-title">{:lang("参与记录")}</div>
+                </div>
+                <div class="panel-body">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>{:lang("参与流水号")}</th>
+                                <th>{:lang("用户类型")}</th>
+                                <th>{:lang("用户ID")}</th>
+                                <th>{:lang("手机号")}</th>
+                                <th>{:lang("参与金额")}</th>
+                                <th>{:lang("佣金")}</th>
+                                <th>{:lang("参与时间")}</th>
+                                <th>{:lang("状态")}</th>
+                                <th>{:lang("操作")}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {volist name='sub_orders' id='row'}
+                            <tr>
+                                <td>{$row.order_sn}</td>
+                                <td>
+                                    {:getStatusText($row['is_xuni'], config('my.is_xuni')[$row['is_xuni']])}
+                                </td>
+                                <td>{$row.user_id}</td>
+                                <td>{$row.user.mobile}</td>
+                                <td>{$row.retail_price|floatval}</td>
+                                <td>{$row.return_bonus|floatval}</td>
+                                <td>{$row.create_time}</td>
+                                <td>
+                                    {if $row.repurchase_status > 2}
+                                    {:getStatusText($row['repurchase_status'], $order_status['repurchase'][$row['repurchase_status']])}
+                                    {else}
+                                    {:getStatusText($row['paid_status'], $order_status['paid'][$row['paid_status']])}
+                                    {/if}
+                                </td>
+                                <td>
+                                    {if $row.repurchase_status eq 2}
+                                    <button data-order='{$row|json_encode}' class="btn btn-primary btn-xs repurchaseEvent">{:lang("确认回购")}</button>
+                                    <button data-order='{$row|json_encode}' class="btn btn-danger btn-xs rejectEvent">{:lang("拒绝")}</button>
+                                    {else}
+                                    -
+                                    {/if}
+                                </td>
+                            </tr>
+                            {/volist}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="panel-title">{:lang("商品信息")}</div>
+                </div>
+                <div class="panel-body">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>{:lang("售卖ID")}</th>
+                                <th>{:lang("商品信息")}</th>
+                                <th>{:lang("实际价格")}</th>
+                                <th>{:lang("拼单价格")}</th>
+                                <th>{:lang("佣金")}</th>
+                                <th>{:lang("上架时间")}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>{$order.goods_id}</td>
+                                <td style="width: 380px;">
+                                    <img src="{$order.goods.pic|toMedia}" style="float: left; margin-right: 12px; max-width: 100px;">
+                                    <p style="font-size: 15px;color: #000;margin-top: 12px;">
+                                        {$order.goods.goods_name}
+                                        {if $order.goods_attr}
+                                        【{$order.goods_attr.name}】
+                                        {/if}
+                                    </p>
+                                </td>
+                                <td>
+                                    {if $order.goods_attr}
+                                        {$order.goods_attr.shop_price|floatval}
+                                    {else}
+                                        {$order.goods.shop_price|floatval}
+                                    {/if}
+                                </td>
+                                <td>
+                                    {if $order.goods_attr}
+                                        {$order.goods_attr.retail_price|floatval}
+                                    {else}
+                                        {$order.goods.retail_price|floatval}
+                                    {/if}
+                                </td>
+                                <td>
+                                    {if $order.goods_attr}
+                                        {$order.goods_attr.return_bonus|floatval}
+                                    {else}
+                                        {$order.goods.return_bonus|floatval}
+                                    {/if}
+                                </td>
+                                <td>{$order.goods.create_time}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+// 拒绝回购
+$('.rejectEvent').click(function() {
+    var order = $(this).data('order');
+    layer.confirm(
+        '{:lang("是否拒绝用户")}【'+order.user.mobile+'】{:lang("的订单回购请求")}？',
+        {
+            icon: 3,
+            closeBtn: false,
+            title: '{:lang("拒绝回购确认")}【'+order.user_id+'】',
+            btn: ['{:lang("是")}', '{:lang("取消")}']
+        },
+        function(index, layero){
+            $.post("{:url('checkout')}", {
+                id: order.id,
+                status:1
+            }, function(res){
+                layer.close(index);
+                layer.msg(res.msg);
+                setTimeout(function(){
+                    location.reload();
+                }, 1500);
+            });
+        }
+    );
+})
+
+$('.repurchaseEvent').click(function(){
+    var order = $(this).data('order');
+    console.log(order)
+    layer.confirm(
+        '{:lang("是否回购用户")}【'+order.user.mobile+'】{:lang("的订单")}？<br />{:lang("订单金额")}：'+order.retail_price+'<br />{:lang("佣金")}：' +order.return_bonus+'<br />{:lang("将全部返还到用户的余额")}。',
+        {
+            icon: 3,
+            closeBtn: false,
+            title: '{:lang("回购确认")}【'+order.user_id+'】',
+            btn: ['{:lang("确认")}', '{:lang("取消")}']
+        },
+        function(index, layero){
+            $.post('{:url("checkout")}', {
+                id:order.id,
+                status:3
+            },function(res){
+                layer.close(index);
+                layer.msg(res.msg);
+                setTimeout(function(){
+                    location.reload();
+                }, 1500);
+            })
+        }
+    );
+})
+</script>
+{include file="footer" /}

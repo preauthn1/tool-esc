@@ -1,0 +1,92 @@
+    {include file="header" /}
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>{:lang("添加")}</h5>
+                </div>
+                <div class="ibox-content">
+                    <form class="form-horizontal m-t" id="dataForm" method="post" action="{:url('add')}">
+                        <input type="hidden" name="id" value="{$info.id}"/>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">{:lang("语言")}：</label>
+                            <div class="input-group col-sm-4">
+                                <select name='lang' class="form-control">
+                                    {volist name='langs' id='lang'}
+                                    <option value="{$lang.lang}" {if $info.lang eq $lang.lang} selected{/if}>{$lang.title|lang}</option>
+                                    {/volist}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">{:lang("排序")}：</label>
+                            <div class="input-group col-sm-4">
+                                <input type="text" class="form-control" value="{$info.sort|intval}" name="sort" />
+                                <p class="help-block">{:lang("数字越小的排在前面")}</p>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">{:lang("银行名称")}：</label>
+                            <div class="input-group col-sm-4">
+                                <input type="text" class="form-control" value="{$info.name}" name="name" required />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">{:lang("银行编码")}：</label>
+                            <div class="input-group col-sm-4">
+                                <input type="text" class="form-control" value="{$info.bank_code}" name="bank_code" required />
+                                <p class="help-block">{:lang("确定后勿随意修改")}</p>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">{:lang("银行卡号规则")}：</label>
+                            <div class="input-group col-sm-4">
+                                <input type="text" class="form-control" value="{$info.bank_number_rule}" name="bank_number_rule" />
+                                <p class="help-block">
+                                    填数字或正则表达式<br>
+                                    数字：为银行卡号长度<br>
+                                    正则：<code>/^\d+{10}$/</code>为验证10个数字，更多请咨询技术人员<br>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">{:lang("其他信息")}：</label>
+                            <div class="input-group col-sm-4">
+                                <input type="text" class="form-control" value="{$info.extra}" name="extra" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">{:lang("银行logo")}：</label>
+                            <input name="logo" id="img" value="{$info.logo}" type="hidden" />
+                            <div class="form-inline">
+                                <div class="input-group col-sm-2">
+                                    <button type="button" class="layui-btn" id="uploader">
+                                        <i class="layui-icon">&#xe67c;</i>{:lang("上传图片")}
+                                    </button>
+                                </div>
+                                <div class="input-group col-sm-3">
+                                    <div id="sm">{if $info.logo}<img src="{$info.logo|toMedia}" style="width:40px; height: 40px;"/>{/if}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">{:lang("状态")}：</label>
+                            <div class="input-group col-sm-4">
+                                <select class="form-control" name="status">
+                                    <option value="1" {if $info.status eq 1} selected {/if}>{:lang("启用")}</option>
+                                    <option value="0" {if $info.status neq 1} selected {/if}>{:lang("停用")}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-4 col-sm-offset-6">
+                                <button class="btn btn-primary" type="submit">{:lang("提交")}</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+{include file="footer" /}

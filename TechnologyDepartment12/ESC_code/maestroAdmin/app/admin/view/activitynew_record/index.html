@@ -1,0 +1,121 @@
+{include file="header" /}
+    <!-- Panel Other -->
+    <div class="ibox float-e-margins">
+        <div class="ibox-title">
+            <h5>{$title|lang}</h5>
+        </div>
+        <div class="ibox-content">
+            <div id="toolbar">
+                <div id="stats" style=' float: left; padding: 8px 12px'></div>
+            </div>
+            <form id='commentForm' role="form" method="post" class="form-inline pull-right">
+                <div class="content clearfix m-b">
+                    <div class="form-group">
+                        <label>{:lang("选择时间")}：</label>
+                        <input type="text" class="form-control" id="start_time" name="startTime" value="{:getDateStr()}" placeholder="yyyy-MM-dd" lay-key="1" autocomplete="off">
+                        -
+                        <input type="text" class="form-control" id="end_time" name="endTime" value="{:getDateStr()}" placeholder="yyyy-MM-dd" lay-key="2" autocomplete="off">
+                    </div>
+                    <div class="form-group">
+                        <label>{:lang("活动")}：</label>
+                        <select class="form-control" name="activity_id" id="activity_id" >
+                            <option value="">所有</option>
+                            {volist name='activitys' id='item'}
+                            <option value="{$item.id}">{$item.title}</option>
+                            {/volist}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>{:lang("用户名称")}：</label>
+                        <input type="text" class="form-control" id="username" name="user_name" placeholder="{:lang('用户账户/用户ID')}">
+                    </div>
+                    <div class="form-group">
+                        <label>{:lang("来自用户ID")}：</label>
+                        <input type="text" class="form-control" id="from_user_id" name="from_user_id" placeholder="{:lang('来自用户ID')}">
+                    </div>
+                    <div class="form-group">
+                        <label>{:lang("用户类型")}：</label>
+                        <select class="form-control" id="is_xuni" name="is_xuni">
+                            <option value="-1">{:lang("所有")}</option>
+                            <option value="1">{:lang("虚拟用户")}</option>
+                            <option value="0" selected>{:lang("真实用户")}</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>{:lang("是否领取")}：</label>
+                        <select class="form-control" id="status" name="status">
+                            <option value="-1">{:lang("所有")}</option>
+                            <option value="1">{:lang("已领取")}</option>
+                            <option value="0" selected>{:lang("未领取")}</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <button class="btn btn-primary" type="button" style="margin-top:5px" id="search"><strong>{:lang('搜索')}</strong>
+                        </button>
+                    </div>
+                </div>
+            </form>
+            <div class="example-wrap">
+                <div class="example">
+                    <table id="cusTable">
+                        <thead>
+                        <th data-field="id">{:lang("ID")}</th>
+                        <th data-field="user_id">{:lang("用户ID")}</th>
+                        <th data-field="reward_type">{:lang("奖励类型")}</th>
+                        <th data-field="recharge_amount">{:lang("充值金额")}</th>
+                        <th data-field="reward">{:lang("奖励")}</th>
+<!--                        <th data-field="befor_num">{:lang("发放奖励前账户余额")}</th>-->
+                        <th data-field="activity_id">{:lang("活动标题")}</th>
+                        <th data-field="type_str">{:lang("活动类型")}</th>
+                        <th data-field="from_user_id">{:lang("来自用户ID")}</th>
+                        <th data-field="status">{:lang("是否领取")}</th>
+                        <th data-field="create_time">{:lang("时间")}</th>
+                        <th data-field="is_xuni_text">{:lang("虚拟账户")}</th>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+            <!-- End Example Pagination -->
+        </div>
+    </div>
+
+<script type="text/javascript">
+    function queryParams(params) {   //设置查询参数
+        params.activity_id= $('#activity_id').val();
+        params.username = $('#username').val();
+        params.startTime = $('#start_time').val();
+        params.endTime = $('#end_time').val();
+        params.from_user_id = $('#from_user_id').val();
+        params.is_xuni = $('#is_xuni').val();
+        params.status = $('#status').val();
+        return params;
+    }
+    function onLoadSuccess(res) {
+        var stathtml = '';
+        if (res.stat) {
+            $.each(res.stat, function(i, v){
+                stathtml += '<span class="label label-success">'+v.text+'：'+v.total+'</span> ';
+            });
+        }
+        $("#stats").html(stathtml);
+
+    }
+    $(document).ready(function () {
+        layui.use('laydate', function(){
+            var laydate = layui.laydate;
+            laydate.render({
+                elem: '#start_time'
+                ,trigger: 'click'
+            });
+            laydate.render({
+                elem: '#end_time'
+                ,trigger: 'click'
+            });
+        });
+        initTable();
+        $("#search").on("click", function(){
+            initTable();
+        });
+    });
+</script>
+{include file="footer" /}

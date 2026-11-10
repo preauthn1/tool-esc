@@ -1,0 +1,94 @@
+{include file="header" /}
+<div style="padding: 20px;">
+    <label>{$title}</label>
+    <form class="form-horizontal" id="commentForm" method="post" action="{:url('team_reward/config1')}">
+        <div id="myTabContent" class="tab-content ibox-content">
+            <div class="form-group">
+                <label class="col-sm-3 control-label">{:lang("总阶段数")}：</label>
+                <div class="input-group col-sm-4">
+                    <input type="text" class="form-control" name="phase_count" value="{$config.phase_count|default=0}">
+                    <p class="help-block">phase_count：首充送款条件：充值金额大于等于x（最低要求），设置0不限制金额。</p>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-sm-3 control-label">{:lang("直推首次充值金额")}：</label>
+                <div class="input-group col-sm-4">
+                    <input type="text" class="form-control" name="level1_recharge_money" value="{$config.level1_recharge_money|default=0}">
+                    <p class="help-block">level1_recharge_money：直推首次充值金额。</p>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">{:lang("直推基础人数")}：</label>
+                <div class="input-group col-sm-4">
+                    <input type="text" class="form-control" name="base_level1_user" value="{$config.base_level1_user|default=0}">
+                    <p class="help-block">base_level1_user：直推基础人数。</p>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-sm-3 control-label">{:lang("直推增长阶梯数")}：</label>
+                <div class="input-group col-sm-4">
+                    <input type="text" class="form-control" name="level1_user_up_step" value="{$config.level1_user_up_step|default=0}">
+                    <p class="help-block">level1_user_up_step：直推增长阶梯数。</p>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-sm-3 control-label">{:lang("活跃基础人数")}：</label>
+                <div class="input-group col-sm-4">
+                    <input type="text" class="form-control" name="base_active_user" value="{$config.base_active_user|default=0}">
+                    <p class="help-block">base_active_user：活跃基础人数。</p>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-sm-3 control-label">{:lang("活跃增长阶梯数")}：</label>
+                <div class="input-group col-sm-4">
+                    <input type="text" class="form-control" name="active_user_up_step" value="{$config.active_user_up_step|default=0}">
+                    <p class="help-block">active_user_up_step：活跃增长阶梯数。</p>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">{:lang("团队奖励基础金额")}：</label>
+                <div class="input-group col-sm-4">
+                    <input type="text" class="form-control" name="reward_amount" value="{$config.reward_amount|default=0}">
+                    <p class="help-block">reward_amount：团队奖励基础金额。</p>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">{:lang("团队奖励阶梯金额")}：</label>
+                <div class="input-group col-sm-4">
+                    <input type="text" class="form-control" name="reward_amount_step" value="{$config.reward_amount_step|default=0}">
+                    <p class="help-block">reward_amount_step：团队奖励阶梯数。例如：100-200-300，表示基础上加，基础+100-基础+200-基础+300。如果只配置100,那么表示全部都是在基础上+100</p>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-4 col-sm-offset-4">
+                    <button class="btn btn-primary" type="submit">{:lang("保存初始团队活跃奖励配置")}</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+    layui.use(['jquery'], function () {
+        var $ = layui.jquery;
+
+        $('#commentForm').submit(function () {
+            var options = {
+                beforeSubmit: function() {
+                    return showStart();
+                },
+                success: showSuccess
+            };
+            $(this).ajaxSubmit(options);
+            return false;
+        });
+        // 保存数据
+
+    });
+
+</script>
+{include file="footer" /}

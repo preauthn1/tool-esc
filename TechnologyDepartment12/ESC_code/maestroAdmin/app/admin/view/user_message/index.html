@@ -1,0 +1,212 @@
+{include file="header" /}
+<!-- Panel Other -->
+<div class="ibox float-e-margins">
+    <div class="ibox-title">
+        <h5>{:lang("站内信")}</h5>
+    </div>
+    <div class="ibox-content">
+        <div class="form-group clearfix col-sm-1">
+            {if authCheck('user_message/add') }
+            <button class="btn btn-outline btn-primary" type="button" lay-on="add">{:lang("新增")}</button>
+            {/if}
+            <a href="javascript:;" onclick="delAll();">
+                <button class="btn btn-outline btn-danger" type="button">{:lang("删除")}</button>
+            </a>
+        </div>
+        <!--搜索框开始-->
+        <form id='commentForm' role="form" method="post" class="form-inline pull-right">
+            <div class="content clearfix m-b">
+                <div class="form-group">
+                    <label>{:lang("用户名")}：</label>
+                    <input type="text" class="form-control" id="user_name" name="user_name" placeholder="{:lang('请输入用户名')}">
+                </div>
+                <div class="form-group">
+                    <label>{:lang("标题")}：</label>
+                    <input type="text" class="form-control" id="title" name="title" placeholder="{:lang('请输入标题')}">
+                </div>
+                <div class="form-group">
+                    <label>{:lang("内容")}：</label>
+                    <input type="text" class="form-control" id="content" name="content" placeholder="{:lang('请输入内容')}">
+                </div>
+                <div class="form-group">
+                    <label>{:lang("类型")}：</label>
+                    <select class="form-control" id="type" name="type">
+                        <option value="">{:lang('全部')}</option>
+                        {foreach $typeMap as $key => $type}
+                        <option value="{$key}">{$type}</option>
+                        {/foreach}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>{:lang("是否已读")}：</label>
+                    <select class="form-control" id="is_read" name="is_read">
+                        <option value="">{:lang('全部')}</option>
+                        <option value="1">{:lang('已读')}</option>
+                        <option value="0">{:lang('未读')}</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>{:lang("是否弹窗")}：</label>
+                    <select class="form-control" id="is_pop" name="is_pop">
+                        <option value="">{:lang('全部')}</option>
+                        <option value="1">{:lang('是')}</option>
+                        <option value="0">{:lang('否')}</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <button class="btn btn-primary" type="button" style="margin-top:5px" id="search"><strong>{:lang('搜索')}</strong></button>
+                    <button class="btn btn-default" type="button" style="margin-top:5px" onclick="resetSearch();"><strong>{:lang('重置')}</strong></button>
+                </div>
+            </div>
+        </form>
+        <!--搜索框结束-->
+        <div class="example-wrap">
+            <div class="example">
+                <table id="cusTable">
+                    <thead>
+                    <th data-checkbox="true"></th><!--复选框-->
+                    <th data-field="id">{:lang("id")}</th>
+                    <th data-field="user_info">{:lang("用户信息")}</th>
+                    <th data-field="admin_id">{:lang("发送人")}</th>
+                    <th data-field="title">{:lang("标题信息")}</th>
+                    <th data-field="content_short">{:lang("内容")}</th>
+                    <th data-field="type_str">{:lang("类型")}</th>
+                    <th data-field="create_time">{:lang("发送时间")}</th>
+                    <th data-field="is_read">{:lang("是否已读")}</th>
+                    <th data-field="read_time">{:lang("已读时间")}</th>
+                    <th data-field="is_pop">{:lang("是否弹窗")}</th>
+                    <th data-field="operate">{:lang("操作")}</th>
+                    </thead>
+                </table>
+            </div>
+        </div>
+        <!-- End Example Pagination -->
+    </div>
+</div>
+<!-- End Panel Other -->
+<script type="text/javascript">
+    tableCheckbox = true;
+    function queryParams(params) {
+        params.user_name = $('#user_name').val();
+        params.title = $('#title').val();
+        params.content = $('#content').val();
+        params.type = $('#type').val();
+        params.is_read = $('#is_read').val();
+        params.is_pop = $('#is_pop').val();
+        return params;
+    }
+
+    // 重置搜索条件
+    function resetSearch() {
+        $('#user_name').val('');
+        $('#title').val('');
+        $('#content').val('');
+        $('#type').val('');
+        $('#is_read').val('');
+        $('#is_pop').val('');
+        initTable();
+    }
+
+    function delAll(){
+        var getSelectRows = $("#cusTable").bootstrapTable('getSelections', function (row) {
+            return row;
+        });
+        var ids = new Array();  // 定义js数组用于存放自己所需的值
+        for(var i=0;i<getSelectRows.length;i++){
+            ids[i] = getSelectRows[i].id;
+        }
+        if (ids.length <= 0) {
+            layer.msg('请选择要操作的站内信');
+            return;
+        }
+        layer.confirm('确认操作吗?', {icon: 3, title:'提示'}, function(index){
+            $.getJSON("{:url('user_message/del')}", {'id' : ids}, function(res){
+                if(1 == res.code){
+                    layer.alert(res.msg, {title: "{:lang('友情提示')}", icon: 1, closeBtn: 0}, function(inx){
+                        layer.close(inx);
+                        initTable();
+                    });
+                }else if(111 == res.code){
+                    window.location.reload();
+                }else{
+                    layer.alert(res.msg, {title: "{:lang('友情提示')}", icon: 2});
+                }
+            });
+
+            layer.close(index);
+        })
+    }
+
+    function showDetail(id) {
+        // 获取当前行数据
+        var row = $("#cusTable").bootstrapTable('getData').find(item => item.id == id);
+        if (!row) return;
+        
+        // 构建详情HTML
+        var content = '<div class="form-horizontal" style="padding: 20px;">';
+        content += '<div class="form-group"><label class="col-sm-2 control-label">用户信息：</label><div class="col-sm-10"><p class="form-control-static">' + row.user_info + '</p></div></div>';
+        content += '<div class="form-group"><label class="col-sm-2 control-label">发送人：</label><div class="col-sm-10"><p class="form-control-static">' + row.admin_id + '</p></div></div>';
+        content += '<div class="form-group"><label class="col-sm-2 control-label">标题：</label><div class="col-sm-10"><p class="form-control-static">' + row.title + '</p></div></div>';
+        content += '<div class="form-group"><label class="col-sm-2 control-label">内容：</label><div class="col-sm-10"><div class="form-control-static" style="white-space: pre-wrap;">' + row.content + '</div></div></div>';
+        content += '<div class="form-group"><label class="col-sm-2 control-label">发送时间：</label><div class="col-sm-10"><p class="form-control-static">' + row.create_time + '</p></div></div>';
+        content += '<div class="form-group"><label class="col-sm-2 control-label">是否已读：</label><div class="col-sm-10"><p class="form-control-static">' + row.is_read + '</p></div></div>';
+        content += '<div class="form-group"><label class="col-sm-2 control-label">已读时间：</label><div class="col-sm-10"><p class="form-control-static">' + row.read_time + '</p></div></div>';
+        content += '<div class="form-group"><label class="col-sm-2 control-label">是否弹窗：</label><div class="col-sm-10"><p class="form-control-static">' + row.is_pop + '</p></div></div>';
+        content += '</div>';
+
+        // 显示弹窗
+        layer.open({
+            type: 1,
+            title: '站内信详情',
+            area: ['800px', '600px'],
+            content: content
+        });
+    }
+
+    $(document).ready(function () {
+        initTable();
+        $("#search").bind("click", initTable);
+
+        layui.use(['util'], function () {
+            var util = layui.util;
+            util.on({
+                add: function (e) {
+                    let url = "{:url('user_message/add')}"
+                    // 在此处输入 layer 的任意代码
+                    layer.open({
+                        type: 2,
+                        area: ['100%', '100%'],
+                        title: '新增',
+                        maxmin: true, // 允许全屏最小化
+                        anim: 0, // 0-6 的动画形式，-1 不开启
+                        content: url,
+                        end: function(){
+                            initTable()
+                        }
+                    });
+                },
+            });
+        })
+    });
+
+    function del(id){
+        layer.confirm('确认删除?', {icon: 3, title:'提示'}, function(index){
+            //do something
+            $.getJSON("{:url('user_message/del')}", {'id' : id}, function(res){
+                if(1 == res.code){
+                    layer.alert(res.msg, {title: "{:lang('友情提示')}", icon: 1, closeBtn: 0}, function(inx){
+                        layer.close(inx);
+                        initTable();
+                    });
+                }else if(111 == res.code){
+                    window.location.reload();
+                }else{
+                    layer.alert(res.msg, {title: "{:lang('友情提示')}", icon: 2});
+                }
+            });
+
+            layer.close(index);
+        })
+    }
+</script>
+{include file="footer" /}

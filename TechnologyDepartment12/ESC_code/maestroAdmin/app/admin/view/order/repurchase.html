@@ -1,0 +1,126 @@
+{include file="header" /}
+    <!-- Panel Other -->
+    <div class="ibox float-e-margins">
+        <div class="ibox-title">
+            <h5>{:lang("订单列表")}</h5>
+        </div>
+        <div class="ibox-content">
+            <!--搜索框开始-->
+            <form id='commentForm' role="form" method="post" class="form-inline pull-right">
+                <div class="content clearfix m-b">
+                    <div class="form-group">
+                        <label>{:lang("选择时间")}：</label>
+                        <input type="text" class="form-control" id="start_time" name="start_time" value="" placeholder="yyyy-MM-dd" lay-key="1" autocomplete="off">
+                        -
+                        <input type="text" class="form-control" id="end_time" name="end_time" value="" placeholder="yyyy-MM-dd" lay-key="2" autocomplete="off">
+                    </div>
+                    <div class="form-group">
+                        <label>{:lang("订单号/手机号")}：</label>
+                        <input type="text" class="form-control" id="ordersn" name="ordersn">
+                    </div>
+                    <div class="form-group">
+                        <button class="btn btn-primary" type="button" style="margin-top:5px" id="search"><strong>{:lang('搜索')}</strong>
+                        </button>
+                    </div>
+                </div>
+            </form>
+            <!--搜索框结束-->
+            <div class="example-wrap">
+                <div class="example">
+                    <table id="cusTable">
+                        <thead>
+                        <th data-field="order_sn">{:lang("订单号")}</th>
+                        <th data-field="is_xuni">{:lang("用户类型")}</th>
+                        <th data-field="user_id">{:lang("用户ID")}</th>
+                        <th data-field="mobile">{:lang("手机号")}</th>
+                        <th data-field="retail_price">{:lang("参与金额")}</th>
+                        <th data-field="return_bonus">{:lang("返佣")}</th>
+                        <th data-field="create_time">{:lang("参与时间")}</th>
+                        <th data-field="repurchase_status">{:lang("状态")}</th>
+                        <th data-field="operate">{:lang("操作")}</th>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+            <!-- End Example Pagination -->
+        </div>
+    </div>
+    
+{include file="footer" /}
+<script type="text/javascript">
+    index_url = "{:url('repurchase')}"
+    $(document).ready(function () {
+        layui.use('laydate', function(){
+            var laydate = layui.laydate;
+            laydate.render({
+                elem: '#start_time'
+                ,trigger: 'click'
+            });
+            laydate.render({
+                elem: '#end_time'
+                ,trigger: 'click'
+            });
+        });
+        initTable();
+        //当点击查询按钮的时候执行
+        $("#search").bind("click", initTable);
+    });
+    function queryParams(params) {   //设置查询参数
+        params.searchText = $('#ordersn').val()
+        return params;
+    }
+
+</script>
+
+<script>
+// 拒绝回购
+$(document).on('click', '.rejectEvent', function() {
+    var order = $(this).data('order');
+    layer.confirm(
+        "{:lang(\"是否拒绝用户\")}【"+order.user.mobile+"】{:lang(\"的订单回购请求\")}？",
+        {
+            icon: 3,
+            closeBtn: false,
+            title: "{:lang(\"拒绝回购确认\")}【"+order.user_id+"】",
+            btn: ["{:lang(\"是\")}", "{:lang(\"取消\")}"]
+        },
+        function(index, layero){
+            $.post("{:url('checkout')}", {
+                id: order.id,
+                status:1
+            }, function(res){
+                layer.close(index);
+                layer.msg(res.msg);
+                setTimeout(function(){
+                    initTable();
+                }, 1500);
+            });
+        }
+    );
+})
+
+$(document).on('click', '.repurchaseEvent', function() {
+    var order = $(this).data('order');
+    layer.confirm(
+        "{:lang(\"是否回购用户\")}【"+order.user.mobile+"】{:lang(\"的订单\")}？<br />{:lang(\"订单金额\")}："+order.retail_price+"<br />{:lang(\"佣金\")}：" +order.return_bonus+"<br />{:lang(\"将全部返还到用户的余额\")}。",
+        {
+            icon: 3,
+            closeBtn: false,
+            title: "{:lang(\"回购确认\")}【"+order.user_id+"】",
+            btn: ["{:lang(\"确认\")}", "{:lang(\"取消\")}"]
+        },
+        function(index, layero){
+            $.post('{:url("checkout")}', {
+                id:order.id,
+                status:3
+            },function(res){
+                layer.close(index);
+                layer.msg(res.msg);
+                setTimeout(function(){
+                    initTable();
+                }, 1500);
+            })
+        }
+    );
+})
+</script>

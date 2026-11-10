@@ -1,0 +1,43 @@
+
+<div class="form-group">
+    <label class="col-sm-3 control-label">{:lang("余额宝开关")}：</label>
+    <div class="input-group col-sm-4">
+        <div class="layui-form">
+            <input type="radio" name="is_open_balance_money" value="1" title="开启" {if $config['is_open_balance_money'] == 1}checked{/if}>
+            <input type="radio" name="is_open_balance_money" value="0" title="关闭" {if $config['is_open_balance_money'] == 0}checked{/if}>
+        </div>
+        <p class="help-block">is_open_balance_money：余额宝开关,关闭后，用户无法充值。</p>
+    </div>
+</div>
+
+<!--<div class="form-group">-->
+<!--    <label class="col-sm-3 control-label">{:lang("结算有效时间")}：</label>-->
+<!--    <div class="input-group col-sm-4">-->
+<!--        <input type="number" class="form-control" name="balance_money_settle_time" value="{$config.balance_money_settle_time|default=0}">-->
+<!--        <p class="help-block">balance_money_settle_time：结算有效时间，单位：时，24小时，设置15时表示15点前购买的余额才有收益。</p>-->
+<!--    </div>-->
+<!--</div>-->
+
+<div class="form-group">
+    <label class="col-sm-3 control-label">{:lang("结算周期")}：</label>
+    <div class="input-group col-sm-4">
+        <input type="number" class="form-control" name="balance_money_settle_cycle" value="{$config.balance_money_settle_cycle|default=2}">
+        <p class="help-block">balance_money_settle_cycle：结算有周期  单位小时，设置2表示2小时结算一次</p>
+    </div>
+</div>
+
+<div class="form-group">
+    <label class="col-sm-3 control-label">{:lang("有效结算次数")}：</label>
+    <div class="input-group col-sm-4">
+        <input type="number" class="form-control" name="balance_money_settle_count" value="{$config.balance_money_settle_count|default=4}">
+        <p class="help-block">balance_money_settle_count：结算有效次数，单位：次，设置4表示只有4次结算有效</p>
+    </div>
+</div>
+
+<div class="form-group">
+    <label class="col-sm-3 control-label">{:lang("收益率")}：</label>
+    <div class="input-group col-sm-4">
+        <input type="text" class="form-control" name="balance_money_settle_ratio" value="{$config.balance_money_settle_ratio|default=0}">
+        <p class="help-block">balance_money_settle_ratio：收益率 %，单位：%，设置0时表示无收益。 10 表示10%收益</p>
+    </div>
+</div>

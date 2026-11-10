@@ -1,0 +1,119 @@
+{include file="header" /}
+<style>
+    .layui-form-label {
+        width: 120px !important;
+    }
+    .layui-input-block {
+        margin-left: 150px !important;
+    }
+    .layui-form-item .layui-input-inline {
+        margin-left: 20px;
+        width: 250px;
+    }
+</style>
+<div class="ibox float-e-margins">
+    <div class="ibox-content">
+        <form class="layui-form" lay-filter="investTimeForm">
+            <input type="hidden" name="id" value="{$info.id|default=''}">
+            <input type="hidden" name="level_id" value="{$info.level_id|default=input('param.level_id')}">
+
+            <div class="layui-form-item">
+                <label class="layui-form-label">{:lang('开始时间')}：</label>
+                <div class="layui-input-inline">
+                    <input id="start_time" type="text" class="layui-input" name="start_time"
+                        value="{$info.start_time|default=''}" lay-verify="required" readonly>
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label">{:lang('结束时间')}：</label>
+                <div class="layui-input-inline">
+                    <input id="end_time" type="text" class="layui-input" name="end_time"
+                        value="{$info.end_time|default=''}" lay-verify="required" readonly>
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label">{:lang('理财占余额比例')}(%)：</label>
+                <div class="layui-input-inline">
+                    <input id="invest_rate" type="number" class="layui-input" name="invest_rate"
+                        value="{$info.invest_rate|default='0'}" lay-verify="required|number" min="0" max="100" step="0.01">
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label">{:lang('收益率')}(%)：</label>
+                <div class="layui-input-inline">
+                    <input id="profit_rate" type="number" class="layui-input" name="profit_rate"
+                        value="{$info.profit_rate|default='0'}" lay-verify="required|number" min="0" step="0.01">
+                </div>
+            </div>
+
+            <div class="hr-line-dashed"></div>
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <button class="layui-btn" lay-submit lay-filter="submitBtn">{:lang('提交')}</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<script type="text/javascript">
+    layui.use(['form', 'laydate'], function(){
+        var form = layui.form,
+            laydate = layui.laydate;
+
+        //开始时间
+        laydate.render({
+            elem: '#start_time',
+            type: 'time',
+            format: 'HH:mm:ss',
+            trigger: 'click'
+        });
+
+        //结束时间
+        laydate.render({
+            elem: '#end_time',
+            type: 'time',
+            format: 'HH:mm:ss',
+            trigger: 'click'
+        });
+
+        //监听提交
+        form.on('submit(submitBtn)', function(data){
+            console.log(data.field); // 调试用，查看提交的数据
+            var loadIndex = layer.load(2, {shade: [0.3, '#fff']});
+
+            // 验证level_id
+            if (!data.field.level_id) {
+                layer.close(loadIndex);
+                layer.msg('{:lang("参数错误")}');
+                return false;
+            }
+
+            $.ajax({
+                url: "{:url('level/investTimeEdit')}",
+                type: 'POST',
+                dataType: 'json',
+                data: data.field,
+                success: function(res) {
+                    layer.close(loadIndex);
+                    if (res.code == 1) {
+                        parent.layer.msg(res.msg);
+                        parent.location.reload();
+                        var index = parent.layer.getFrameIndex(window.name);
+                        parent.layer.close(index);
+                    } else {
+                        layer.msg(res.msg);
+                    }
+                },
+                error: function() {
+                    layer.close(loadIndex);
+                    layer.msg('{:lang("网络错误")}');
+                }
+            });
+            return false;
+        });
+    });
+</script>
+{include file="footer" /}

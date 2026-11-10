@@ -1,0 +1,72 @@
+    {include file="header" /}
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>{:lang("设置CP")}</h5>
+                </div>
+                <div class="ibox-content">
+                    <form class="form-horizontal m-t" id="dataForm2" method="post" action="{:url('setcp')}">
+                        <input type="hidden" id="user_id" name="user_id" value="{$user.id}">
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">{:lang("用户信息")}：</label>
+                            <div class="col-sm-8">
+                                <p class="form-control-static">
+                                    ID：{$user.id}<br>
+                                    {:lang("手机号")}：{$user.mobile}
+                                </p>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">{:lang("CP信息")}：</label>
+                            <div class="col-sm-8">
+                                <p class="form-control-static">ID：{$user.cp_id}{if $user.cp}<br>{:lang("手机号")}：{$user.cp.mobile}{/if}</p>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">{:lang("修改CP")}：</label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control" name="cp_id" required="" placeholder="可填写用户ID/手机号/邀请码">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-4 col-sm-offset-6">
+                                <button class="btn btn-primary" type="submit">{:lang("提交")}</button>
+								<button class="btn btn-primary" type="button" id='cancel'>{:lang("取消cp")}</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{include file="footer" /}
+<script>
+$(document).ready(function(){
+    // 提交订单
+    $('#dataForm2').submit(function(){
+        if (!window.confirm('{:lang("确定提交")}？')) {
+            return false;
+        }
+        $(this).ajaxSubmit(formSubmitOptions);
+        return false;
+    });
+	
+	$('#cancel').on('click',function(){
+		if (!window.confirm('{:lang("确定取消cp关系？取消后进行中订单也会取消")}')) {
+		    return false;
+		}
+		$.getJSON("{:url('member/cancelcp')}", {'user_id' : $('#user_id').val()}, function(res){
+		    if(1 == res.code){
+		        layer.alert(res.msg, {title: "{:lang('友情提示')}", icon: 1, closeBtn: 0}, function(){
+		            window.location.reload();
+		        });
+		    }else if(111 == res.code){
+		        window.location.reload();
+		    }else{
+		        layer.alert(res.msg, {title: "{:lang('友情提示')}", icon: 2});
+		    }
+		});
+	});
+});
+</script>

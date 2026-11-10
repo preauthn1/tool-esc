@@ -1,0 +1,159 @@
+{include file="header" /}
+    <!-- Panel Other -->
+    <div class="ibox float-e-margins">
+        <div class="ibox-title">
+            <h5>{:lang("信用分调整")}</h5>
+        </div>
+        <div class="ibox-content">
+            <!--搜索框开始-->
+            {if authCheck('credit_score_log/creditScoreAdd') }
+            <form id='dataForm' role="form" method="post" action="{:url('credit_score_log/creditScoreAdd')}" class="form-inline pull-right">
+                <div class="content clearfix m-b">
+                    <div class="form-group">
+                        <label>{:lang("用户id")}：</label>
+                        <input type="text"  class="form-control" required id="uid" name="uid" value="" />
+                    </div>
+                    <div class="form-group">
+                        <label>{:lang("操作类型")}：</label>
+                        <select class="form-control" name="type" id="type" >
+                            <option value="">{:lang("选择类型")}</option>
+                            <option value="1">{:lang("交易量")}</option>
+                            <option value="2">{:lang("活跃人数")}</option>
+                            <option value="3">{:lang("新增人数")}</option>
+<!--                            <option value="4">{:lang("逾期扣分")}</option>-->
+<!--                            <option value="5">{:lang("后台增加")}</option>-->
+<!--                            <option value="6">{:lang("后台减少")}</option>-->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>{:lang("信用分")}：</label>
+                        <input type="number" min="-100" max="100" style="width: 220px;" placeholder="{:lang('正数为加分,负数为减分')}" class="form-control" required id="score" name="score">
+                    </div>
+                    <div class="form-group">
+                        <label>{:lang("说明")}：</label>
+                        <input type="text" class="form-control" id="remarks" name="remarks">
+                    </div>
+                    <div class="form-group">
+                        <button class="btn btn-danger" onclick="return window.confirm('{:lang("确认操作") }?')" type="submit" style="margin-top:5px"><strong>{:lang("确定")}</strong> </button>
+                    </div>
+                </div>
+            </form>
+            {/if}
+            <div id="stats" style=' float: left; padding: 8px 12px'></div>
+            <form id='commentForm' role="form" method="post" class="form-inline pull-right">
+                <div class="content clearfix m-b">
+                    <div class="form-group" id="ID-laydate-rangeLinked">
+                        <label>{:lang("选择时间")}：</label>
+                        <input type="text" class="form-control" id="start_time" name="startTime" value="{:getYesterdayStr()} 00:00:00" placeholder="yyyy-MM-dd HH:mm:ss" autocomplete="off">
+                        -
+                        <input type="text" class="form-control" id="end_time" name="endTime" value="{:getDateStr()} 23:59:59" placeholder="yyyy-MM-dd HH:mm:ss" autocomplete="off">
+                    </div>
+                    <div class="form-group">
+                        <label>{:lang("类型")}：</label>
+                        <select class="form-control" name="type" id="type_filter" >
+                            <option value="">所有</option>
+                            <option value="1">{:lang("交易量")}</option>
+                            <option value="2">{:lang("活跃人数")}</option>
+                            <option value="3">{:lang("新增人数")}</option>
+                            <option value="4">{:lang("逾期扣分")}</option>
+                            <option value="5">{:lang("后台增加")}</option>
+                            <option value="6">{:lang("后台减少")}</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>{:lang("用户名称")}：</label>
+                        <input type="text" class="form-control" id="username" name="user_name" placeholder="{:lang('用户账户/用户ID')}">
+                    </div>
+                    <div class="form-group">
+                        <label>{:lang("用户类型")}：</label>
+                        <select class="form-control" id="is_xuni" name="is_xuni">
+                            <option value="-1">{:lang("所有")}</option>
+                            <option value="1">{:lang("虚拟用户")}</option>
+                            <option value="0">{:lang("真实用户")}</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <input type="hidden" value="1" name="export"/>
+                        <button class="btn btn-primary" type="button" style="margin-top:5px" id="search"><strong>{:lang('搜索')}</strong></button>
+                        <button class="btn btn-danger" type="submit" style="margin-top:5px" id="export"><strong>{:lang("导出")}</strong>
+                        </button>
+                    </div>
+                </div>
+            </form>
+            <div class="example-wrap">
+                <div class="example">
+                    <table id="cusTable">
+                        <thead>
+                        <th data-checkbox="true"></th><!--复选框-->
+                        <th data-field="id">{:lang("ID")}</th>
+                        <th data-field="user_id">{:lang("用户ID")}</th>
+                        <th data-field="user_name" data-formatter="userInfoFormatter">{:lang("用户信息")}</th>
+                        <th data-field="type_str">{:lang("类型")}</th>
+                        <th data-field="top_leader_remark">{:lang("所属代理")}</th>
+                        <th data-field="before">{:lang("操作前信用分")}</th>
+                        <th data-field="score">{:lang("操作信用分")}</th>
+                        <th data-field="after">{:lang("操作后信用分")}</th>
+                        <th data-field="title">{:lang("标题")}</th>
+                        <th data-field="remarks">{:lang("备注")}</th>
+                        <th data-field="admin_name">{:lang("管理员")}</th>
+                        <th data-field="tree_level">{:lang("所在层级")}</th>
+                        <th data-field="is_xuni_text">{:lang("虚拟账号")}</th>
+                        <th data-field="create_time">{:lang("添加时间")}</th>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+            <!-- End Example Pagination -->
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+
+    // 用户信息
+    function userInfoFormatter(value, row, index) {
+        var html = row.user.user_name;
+        if (row.user.is_xuni == 1) {
+            return "<span style='color:red'>" + html + "</span>";
+        }
+        return "<span>" + html + "</span>";
+    }
+
+    tableCheckbox = true;
+    index_url = '{:url("credit_score_log/index")}';
+    function queryParams(params) {   //设置查询参数
+        params.type = $('#type_filter').val();
+        params.username = $('#username').val();
+        params.startTime = $('#start_time').val();
+        params.endTime = $('#end_time').val();
+        params.is_xuni = $('#is_xuni').val();
+        return params;
+    }
+    function onLoadSuccess(res) {
+        var stathtml = '';
+        if (res.stat) {
+            $.each(res.stat, function(i, v){
+                stathtml += '<span class="label label-success">'+v.text+'：'+v.total+'</span> ';
+            });
+        }
+        $("#stats").html(stathtml);
+
+    }
+
+    $(document).ready(function () {
+        layui.use('laydate', function(){
+            var laydate = layui.laydate;
+            // 日期范围 - 左右面板联动选择模式
+            laydate.render({
+                elem: '#ID-laydate-rangeLinked',
+                range: ['#start_time', '#end_time'],
+                rangeLinked: true, // 开启日期范围选择时的区间联动标注模式 ---  2.8+ 新增
+                type: 'datetime',
+            });
+        });
+        initTable();
+        $("#search").on("click", function(){
+            initTable();
+        });
+    });
+</script>
+{include file="footer" /}

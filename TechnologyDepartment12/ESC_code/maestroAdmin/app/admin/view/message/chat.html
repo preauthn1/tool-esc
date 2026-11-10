@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>在线客服</title>
+    <link rel="shortcut icon" href="{$admin_icon|toMedia}">
+    <link href="/static/admin/css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
+    <link href="/static/admin/css/font-awesome.min.css?v=4.4.0" rel="stylesheet">
+    <link href="/static/admin/css/plugins/bootstrap-table/bootstrap-table.min.css" rel="stylesheet">
+    <link href="/static/admin/css/animate.min.css" rel="stylesheet">
+    <link href="/static/admin/css/style.min.css?v=4.1.0" rel="stylesheet">
+    <link type="text/css" rel="stylesheet" href="/static/libs/webuploader/webuploader.css" />
+    <link type="text/css" rel="stylesheet" href="/static/admin/css/chat_1.css?v3" />
+    <script src="/static/admin/js/jquery.min.js?v=2.1.4"></script>
+    <script src="/static/admin/js/functions.js"></script>
+    <script src="/static/libs/webuploader/webuploader.js"></script>
+    <script src="/static/libs/vue/vue@2.4.2.js"></script>
+    <script src="/static/libs/lodash/lodash.min.js"></script>
+    <script src="/static/admin/js/plugins/layer3/layer.js"></script>
+    <style>
+    html,body,.main-container,.dashboard-wrapper,#app{height: 100%; margin: 0; padding: 0;}
+    .dashboard-wrapper{min-height: 500px;}
+    .chat-zone .dialog-area .robot-talk .content .robot-response{ margin-right: 0; width: 75%;}
+    #app{
+        padding-top: 42px;
+    }
+    #chat-tool{ height: 42px; position: fixed; width: 100%; background: #FFF; top: 0; left: 0; right: 0;}
+    #chat-tool h4{ padding-left: 20px;}
+    .chat-zone .dialog-area .robot-talk .avatar-robot-header-icon{
+        background: url("{$player.info.avatar}");
+        background-size:cover;
+        cursor: pointer;
+    }
+    .input-tool{
+        position: absolute;
+        bottom: 40px;
+        right: 158px;
+        left: 18px;
+    }
+    th{ text-align: right;}
+    .radio input[type="radio"], .radio-inline input[type="radio"], .checkbox input[type="checkbox"], .checkbox-inline input[type="checkbox"]{ margin-left: -14px;margin-top: 2px;}
+    .radio label, .checkbox label{
+
+        margin-top: 6px;
+        border: 1px solid rgb(204, 204, 204);
+        border-radius: 3px;
+        padding: 6px 15px 7px 10px;
+        color: #000;
+    }
+    .webuploader-pick{
+        padding: 6px 15px 7px 10px;
+    }
+    </style>
+
+</head>
+<body>
+<div id="app">
+    <div id="chat-tool">
+        <h2 style='line-height: 42px; margin: 0 10px; font-size: 18px;'>
+           {:lang("在线客服")}
+        </h2>
+    </div>
+
+    <div class="clearfix" style="height:100%;">
+        <div class="user-info hidden-phone">
+            <table class="table table-striped table-hover table-bordered" style=" margin-bottom: 0;">
+                <tr>
+                    <th>{:lang("用户ID")}</th>
+                    <td>{$player.info.id}</td>
+                    <th>{:lang("账户余额")}</th>
+                    <td>{$player.info.user_money|sprintf4f}</td>
+                </tr>
+                <tr>
+                    <th>{:lang("手机号码")}</th>
+                    <td>{$player.info.mobile|default="-"}</td>
+                    <th>{:lang("支付宝账户")}</th>
+                    <td>{$player.info.alipay|default="-"}</td>
+                </tr>
+                <tr>
+                    <th>{:lang("充值总额")}</th>
+                    <td>{$player.info.Recharge|get_number_unit}</td>
+                    <th>{:lang("当天充值")}</th>
+                    <td>{$player.info.TodayRecharge|get_number_unit}</td>
+                </tr>
+                <tr>
+                    <th>{:lang("提现总额")}</th>
+                    <td>{$player.info.Withdraw|get_number_unit}</td>
+                    <th>{:lang("当天提现")}</th>
+                    <td>{$player.info.TodayWithdraw|get_number_unit}</td>
+                </tr>
+                <tr>
+                    <th>{:lang("注册IP")}</th>
+                    <td>{$player.info.ip} ({$player.info.ip_local})</td>
+                    <th>{:lang("最后登录IP")}</th>
+                    <td>{$player.info.last_login_ip} ({$player.info.last_login_ip_local})</td>
+                </tr>
+                <tr>
+                    <th>{:lang("注册时间")}</th>
+                    <td>{$player.info.create_time}</td>
+                    <th>{:lang("最后登录时间")}</th>
+                    <td>{$player.info.last_login_time}</td>
+                </tr>
+                <tr>
+                    <th>{:lang("CP")}</th>
+                    <td colspan="3">{$player.info.cp_id}
+                    </td>
+                </tr>
+                {if $player.info.leader1 > 0}
+                <tr>
+                    <th>{:lang("上级信息")}</th>
+                    <td colspan="3">
+                        {volist name='player.info.tree_id' id='tid'}
+                        {if $tid != $player.info.id}
+                        第{$key+1}级:{$player.info.tree_id_mobile[$tid]}<br>
+                        {/if}
+                        {/volist}
+                    </td>
+                </tr>
+                {/if}
+            </table>
+            <div class="panel panel-default">
+                <div class="panel-heading">{:lang("快捷查询记录")}</div>
+                <div class="panel-body">
+                    <a class="btn btn-link" href="javascript:;" onclick="javascript:openWindowOwn('{:url('recharge/add', ['user_id' => $player['info']['id'], 'win' => 1])}','RecordUserInout{$player['info']['id']}',500,400);">{:lang("上分")}</a>
+                    <a class="btn btn-link" href="javascript:;" onclick="javascript:openWindowOwn('{:url('member/setcp', ['user_id' => $player['info']['id'], 'win' => 1])}','RecordUserInout{$player['info']['id']}',600,400);">{:lang("设置CP")}</a>
+                    <a class="btn btn-link" href="javascript:;" onclick="javascript:openWindowOwn('{:url('member/money', ['uid' => $player['info']['id'], 'win' => 1])}','RecordUserInout{$player['info']['id']}',1200,600);">{:lang("账户明细")}</a>
+                    <a class="btn btn-link" href="javascript:;" onclick="javascript:openWindowOwn('{:url('recharge/index', ['uid' => $player['info']['id'], 'win' => 1])}','RecordUserInout{$player['info']['id']}',1200,600);">{:lang("充值记录")}</a>
+                    <a class="btn btn-link" href="javascript:;" onclick="javascript:openWindowOwn('{:url('withdraw/index', ['uid' => $player['info']['id'], 'win' => 1])}','RecordUserInout{$player['info']['id']}',1200,600);">{:lang("提现记录")}</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="chat-zone">
+            <chat-box v-bind:chat-list="chatList"></chat-box>
+            <div class="ask-area">
+                <div class="input-area">
+                    <ul class="input-tips" v-bind:class="{hidden:hideTips}">
+                        <li v-for="tip of tips">
+                            <a href="javascript:;" @click="setContent({title:tip.content})" v-html="tip.title"></a>
+                        </li>
+                    </ul>
+                    <textarea name="content" autofocus v-model.trim="content" @keyup.enter="reply" id="content" required placeholder="填写回复内容  Shift+Enter 换行"></textarea>
+                </div>
+                <div class="input-tool hidden-phone">
+                    <div class="checkbox" style="position: absolute; margin: 0;">
+                    <label data-toggle="tooltip" data-placement="top" title="{:lang('发送消息后自动关闭对话框(优先级低于自动切换)')}">&nbsp;&nbsp;<input type="checkbox" v-model="autoClose" :checked="autoClose"> {:lang("自动关闭")}</label>
+                    <label data-toggle="tooltip" data-placement="top" title="{:lang('发送消息后自动切换到下一条')}">&nbsp;&nbsp;<input type="checkbox" v-model="autoNext" :checked="autoNext"> {:lang("自动切换")}</label>
+                    </div>
+                    <a class="" href="javascript:;" @click="setRead" style="position: absolute; left:180px; margin-top: 6px; border:1px #CCC solid;border-radius:3px; padding: 6px 15px 7px 15px; color: #ff0000;">{:lang("下一条")}</a>
+                    <div class="uploader" id="uploader_picker" style="position: absolute; right: 102px; margin-top: 6px;">{:lang("上传图片")}</div>
+                    <div class="dropup" style="float: right;margin-top:6px;">
+                        <!--<button class="btn btn-default dropdown-toggle" type="button" id="menu1" data-toggle="dropdown">快捷回复
+                        <span class="caret"></span></button>-->
+                        <ul class="dropdown-menu" role="menu" aria-labelledby="menu1" style="right:0; left:auto;width:350px;overflow:hidden;height: 450px; overflow-y: scroll;">
+                        <li v-for="tip of tipsList">
+                            <a href="javascript:;" @click="setContent({title:tip.content})" v-html="tip.title"></a>
+                        </li>
+                        </ul>
+                    </div>
+
+                </div>
+                <button type="button" id="fromSubmit" :disabled="disabledSendBtn" :class="{enabled:!disabledSendBtn}" @click="reply" class="send-btn ">发送</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/x-template" id="chat-box-template">
+<div class="dialog-area">
+    <div class="chat-box clearfix" v-for="(chat, index) in chatList">
+        <div class="i-talk" v-if="chat.isMe">
+            <div class="avatar">{:lang('客服')}</div>
+            <div class="content" >
+                <div class="">
+                    <div class="html-content" style="word-break: break-all;width：75%;" v-html="chat.content"></div>
+                    <hr style="margin:10px 0;">
+                    <div style="display: flex;justify-content: space-between;">
+                    	<time>{:lang('客服')}：{{chat.MasterName}} {:lang('回复时间')}：{{chat.reply_time}}</time>
+						<img @click="withdraw(chat.MessageID)" src="/static/service/images/del.png" style="width: 20px;height: 20px;" />
+                    </div>
+                </div>
+            </div>
+            <span class="i-talk-cor"></span>
+        </div>
+
+        <div class="robot-talk" v-if="!chat.isMe">
+            <div class="avatar avatar-robot-header-icon" style="width:46px;height:46px"></div>
+            <robot-talk-content v-bind:robot="chat.robot" v-bind:index="index"></robot-talk-content>
+            <span class="robot-talk-cor"></span><span class="robot-talk-outer-cor"></span>
+        </div>
+    </div>
+</div>
+</script>
+<script type="text/x-template" id="robot-talk-content-template">
+<div class="content">
+    <div v-if="robot.isReady" class="robot-response">
+        <div class="chat">
+            <div class="html-content" style="word-break: break-all;width:75%;" v-html="robot.question"></div>
+            <div style="display: flex;justify-content: space-between;">
+            	<time>{{robot.ask_time}}</time>
+            	<img @click="delMessage(robot.id)" src="/static/service/images/del1.png" style="width: 20px;height: 20px;" />
+            </div>
+        </div>
+    </div>
+</div>
+</script>
+<script type="text/javascript">
+var account = {
+    UserID:"{$player['info']['id']}",
+    Accounts:"{$player['info']['mobile']}",
+    NickName:"{$player['info']['mobile']}",
+};
+var get_tips_url = '{:url("get_tips")}';
+var get_list_url = '{:url("get_list")}';
+var get_next_url = '{:url("get_next")}';
+var reply_url = '{:url("reply")}';
+var upload_url = '{:url("upload")}';
+var setread_url = '{:url("setread")}';
+var mute_url = '{:url("mute")}';
+var save_fast_url = '{:url("save_fast")}';
+var withdraw_url = '{:url("withdraw")}';
+</script>
+<script src="/static/admin/js/message.js?v6"></script>
+</body>
+</html>

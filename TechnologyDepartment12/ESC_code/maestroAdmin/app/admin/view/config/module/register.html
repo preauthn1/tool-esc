@@ -1,0 +1,223 @@
+<div class="layui-collapse">
+    <div class="layui-colla-item">
+        <div class="layui-colla-title">注册配置</div>
+        <div class="layui-colla-content layui-show">
+            <div class="form-group">
+                <label class="col-sm-3 control-label">{:lang("注册账号规则")}：</label>
+                <div class="input-group col-sm-4">
+                    <div class="layui-form">
+                        <input type="radio" name="account_rule" value="0" title="手机号或邮箱" {if $config['account_rule'] == '0'}checked{/if}>
+                        <input type="radio" name="account_rule" value="1" title="只能邮箱" {if $config['account_rule'] == '1'}checked{/if}>
+                        <input type="radio" name="account_rule" value="2" title="只能手机" {if $config['account_rule'] == '2'}checked{/if}>
+                    </div>
+                    <p class="help-block">account_rule：可选手机号或者邮箱注册状态。</p>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-sm-3 control-label">{:lang("用户协议和隐私协议是否显示")}：</label>
+                <div class="input-group col-sm-4">
+                    <div class="layui-form">
+                        <input type="radio" name="is_show_user_protocol" value="1" title="显示" {if $config['is_show_user_protocol'] == '1'}checked{/if}>
+                        <input type="radio" name="is_show_user_protocol" value="0" title="隐藏" {if $config['is_show_user_protocol'] == '0'}checked{/if}>
+                    </div>
+                    <p class="help-block">is_show_user_protocol：用户协议和隐私协议是否显示。</p>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-sm-3 control-label">{:lang("注册赠送金额")}：</label>
+                <div class="input-group col-sm-4">
+                    <input type="number" class="form-control" name="register_give_money" value="{$config.register_give_money|default=0}">
+                    <p class="help-block">register_give_money：注册赠送金额。</p>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-sm-3 control-label">{:lang("同IP个数限制")}：</label>
+                <div class="input-group col-sm-4">
+                    <input type="number" class="form-control" name="reg_ip_limit" value="{$config.reg_ip_limit|intval}">
+                    <p class="help-block">reg_ip_limit：同IP可注册账号个数限制</p>
+                </div>
+            </div>
+
+            <!--<div class="form-group">-->
+            <!--    <label class="col-sm-3 control-label">{:lang("注册发送站内信")}：</label>-->
+            <!--    <div class="input-group col-sm-4">-->
+            <!--        <div class="layui-form">-->
+            <!--            <input type="radio" name="is_register_message" value="1" title="开启" {if $config['is_register_message'] == '1'}checked{/if}>-->
+            <!--            <input type="radio" name="is_register_message" value="0" title="关闭" {if $config['is_register_message'] == '0'}checked{/if}>-->
+                        <input type="hidden" name="is_register_message" value="0" title="关闭">
+            <!--        </div>-->
+            <!--        <p class="help-block">is_register_message：注册是否要发送站内信。</p>-->
+            <!--    </div>-->
+            <!--</div>-->
+
+            <div class="form-group">
+                <label class="col-sm-3 control-label">{:lang("重复密码")}：</label>
+                <div class="input-group col-sm-4">
+                    <div class="layui-form">
+                        <input type="radio" name="is_repeat_password" value="1" title="开启" {if $config['is_repeat_password'] == '1'}checked{/if}>
+                        <input type="radio" name="is_repeat_password" value="0" title="关闭" {if $config['is_repeat_password'] == '0'}checked{/if}>
+                    </div>
+                    <p class="help-block">is_repeat_password：注册时是否开启重复一遍密码（登录密码及安全密码）。</p>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">{:lang("邮箱注册时是否需要验证邮箱验证码")}：</label>
+                <div class="input-group col-sm-4">
+                    <div class="layui-form">
+                        <input type="radio" name="is_verify_email_code" value="1" title="开启" {if $config['is_verify_email_code'] == '1'}checked{/if}>
+                        <input type="radio" name="is_verify_email_code" value="0" title="关闭" {if $config['is_verify_email_code'] == '0'}checked{/if}>
+                    </div>
+                    <p class="help-block">is_verify_email_code：邮箱注册时是否需要验证邮箱验证码。</p>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">{:lang("手机注册时是否需要验证手机验证码")}：</label>
+                <div class="input-group col-sm-4">
+                    <div class="layui-form">
+                        <input type="radio" name="is_verify_phone_code" value="1" title="开启" {if $config['is_verify_phone_code'] == '1'}checked{/if}>
+                        <input type="radio" name="is_verify_phone_code" value="0" title="关闭" {if $config['is_verify_phone_code'] == '0'}checked{/if}>
+                    </div>
+                    <p class="help-block">is_verify_phone_code：手机注册时是否需要验证手机验证码。</p>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">验证码有效时间：</label>
+                <div class="input-group col-sm-4">
+                    <input type="number" step="1" min="60" class="form-control" name="verify_code_ttl" value="{$config.verify_code_ttl|default=180}">
+                    <p class="help-block">verify_code_ttl：验证码有效时间，单位秒。</p>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">开启地区访问限制：</label>
+                <div class="input-group col-sm-4">
+                    <input type="text" class="form-control" name="open_region_limit" value="{$config.open_region_limit}">
+                    <p class="help-block">open_region_limit：填1为开启，0为关闭 </p>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">限制字段：</label>
+                <div class="input-group col-sm-4">
+                    <select class="form-control" name="region_limit_field">
+                        <option value="countryCode" {if $config.region_limit_field eq 'countryCode'} selected{/if}>国家代码[countryCode]</option>
+                        <option value="countryName" {if $config.region_limit_field eq 'countryName'} selected{/if}>国家名称[countryName]</option>
+                        <option value="regionName" {if $config.region_limit_field eq 'regionName'} selected{/if}>省/区级名称[regionName]</option>
+                        <option value="cityName" {if $config.region_limit_field eq 'cityName'} selected{/if}>城市名称[cityName]</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">允许地区名称：</label>
+                <div class="input-group col-sm-4">
+                    <input type="text" class="form-control" name="allow_region_limit" value="{$config.allow_region_limit}">
+                    <p class="help-block">多个请用英文逗号[,]分隔</p>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">禁止地区名称：</label>
+                <div class="input-group col-sm-4">
+                    <input type="text" class="form-control" name="deny_region_limit" value="{$config.deny_region_limit}">
+                    <p class="help-block">
+                        多个请用英文逗号[,]分隔<br>
+                        禁止权重高于允许权重<br>
+                        禁止和允许只能设置一个
+                    </p>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">禁止地区显示提示语：</label>
+                <div class="input-group col-sm-4">
+                    <input type="text" class="form-control" name="deny_region_limit_tips" value="{$config.deny_region_limit_tips}">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">您当前IP：</label>
+                <div class="input-group col-sm-4">
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="ip" value="{$ip}">
+                        <a class="input-group-addon btn btn-primary" id="query_ip">查询</a>
+                    </div>
+                    <p class="help-block">
+                        输入IP可查询以下信息<br>
+                        国家代码[countryCode]:<span id="countryCode">{$ip_local.countryCode|default='-'}</span><br/>
+                        国家名称[countryName]:<span id="countryName">{$ip_local['countryName']|default='-'}</span><br/>
+                        省/区级名称[regionName]:<span id="regionName">{$ip_local['regionName']|default='-'}</span><br/>
+                        城市名称[cityName]:<span id="cityName">{$ip_local['cityName']|default='-'}</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="layui-colla-item">
+        <div class="layui-colla-title">邀请配置</div>
+        <div class="layui-colla-content  layui-show">
+            <div class="form-group">
+                <label class="col-sm-3 control-label">{:lang("邀请码是否必填")}：</label>
+                <div class="input-group col-sm-4">
+                    <div class="layui-form">
+                        <input type="radio" name="invite_code_required" value="1" title="开启" {if $config['invite_code_required'] == '1'}checked{/if}>
+                        <input type="radio" name="invite_code_required" value="0" title="关闭" {if $config['invite_code_required'] == '0'}checked{/if}>
+                    </div>
+                    <p class="help-block">invite_code_required：邀请码可选择是否必填。</p>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-sm-3 control-label">{:lang("有效用户充值金额")}：</label>
+                <div class="input-group col-sm-4">
+                    <input type="number" class="form-control" name="recharge_num_valid_user" value="{$config.recharge_num_valid_user|default=0}">
+                    <p class="help-block">recharge_num_valid_user：用户充值多少金额为有效用户。</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div class="layui-colla-item">
+        <div class="layui-colla-title">登录配置</div>
+        <div class="layui-colla-content  layui-show">
+           <div>
+<!--               <div class="form-group">-->
+<!--                   <label class="col-sm-3 control-label">{:lang("启用图形验证码错误次数")}：</label>-->
+<!--                   <div class="input-group col-sm-4">-->
+<!--                       <input type="number" class="form-control" name="error_to_show_pic" value="{$config.error_to_show_pic|default=0}">-->
+<!--                       <p class="help-block">error_to_show_pic：登录密码输入错误几次后启用图形验证码。</p>-->
+<!--                   </div>-->
+<!--               </div>-->
+
+               <div class="form-group">
+                   <label class="col-sm-3 control-label">{:lang("封停账号错误次数")}：</label>
+                   <div class="input-group col-sm-4">
+                       <input type="number" class="form-control" name="error_to_ban" value="{$config.error_to_ban|default=0}">
+                       <p class="help-block">error_to_ban：连续输入几次错误的密码封停账号登录权限。</p>
+                   </div>
+               </div>
+           </div>
+        </div>
+    </div>
+    <div class="layui-colla-item">
+        <div class="layui-colla-title">实名认证</div>
+        <div class="layui-colla-content  layui-show">
+           <div>
+               <div class="form-group">
+                   <label class="col-sm-3 control-label">{:lang("自动审核实名认证")}：</label>
+                   <div class="input-group col-sm-4">
+                       <div class="layui-form">
+                           <input type="radio" name="auto_real_name_auth" value="1" title="开启" {if $config['auto_real_name_auth'] == '1'}checked{/if}>
+                           <input type="radio" name="auto_real_name_auth" value="0" title="关闭" {if $config['auto_real_name_auth'] == '0'}checked{/if}>
+                       </div>
+                       <p class="help-block">auto_real_name_auth：自动审核实名认证。</p>
+                   </div>
+               </div>
+           </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<script>
+
+</script>

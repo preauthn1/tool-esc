@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文字列表</title>
+    <link rel="shortcut icon" href="{$admin_icon|toMedia}">
+    <link href="/static/admin/css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
+    <link href="/static/admin/css/font-awesome.min.css?v=4.4.0" rel="stylesheet">
+    <link href="/static/admin/css/plugins/bootstrap-table/bootstrap-table.min.css" rel="stylesheet">
+    <link href="/static/admin/css/animate.min.css" rel="stylesheet">
+    <link href="/static/admin/css/style.min.css?v=4.1.0" rel="stylesheet">
+    <link href="/static/admin/js/layui/css/layui.css" rel="stylesheet">
+    <link href="/static/admin/css/plugins/sweetalert/sweetalert.css" rel="stylesheet">
+    <style>
+        #lineTemplate .delOne{
+            display: none;
+        }
+    </style>
+</head>
+<body class="gray-bg">
+<div class="wrapper wrapper-content animated fadeInRight">
+    <!-- Panel Other -->
+    <div class="ibox float-e-margins">
+        <div class="ibox-title">
+            <h5>{:lang("文字列表")}</h5>
+        </div>
+        <div class="ibox-content">
+            <div class="example-wrap">
+                <div class="example">
+                    <form id="dataForm" method="post" action="{:url('add')}">
+                    <table id="cusTable" class="table table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                <td colspan="{:count($langs)+2}">
+                                    <button type="button" class="btn btn-warning btn-sm addText" data-index="0"><i class="fa fa-plus"></i>添加</button>
+                                    <button type="button" class="btn btn-primary btn-sm saveAll">保存所有</button>
+                                    <button type="button" class="btn btn-default btn-sm uploadPic" id="test1"><i class="fa fa-upload"></i>上传图片</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>{:lang('文字')}</th>
+                                {volist name='langs' id='row'}
+                                <th><span title="{$row.remark|lang}">{$row.title|lang}</span></th>
+                                {/volist}
+                                <th>{:lang('操作')}</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody">
+                            {volist name='items' id='item'}
+                            <tr>
+                                <td>
+                                    <input type='text' name="olditems[{$item.id}]" disabled class="form-control" value="{$item.title}"/>
+                                </td>
+                                {volist name='langs' id='row'}
+                                <td>
+                                    <div class="input-group">
+                                        <input type='text' name="oldlang[{$row.id}][{$item.id}]" disabled class="form-control" placeholder="{$row.title}" value="{$item['details'][$row['id']]|htmlspecialchars}"/>
+                                        <span class="input-group-addon">{$item['details'][$row['id']]|show_img}</span>
+                                    </div>
+                                </td>
+                                {/volist}
+                                <td>
+                                    <button type="button" data-id='{$item.id}' class="btn btn-primary btn-sm editOne">编辑</button>
+                                    <button type="button" class="btn btn-primary btn-sm saveAll" style="display:none;">保存</button>
+                                    <button type="button" data-id='{$item.id}' class="btn btn-danger btn-sm delOne">删除</button>
+                                </td>
+                            </tr>
+                            {/volist}
+                            <tr id="lineTemplate">
+                                <td>
+                                    <input type='text' name="newitems[]" class="form-control" value=""/>
+                                </td>
+                                {volist name='langs' id='row'}
+                                <td>
+                                    <input type='text' name="newlang[{$row.id}][]" class="form-control" placeholder="{$row.title}" value=""/>
+                                </td>
+                                {/volist}
+                                <td>
+                                    <button type="button" data-id='0' class="btn btn-danger btn-sm delOne">删除</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="{:count($langs)+2}">
+                                    <button type="button" class="btn btn-warning btn-sm addText" data-index="1"><i class="fa fa-plus"></i>添加</button>
+                                    <button type="button" class="btn btn-primary btn-sm saveAll">保存所有</button>
+                                    <button type="button" class="btn btn-default btn-sm uploadPic" id="test1"><i class="fa fa-upload"></i>上传图片</button>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                    </form>
+                </div>
+            </div>
+            <!-- End Example Pagination -->
+        </div>
+    </div>
+</div>
+<!-- End Panel Other -->
+<script src="/static/admin/js/jquery.min.js?v=2.1.4"></script>
+<script src="/static/admin/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="/static/admin/js/content.min.js?v=1.0.0"></script>
+<script src="/static/admin/js/plugins/suggest/bootstrap-suggest.min.js"></script>
+<script src="/static/admin/js/plugins/sweetalert/sweetalert.min.js"></script>
+<script src="/static/admin/js/layui/layui.js"></script>
+<script src="/static/admin/js/plugins/layer/layer.min.js"></script>
+<script>
+$(function(){
+    $(document).on('click', ".addText", function(){
+        var cloneTemplate = $("#lineTemplate").clone();
+        cloneTemplate.removeAttr('id');
+        cloneTemplate.find('input').val('');
+        var index = $(this).data('index');
+        if (index == 1) {
+            $("#tableBody").append(cloneTemplate);
+        }else{
+            $("#tableBody").prepend(cloneTemplate);
+        }
+    });
+    $(document).on('click', ".editOne", function(){
+        $(this).parents('tr').find('input').prop('disabled', false);
+        $(this).hide();
+        $(this).siblings('.saveAll').show();
+    });
+    $(document).on('click', ".delOne", function(){
+        var id = $(this).data('id');
+        var _this = $(this);
+        if (id > 0) {
+            layer.confirm('确认删除?', {icon: 3, title:'提示'}, function(index){
+                $.getJSON("{:url('del')}", {'id' : id}, function(res){
+                    if(1 == res.code){
+                        layer.alert(res.msg, {title: "{:lang('友情提示')}", icon: 1, closeBtn: 0}, function(inx){
+                            layer.close(inx);
+                            _this.parents('tr').remove();
+                        });
+                    }else if(111 == res.code){
+                        window.location.reload();
+                    }else{
+                        layer.alert(res.msg, {title: "{:lang('友情提示')}", icon: 2});
+                    }
+                });
+            })
+        }else{
+            _this.parents('tr').remove();
+        }
+    });
+    $(document).on('click', ".saveAll", function(){
+        $.ajax({
+            url:'{:url("add2")}',
+            type:'POST',
+            dataType:'JSON',
+            data:$("#dataForm").serializeArray(),
+            success:function(res){
+                layer.msg(res.msg)
+            }
+
+        })
+    });
+
+    layui.use('upload', function(){
+        var upload = layui.upload;
+        // 上传文件
+        upload.render({
+            elem: '.uploadPic'
+            ,url: "{:url('upload/upload')}"
+            ,accept: 'file' //普通文件
+            ,done: function(res){
+                console.log(res.data);
+                layer.prompt({
+                    title:'文件地址',
+                    value:res.data.src,
+                },function(value, index, elem){
+                    layer.close(index);
+                });
+            }
+        });
+    })
+})
+</script>
+</body>
+</html>

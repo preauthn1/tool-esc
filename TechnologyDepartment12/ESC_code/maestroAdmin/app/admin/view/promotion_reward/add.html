@@ -1,0 +1,85 @@
+{include file="header" /}
+<div class="row">
+    <div class="col-sm-12">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h5>{:lang("添加/修改")}</h5>
+            </div>
+            <div class="ibox-content">
+                <form class="form-horizontal m-t" id="dataForm" method="post" action="{:url('add')}">
+                    <div id="myTabContent" class="tab-content">
+                        <div class="tab-pane fade in active" id="home">
+                            <input type="hidden" name="id" value="{$info.id}"/>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label"><span
+                                        class="x-red">*</span>{:lang("名称")}：</label>
+                                <div class="input-group col-sm-4">
+                                    <input type="text" class="form-control" value="{$info.name}" name="name"
+                                           required/>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">
+                                    <span class="x-red">*</span>{:lang("签到天数")}
+                                </label>
+                                <div class="input-group col-sm-4">
+                                    <input type="number" min="1" id="day" name="day" required
+                                           value="{$info.day}" class="form-control">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">{:lang("是否启用")}：</label>
+                                <div class="input-group col-sm-4">
+                                    {foreach name='status' item='vo' key='key'}
+                                    <div class="radio i-checks col-sm-4">
+                                        {if condition="$key == $info['status'] " }
+                                        <label><input type="radio" value="{$key}" checked name="status"> <i></i> {$vo}</label>
+                                        {else}
+                                        <label><input type="radio" value="{$key}" name="status"> <i></i> {$vo}</label>
+                                        {/if}
+                                    </div>
+                                    {/foreach}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-3 col-sm-offset-3">
+                                <button class="btn btn-primary btn-block" type="submit">{:lang("提交")}</button>
+                            </div>
+                        </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{include file="footer" /}
+<link href="/static/admin/css/css.css" rel="stylesheet">
+<script src="/static/admin/js/move.js"></script>
+<script src="/static/admin/js/publishImg.js"></script>
+<script type="text/javascript">
+    function deleteElement(Obj, tip) {
+        var ul = $(Obj).closest('ul');
+        $(Obj).closest('li').remove();
+        imgMove(ul.prop('id'));
+        $("#" + tip).text(ul.find('li').length);
+        mainPic();
+    }
+
+    function mainPic() {
+        var main_pic = [];
+        $("#imgMainList").find('li').each(function (i, e) {
+            main_pic.push($(e).data('path'));
+        })
+        $("#main_pic").val(main_pic.join(','));
+    }
+
+    $(document).ready(function () {
+        var editor = UE.getEditor('container', {
+            serverUrl: "{:url('articles/uploadimg')}",
+        });
+        $('#myTab a').click(function (e) {
+            e.preventDefault()
+            $(this).tab('show')
+        })
+    });
+</script>

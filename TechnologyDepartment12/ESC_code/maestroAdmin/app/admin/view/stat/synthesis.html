@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>综合报表</title>
+    <link rel="shortcut icon" href="{$admin_icon|toMedia}">
+    <link href="/static/admin/css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
+    <link href="/static/admin/css/font-awesome.min.css?v=4.4.0" rel="stylesheet">
+    <link href="/static/admin/css/animate.min.css" rel="stylesheet">
+    <link href="/static/admin/css/plugins/iCheck/custom.css" rel="stylesheet">
+    <link href="/static/admin/css/style.min.css?v=4.1.0" rel="stylesheet">
+    <link href="/static/admin/js/layui/css/layui.css" rel="stylesheet">
+    <style>
+        .sm-st {
+            background: #fff;
+            padding: 15px;
+            -webkit-border-radius: 3px;
+            -moz-border-radius: 3px;
+            border-radius: 3px;
+            margin-bottom: 15px;
+        }
+
+        .sm-st-icon {
+            width: 60px;
+            height: 60px;
+            display: inline-block;
+            line-height: 60px;
+            text-align: center;
+            font-size: 30px;
+            background: #eee;
+            -webkit-border-radius: 5px;
+            -moz-border-radius: 5px;
+            border-radius: 5px;
+            float: left;
+            margin-right: 10px;
+            color: #fff;
+        }
+
+        .sm-st-info {
+            padding-top: 2px;
+        }
+
+        .sm-st-info span {
+            display: block;
+            font-size: 21px;
+            font-weight: 600;
+            line-height: 25px;
+        }
+
+        .stat-info-process {
+            margin-top: 10px;
+            width: 200px
+        }
+
+        .orange {
+            background: #fa8564 !important;
+        }
+
+        .tar {
+            background: #45cf95 !important;
+        }
+
+        .sm-st .green {
+            background: #86ba41 !important;
+        }
+
+        .pink {
+            background: #AC75F0 !important;
+        }
+
+        .yellow-b {
+            background: #fdd752 !important;
+        }
+
+        .stat-elem {
+
+            background-color: #fff;
+            padding: 18px;
+            border-radius: 40px;
+
+        }
+
+        .stat-info {
+            text-align: center;
+            background-color: #fff;
+            border-radius: 5px;
+            margin-top: -5px;
+            padding: 8px;
+            -webkit-box-shadow: 0 1px 0px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 1px 0px rgba(0, 0, 0, 0.05);
+            font-style: italic;
+        }
+
+        .stat-icon {
+            text-align: center;
+            margin-bottom: 5px;
+        }
+
+        .st-red {
+            background-color: #F05050;
+        }
+
+        .st-green {
+            background-color: #27C24C;
+        }
+
+        .st-violet {
+            background-color: #7266ba;
+        }
+
+        .st-blue {
+            background-color: #23b7e5;
+        }
+
+        .stats .stat-icon {
+            color: #28bb9c;
+            display: inline-block;
+            font-size: 35px;
+            text-align: center;
+            vertical-align: middle;
+            width: 50px;
+            float: left;
+            margin-top: 5px;
+        }
+
+        .stat {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: inline-block;
+        }
+
+        .stat .value {
+            font-size: 20px;
+            line-height: 24px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-weight: bolder;
+            color: black;
+        }
+
+        .stat .name {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin: 5px 0;
+            color: black;
+        }
+
+        .stat.lg .value {
+            font-size: 26px;
+            line-height: 28px;
+        }
+
+        .stat-col {
+            margin: 5px 0 10px 0;
+        }
+
+        .stat.lg .name {
+            font-size: 16px;
+        }
+
+        .stat-col .progress {
+            height: 2px;
+        }
+
+        .stat-col .progress-bar {
+            line-height: 2px;
+            height: 2px;
+        }
+
+        .item {
+            padding: 30px 0;
+        }
+
+
+        #statistics .panel {
+            min-height: 150px;
+        }
+
+        #statistics .panel h5 {
+            font-size: 14px;
+        }
+    </style>
+    <style>
+        .layui-top-box {
+            padding: 40px 20px 20px 20px;
+            color: #fff;
+        }
+
+        .panel {
+            margin-bottom: 17px;
+            background-color: #fff;
+            border: 1px solid transparent;
+            border-radius: 3px;
+            -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, .05);
+            box-shadow: 0 1px 1px rgba(0, 0, 0, .05);
+        }
+
+        .panel-body {
+            padding: 15px;
+            margin-top: 5px;
+            margin-bottom: 5px;
+        }
+
+        .panel-title {
+            margin-top: 0;
+            margin-bottom: 0;
+            font-size: 14px;
+            color: inherit;
+        }
+
+        .label {
+            display: inline;
+            padding: .2em .6em .3em;
+            font-size: 75%;
+            font-weight: 700;
+            line-height: 1;
+            color: #fff;
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: baseline;
+            border-radius: .25em;
+            margin-top: .3em;
+        }
+
+
+        .top-panel {
+            border: 1px solid #eceff9;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        .top-panel > .layui-card-body {
+            height: 30px;
+            color: black;
+        }
+
+        .top-panel-number {
+            line-height: 30px;
+            font-size: 20px;
+            border-right: 1px solid #eceff9;
+        }
+
+        .top-panel-tips {
+            line-height: 30px;
+            font-size: 12px;
+            text-align: left;
+            padding-left: 10px;
+        }
+
+        .layui-card:last-child {
+            margin-bottom: 0;
+            margin-left: 10px;
+            margin-right: 10px;
+        }
+
+        .wallet div {
+            line-height: 25px;
+            font-size: 12px;
+        }
+
+        .wallet div span {
+            font-weight: bold;
+        }
+
+        .row {
+            line-height: 15px;
+        }
+
+        .title {
+            margin-top: 10px;
+            font-size: 10px;
+            line-height: 0px;
+        }
+    </style>
+</head>
+<body class="gray-bg">
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>{$sys_time}</h5>
+                </div>
+                <div class="ibox-content">
+                    <div class="layuimini-main layui-top-box" style="padding:1px 5px 1px 5px;">
+                        <div class="layui-row layui-col-space1">
+                            <div class="layui-col-md12">
+                                <div class="layui-col-md2">
+                                    <div class="sm-st clearfix">
+                                        <span class="sm-st-icon st-red"><i class="fa fa-users"></i></span>
+                                        <div class="sm-st-info" style="color: black">
+                                            <span>{$member_total}</span>
+                                            {:lang('总会员数')}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="layui-col-md2" style="">
+                                    <div class="sm-st clearfix">
+                                        <span class="sm-st-icon st-red"><i class="fa fa-users"></i></span>
+                                        <div class="sm-st-info" style="color: black">
+                                            <span>{$rec_wit_tolal}</span>
+                                            {:lang('充提差')}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="layui-col-md2" style="">
+                                    <div class="sm-st clearfix">
+                                        <span class="sm-st-icon st-violet"><i class="fa fa-magic"></i></span>
+                                        <div class="sm-st-info" style="color: black">
+                                                <span id="total_recharge_span">{$recharge_total}<i
+                                                        class="layui-icon layui-icon-search"
+                                                        style="font-size: 20px; color: red;"></i></span>
+                                            {:lang('总充值')}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="layui-col-md2" style="">
+                                    <div class="sm-st clearfix">
+                                        <span class="sm-st-icon st-violet"><i class="fa fa-magic"></i></span>
+                                        <div class="sm-st-info" style="color: black">
+                                                <span id="manual_recharge_span">{$manual_recharge}<i
+                                                        class="layui-icon layui-icon-search"
+                                                        style="font-size: 20px; color: red;"></i></span>
+                                            {:lang('手动补单')}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="layui-col-md2" style="">
+                                    <div class="sm-st clearfix">
+                                        <span class="sm-st-icon st-violet"><i class="fa fa-user"></i></span>
+                                        <div class="sm-st-info" style="color: black">
+                                                <span id="total_extract_span">{$withdraw_total}<i
+                                                        class="layui-icon layui-icon-search"
+                                                        style="font-size: 20px; color: red;"></i></span>
+                                            {:lang('总提现')}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="layui-col-md2" style="">
+                                    <div class="sm-st clearfix">
+                                        <span class="sm-st-icon st-violet"><i class="fa fa-magic"></i></span>
+                                        <div class="sm-st-info" style="color: black">
+                                            <span style="font-size: 15px">TRC20-U/T：{:round($all_collection['TRC20-USDT']['money'], 2)}/{:round($all_collection['TRC20-TRX']['money'], 2)}</span>
+                                            <span style="font-size: 15px">BEP20-U/B：{:round($all_collection['BEP20-USDT']['money'], 2)}/{:round($all_collection['BEP20-BNB']['money'], 2)}</span>
+                                            {:lang('总归集')}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layuimini-main layui-top-box" style="padding:1px 10px 1px 10px;margin-top: -20px">
+                        <div class="layui-row layui-col-space1">
+                            <div class="layui-col-md12" style="margin-top: -10px">
+                                <div class="panel layui-bg-number">
+                                    <div class="panel-body"
+                                         style="padding-left: 0px;margin-top:-10px;margin-bottom:-25px;">
+                                        <form class="layui-form layui-form-pane" action="{:url('synthesis')}"
+                                              method="post">
+                                            <div class="layui-form-item" style="color:black;">
+                                                <div class="layui-inline">
+                                                    <label class="layui-form-label">{:lang('开始时间')}</label>
+                                                    <div class="layui-input-inline">
+                                                        <input type="text" id="start_time" name="start_time"
+                                                               autocomplete="off" class="layui-input" value="{$startTime}"
+                                                               placeholder="yyyy/MM/dd hh:mm:ss" lay-key="1"
+                                                               layui-laydate-id="start_time">
+                                                    </div>
+                                                </div>
+                                                <div class="layui-inline">
+                                                    <label class="layui-form-label">{:lang('结束时间')}</label>
+                                                    <div class="layui-input-inline">
+                                                        <input type="text" id="end_time" name="end_time"
+                                                               autocomplete="off" class="layui-input" value="{$endTime}"
+                                                               placeholder="yyyy/MM/dd hh:mm:ss" lay-key="2"
+                                                               layui-laydate-id="end_time">
+                                                    </div>
+                                                </div>
+                                                <div class="layui-inline">
+                                                    <button type="submit" class="layui-btn layui-btn-primary"
+                                                            lay-submit="" lay-filter="data-search-btn"><i
+                                                            class="layui-icon"></i>{:lang('搜 索')}
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="layui-col-md12">
+                                <div class="card sameheight-item stats">
+                                    <div class="card-block">
+                                        <div class="row row-sm stats-container">
+                                            <div class="layui-col-md2 stat-col">
+                                                <div class="stat-icon"><i class="fa fa-rocket"></i></div>
+                                                <div class="stat">
+                                                    <div class="value" id="today_register">{$register}</div>
+                                                    <div class="name">{:lang('注册')}</div>
+                                                </div>
+                                                <div class="stat-info-process">
+                                                    <div class="layui-progress" lay-filter="process_demo">
+                                                        <div class="layui-progress-bar" lay-percent="20%"
+                                                             style="width: 20%;"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="layui-col-md2  stat-col">
+                                                <div class="stat-icon"><i class="fa fa-user-circle"></i></div>
+                                                <div class="stat">
+                                                    <div class="value" id="today_done_task_people_register">
+                                                        {$register_task}
+                                                    </div>
+                                                    <div class="name">{:lang('注册有做任务')}</div>
+                                                </div>
+
+                                                <div class="stat-info-process">
+                                                    <div class="layui-progress" lay-filter="process_demo">
+                                                        <div class="layui-progress-bar" lay-percent="20%"
+                                                             style="width: 20%;"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="layui-col-md2 stat-col">
+                                                <div class="stat-icon"><i class="fa fa-user-plus"></i></div>
+                                                <div class="stat">
+                                                    <div class="value" id="today_collect_u_money">{:round($collection['TRC20-USDT']['money'],2)}({$collection['TRC20-USDT']['num']} {:lang('数')})</div>
+                                                    <div class="name"> {:lang('归集')}TRC20-U</div>
+                                                </div>
+
+                                                <div class="stat-info-process">
+                                                    <div class="layui-progress" lay-filter="process_demo">
+                                                        <div class="layui-progress-bar" lay-percent="20%"
+                                                             style="width: 20%;"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="layui-col-md2  stat-col">
+                                                <div class="stat-icon"><i class="fa fa-child"></i></div>
+                                                <div class="stat">
+                                                    <div class="value" id="today_collect_t_money">{:round($collection['TRC20-TRX']['money'], 2)}({$collection['TRC20-TRX']['num']} {:lang('数')})</div>
+                                                    <div class="name"> {:lang('归集')}TRX</div>
+                                                </div>
+
+                                                <div class="stat-info-process">
+                                                    <div class="layui-progress" lay-filter="process_demo">
+                                                        <div class="layui-progress-bar" lay-percent="20%"
+                                                             style="width: 20%;"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="layui-col-md2 stat-col">
+                                                <div class="stat-icon"><i class="fa fa-money"></i></div>
+                                                <div class="stat">
+                                                    <div class="value" id="today_collect_bep20_u_money">{:round($collection['BEP20-USDT']['money'], 2)}({$collection['BEP20-USDT']['num']} {:lang('数')})</div>
+                                                    <div class="name"> {:lang('归集')}BEP20-U</div>
+                                                </div>
+
+                                                <div class="stat-info-process">
+                                                    <div class="layui-progress" lay-filter="process_demo">
+                                                        <div class="layui-progress-bar" lay-percent="20%"
+                                                             style="width: 20%;"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="layui-col-md2 stat-col">
+                                                <div class="stat-icon"><i class="fa fa-credit-card"></i></div>
+                                                <div class="stat">
+                                                    <div class="value" id="today_collect_b_money">{:round($collection['BEP20-BNB']['money'], 2)}({$collection['BEP20-BNB']['num']} {:lang('数')})</div>
+                                                    <div class="name"> {:lang('归集')}BNB</div>
+                                                </div>
+                                                <div class="stat-info-process">
+                                                    <div class="layui-progress" lay-filter="process_demo">
+                                                        <div class="layui-progress-bar" lay-percent="20%"
+                                                             style="width: 20%;"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="layui-col-md2 stat-col">
+                                                <div class="stat-icon"><i class="fa fa-reply-all"></i></div>
+                                                <div class="stat">
+                                                    <div class="value" id="today_recharge">
+                                                        {:round($recharge_all, 2)}({$recharge_num} {:lang('人')})
+                                                    </div>
+                                                    <div class="name">{:lang('充值金额')}</div>
+                                                </div>
+
+                                                <div class="stat-info-process">
+                                                    <div class="layui-progress" lay-filter="process_demo">
+                                                        <div class="layui-progress-bar" lay-percent="20%"
+                                                             style="width: 20%;"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="layui-col-md2 stat-col">
+                                                <div class="stat-icon"><i class="fa fa-hand-pointer-o"></i></div>
+                                                <div class="stat">
+                                                    <div class="value" id="today_recharge1">
+                                                        {:round($background_recharge_all, 2)}({$background_recharge_num} {:lang('人')})
+                                                    </div>
+                                                    <div class="name">{:lang('手动补单')}</div>
+                                                </div>
+
+                                                <div class="stat-info-process">
+                                                    <div class="layui-progress" lay-filter="process_demo">
+                                                        <div class="layui-progress-bar" lay-percent="20%"
+                                                             style="width: 20%;"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="layui-col-md2 stat-col">
+                                                <div class="stat-icon"><i class="fa fa-wheelchair-alt"></i></div>
+                                                <div class="stat">
+                                                    <div class="value" id="today_extract">
+                                                        {:round($withdraw_all, 2)}({$withdraw_num}{:lang('人')})
+                                                    </div>
+                                                    <div class="name"> {:lang('提现金额')}</div>
+                                                </div>
+
+                                                <div class="stat-info-process">
+                                                    <div class="layui-progress" lay-filter="process_demo">
+                                                        <div class="layui-progress-bar" lay-percent="20%"
+                                                             style="width: 20%;"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="layui-col-md2 stat-col">
+                                                <div class="stat-icon"><i class="fa fa-hand-pointer-o"></i></div>
+                                                <div class="stat">
+                                                    <div class="value" id="today_first_recharge_people">
+                                                        {$recharge_first}
+                                                    </div>
+                                                    <div class="name">{:lang('首充')}</div>
+                                                </div>
+
+                                                <div class="stat-info-process">
+                                                    <div class="layui-progress" lay-filter="process_demo">
+                                                        <div class="layui-progress-bar" lay-percent="20%"
+                                                             style="width: 20%;"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="layui-col-md2 stat-col">
+                                                <div class="stat-icon"><i class="fa fa-users"></i></div>
+                                                <div class="stat">
+                                                    <div class="value" id="today_sign_people" style="color: #1aa094"
+                                                    >{$recharge_rep}
+                                                    </div>
+                                                    <div class="name">{:lang('复充')}</div>
+                                                </div>
+
+                                                <div class="stat-info-process">
+                                                    <div class="layui-progress" lay-filter="process_demo">
+                                                        <div class="layui-progress-bar" lay-percent="20%"
+                                                             style="width: 20%;"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="layui-col-md2 stat-col">
+                                                <div class="stat-icon"><i class="fa fa-check-square"></i></div>
+                                                <div class="stat">
+                                                    <div class="value" id="today_done_task_count">{$task_num}</div>
+                                                    <div class="name"> {:lang('完成任务数')}</div>
+                                                </div>
+
+                                                <div class="stat-info-process">
+                                                    <div class="layui-progress" lay-filter="process_demo">
+                                                        <div class="layui-progress-bar" lay-percent="20%"
+                                                             style="width: 20%;"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="layui-col-md2 stat-col">
+                                                <div class="stat-icon"><i class="fa fa-diamond"></i></div>
+                                                <div class="stat">
+                                                    <div class="value" id="today_task_money">{$task_money}</div>
+                                                    <div class="name"> {:lang('任务总佣金')}</div>
+                                                </div>
+
+                                                <div class="stat-info-process">
+                                                    <div class="layui-progress" lay-filter="process_demo">
+                                                        <div class="layui-progress-bar" lay-percent="20%"
+                                                             style="width: 20%;"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layuimini-main layui-top-box" style="padding:1px 10px 1px 10px;margin-top: -5px">
+                        <div class="layui-row layui-col-space10">
+                            <div class="layui-col-md3">
+                                <div class="panel" style="background-color: rgb(29, 139, 241)">
+                                    <div class="panel-body">
+                                        <div class="panel-title">
+                                            <span class="label pull-right layui-bg-cyan">{:lang('实时')}</span>
+                                            <h5 style="margin-top: -12px;margin-bottom: 12px;">{:lang('充值人数')}</h5>
+                                        </div>
+                                        <div class="panel-content">
+                                            <div class="layui-row">
+                                                <div class="layui-col-md6" style="display: inline-block">
+                                                    <h1 class="no-margins" id="recharge_num">0</h1>
+                                                    <div class="title">
+                                                        <span>{:lang('总充人数')}</span>
+                                                    </div>
+                                                </div>
+                                                <div class="layui-col-md4"
+                                                     style="float: right;display: inline-block">
+                                                    <h1 class="no-margins" id="recharge_rep">0</h1>
+                                                    <div class="title">
+                                                        <span>{:lang('复充人数')}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="layui-col-md3">
+                                <div class="panel" style="background-color: rgb(90, 212, 212)">
+                                    <div class="panel-body">
+                                        <div class="panel-title">
+                                            <span class="label pull-right layui-bg-cyan">{:lang('实时')}</span>
+                                            <h5 style="margin-top: -12px;margin-bottom: 12px;">{:lang('总任务佣金')}</h5>
+                                        </div>
+                                        <div class="panel-content">
+                                            <h1 class="no-margins" id="brokerage_all">0</h1>
+
+                                            <div class="title">
+                                                <!--                                    <span>佣金产出:</span><span style="color:red;" id="profit_money">00</span>-->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="layui-col-md3">
+                                <div class="panel" style="background-color: rgb(118, 114, 180)">
+                                    <div class="panel-body">
+                                        <div class="panel-title">
+                                            <span class="label pull-right layui-bg-cyan">{:lang('实时')}</span>
+                                            <h5 style="margin-top: -12px;margin-bottom: 12px;">{:lang('用户余额')}</h5>
+                                        </div>
+                                        <div class="panel-content">
+                                            <h1 class="no-margins" id="user_money_all">0</h1>
+
+                                            <div class="title">
+                                                <!--                                    <span>佣金产出:</span><span style="color:red;" id="profit_money">00</span>-->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="layui-col-md3">
+                                <div class="panel" style="background-color: rgb(26, 204, 169)">
+                                    <div class="panel-body">
+                                        <div class="panel-title">
+                                            <span class="label pull-right layui-bg-cyan">{:lang('当日')}</span>
+                                            <h5 style="margin-top: -12px;margin-bottom: 12px;">{:lang('广告位')}</h5>
+                                        </div>
+                                        <div class="panel-content">
+                                            <div class="layui-row">
+                                                <div class="layui-col-md6" style="display: inline-block">
+                                                    <h1 class="no-margins" id="finance_product_user_num">0</h1>
+                                                    <div class="title">
+                                                        <span>{:lang('广告位人数')}</span>
+                                                    </div>
+                                                </div>
+                                                <div class="layui-col-md4"
+                                                     style="float: right;display: inline-block">
+                                                    <h1 class="no-margins" id="finance_product_money">0</h1>
+                                                    <div class="title">
+                                                        <span>{:lang('广告位金额')}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+<!--                            <div class="layui-col-md3">-->
+<!--                                <div class="panel" style="background-color: rgb(118, 114, 180)">-->
+<!--                                    <div class="panel-body">-->
+<!--                                        <div class="panel-title">-->
+<!--                                            <span class="label pull-right layui-bg-cyan">{:lang('实时')}</span>-->
+<!--                                            <h5 style="margin-top: -12px;margin-bottom: 12px;">{:lang('用户佣金账户余额')}</h5>-->
+<!--                                        </div>-->
+<!--                                        <div class="panel-content">-->
+<!--                                            <h1 class="no-margins" id="energy_all">0</h1>-->
+
+<!--                                            <div class="title">-->
+<!--                                                &lt;!&ndash;                                    <span>佣金产出:</span><span style="color:red;" id="profit_money">00</span>&ndash;&gt;-->
+<!--                                            </div>-->
+<!--                                        </div>-->
+<!--                                    </div>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                            <div class="layui-col-md3">-->
+<!--                                <div class="panel" style="background-color: rgb(26, 204, 169)">-->
+<!--                                    <div class="panel-body">-->
+<!--                                        <div class="panel-title">-->
+<!--                                            <span class="label pull-right layui-bg-cyan">{:lang('实时')}</span>-->
+<!--                                            <h5 style="margin-top: -12px;margin-bottom: 12px;">{:lang('出款燃烧的TRX数量')}</h5>-->
+<!--                                        </div>-->
+<!--                                        <div class="panel-content">-->
+<!--                                            <h1 class="no-margins"-->
+<!--                                                style="font-weight: 600;margin-bottom: -14px;"-->
+<!--                                                id="contribute_all">-->
+<!--                                                0</h1>-->
+
+<!--                                            <div class="title">-->
+<!--                                                &lt;!&ndash;                                    <span>佣金产出:</span><span style="color:red;" id="profit_money">00</span>&ndash;&gt;-->
+<!--                                            </div>-->
+<!--                                        </div>-->
+<!--                                    </div>-->
+<!--                                </div>-->
+<!--                            </div>-->
+                        </div>
+                    </div>
+                    <div class="layuimini-main layui-top-box"
+                         style="color:black;padding-left:10px;padding-top:0px;margin-top: -5px">
+                        <div class="layui-row layui-col-space1" style="margin-right:-20px;">
+                            <div class="layui-col-xs12 layui-col-md12  layui-col-space10">
+{/*                                <div class="layui-col-md3">*/}
+{/*                                    <div class="panel" style="background-color: rgb(29, 139, 241); color: white;">*/}
+{/*                                        <div class="panel-body">*/}
+{/*                                            <div class="panel-title">*/}
+{/*                                                <span class="label pull-right layui-bg-cyan">{:lang('当天')&cc;</span>*/}
+{/*                                                <h5 style="margin-top: -12px;margin-bottom: 12px;">{:lang('余额宝转入')&cc;</h5>*/}
+{/*                                            </div>*/}
+{/*                                            <div class="panel-content">*/}
+{/*                                                <div class="layui-row">*/}
+{/*                                                    <div class="layui-col-md4" style="display: inline-block">*/}
+{/*                                                        <h1 class="no-margins" id="today_add_balance_user_num">0</h1>*/}
+{/*                                                        <div class="title">*/}
+{/*                                                            <span>{:lang('今日人数')&cc;</span>*/}
+{/*                                                        </div>*/}
+{/*                                                    </div>*/}
+{/*                                                    <div class="layui-col-md4"*/}
+{/*                                                         style="float: right;display: inline-block">*/}
+{/*                                                        <h1 class="no-margins" id="add_user_balance">0</h1>*/}
+{/*                                                        <div class="title">*/}
+{/*                                                            <span>{:lang('总余额')&cc;</span>*/}
+{/*                                                        </div>*/}
+{/*                                                    </div>*/}
+{/*                                                    <div class="layui-col-md4"*/}
+{/*                                                         style="float: right;display: inline-block">*/}
+{/*                                                        <h1 class="no-margins" id="add_balance_user_num">0</h1>*/}
+{/*                                                        <div class="title">*/}
+{/*                                                            <span>{:lang('总人数')&cc;</span>*/}
+{/*                                                        </div>*/}
+{/*                                                    </div>*/}
+{/*                                                </div>*/}
+{/*                                            </div>*/}
+{/*                                        </div>*/}
+{/*                                    </div>*/}
+{/*                                </div>*/}
+{/*                                <div class="layui-col-md3">*/}
+{/*                                    <div class="panel" style="background-color: rgb(29, 139, 241); color: white;">*/}
+{/*                                        <div class="panel-body">*/}
+{/*                                            <div class="panel-title">*/}
+{/*                                                <span class="label pull-right layui-bg-cyan">{:lang('当天')&cc;</span>*/}
+{/*                                                <h5 style="margin-top: -12px;margin-bottom: 12px;">{:lang('余额宝转出')&cc;</h5>*/}
+{/*                                            </div>*/}
+{/*                                            <div class="panel-content">*/}
+{/*                                                <div class="layui-row">*/}
+{/*                                                    <div class="layui-col-md4" style="display: inline-block">*/}
+{/*                                                        <h1 class="no-margins" id="today_sub_balance_user_num">0</h1>*/}
+{/*                                                        <div class="title">*/}
+{/*                                                            <span>{:lang('今日人数')&cc;</span>*/}
+{/*                                                        </div>*/}
+{/*                                                    </div>*/}
+{/*                                                    <div class="layui-col-md4"*/}
+{/*                                                         style="float: right;display: inline-block">*/}
+{/*                                                        <h1 class="no-margins" id="sub_user_balance">0</h1>*/}
+{/*                                                        <div class="title">*/}
+{/*                                                            <span>{:lang('总余额')&cc;</span>*/}
+{/*                                                        </div>*/}
+{/*                                                    </div>*/}
+{/*                                                    <div class="layui-col-md4"*/}
+{/*                                                         style="float: right;display: inline-block">*/}
+{/*                                                        <h1 class="no-margins" id="sub_balance_user_num">0</h1>*/}
+{/*                                                        <div class="title">*/}
+{/*                                                            <span>{:lang('总人数')&cc;</span>*/}
+{/*                                                        </div>*/}
+{/*                                                    </div>*/}
+{/*                                                </div>*/}
+{/*                                            </div>*/}
+{/*                                        </div>*/}
+{/*                                    </div>*/}
+{/*                                </div>*/}
+                                <div class="layui-col-md3">
+                                    <div class="panel" style="background-color: rgb(29, 139, 241); color: white;">
+                                        <div class="panel-body">
+                                            <div class="panel-title">
+                                                <span class="label pull-right layui-bg-cyan">{:lang('当天')}</span>
+                                                <h5 style="margin-top: -12px;margin-bottom: 12px;">{:lang('活跃人数')}</h5>
+                                            </div>
+                                            <div class="panel-content">
+                                                <div class="layui-row">
+                                                    <div class="layui-col-md6" style="display: inline-block">
+                                                        <h1 class="no-margins" id="active_user_num">0</h1>
+                                                        <div class="title">
+                                                            <span>{:lang('人数')}</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="layui-col-md5"
+                                                         style="float: right;display: inline-block">
+                                                        <h1 class="no-margins" id="active_user_num_money">0</h1>
+                                                        <div class="title">
+                                                            <span>{:lang('用户余额')}</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="layui-col-md3">
+                                    <div class="panel" style="background-color: rgb(29, 139, 241); color: white;">
+                                        <div class="panel-body">
+                                            <div class="panel-title">
+                                                <span class="label pull-right layui-bg-cyan">{:lang('当天')}</span>
+                                                <h5 style="margin-top: -12px;margin-bottom: 12px;">{:lang('新增用户')}</h5>
+                                            </div>
+                                            <div class="panel-content">
+                                                <div class="layui-row">
+                                                    <div class="layui-col-md6" style="display: inline-block">
+                                                        <h1 class="no-margins" id="new_user_num">0</h1>
+                                                        <div class="title">
+                                                            <span>{:lang('人数')}</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="layui-col-md4"
+                                                         style="float: right;display: inline-block">
+                                                        <h1 class="no-margins" id="new_user_money">0</h1>
+                                                        <div class="title">
+                                                            <span>{:lang('用户余额')}</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="layui-row layui-col-space1" style="margin-right:-20px;">
+                            <div class="layui-col-xs12 layui-col-md12  layui-col-space10">
+                                <div class="layui-col-md3 wallet">
+                    <span style="display:block;line-height:25px;font-size:15px;">{:lang('归集钱包')}
+                        <button class="layui-btn layui-btn-xs layui-bg-green layui-btn-normal" style="margin-left: 10px"
+                                onclick="getData('recharge',true)">
+                        <i class="layui-icon"></i>{:lang('点击刷新')}</button></span>
+                                    <div>
+                                        <label>TRC20：</label><span style="word-break:break-all" id="TRC20_addr"></span>
+                                    </div>
+                                    <div>
+                                        <label>U{:lang('余额')}：</label><span
+                                            id="TRC20_u_balance">0</span>
+                                        <label style="margin-left: 20px">T{:lang('余额')}：</label><span id="TRC20_t_balance">0</span>
+                                    </div>
+                                    <div>
+                                        <label>BEP20：</label><span style="word-break:break-all"
+                                                                   id="BEP20_addr"></span>
+                                    </div>
+                                    <div>
+                                        <label>U{:lang('余额')}：</label><span id="BEP20_u_balance">--</span>
+                                        <label style="margin-left: 20px">bnb{:lang('余额')}：</label><span
+                                            id="BEP20_bnb_balance">--</span>
+                                    </div>
+                                </div>
+                                <div class="layui-col-md3 wallet">
+                    <span style="display:block;line-height:25px;font-size:15px;">{:lang('打款钱包')}
+                        <button class="layui-btn layui-btn-xs layui-bg-green layui-btn-normal wallet-refresh"
+                                style="margin-left: 10px" onclick="getData('brokerage',true)">
+                        <i class="layui-icon"></i>{:lang('点击刷新')}</button></span>
+                                    <div>
+                                        <label>{:lang('地址')}：</label><span
+                                            id="TRC20_brok_addr"></span></div>
+                                    <div>
+                                        <label>U{:lang('余额')}：</label><span id="TRC20_brok_u_balance">0</span>
+                                        <label style="margin-left: 20px">T{:lang('余额')}：</label><span
+                                            id="TRC20_brok_t_balance">0</span>
+                                    </div>
+<!--                                    <div>-->
+<!--                                        <label>打款钱包能量：</label><span id="TRC20_brok_energy">-/-</span>-->
+<!--                                        <a href="http://tronqq.com" target="_blank"-->
+<!--                                           style="color: #009688;font-weight: bolder">能量网站</a><a-->
+<!--                                            style="margin-left: 8px" href="https://t.me/tronqq_com" target="_blank"><img-->
+<!--                                            src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAYxJREFUOE+lk88rg3Ecx9/vZ36VUnseoiiaLQcXFweHnZSDs+Rql9lIcXNCKScc5HlWIklx8A9wQPYPLOXiGXEgZXvmR8qPbR9tPLOtLWnfw7c+P96v+vwiil7D8rlaVVc7RIhXQG8mTEhYwHDy7X3/ebrbypcw33Aa0REKFgHpKAZ/27wWYiYRcO/Z8RxA1U0pLSrttYKerDb7qWvmMoip/wAgWLHGPdNU1802fCICQPsLIIIHEk0/eXFUo4eqfjEKcLO8mGegbOETG9ak57mwVPFR0y8MAceKAB+AbCnkbizgOcnEmrfv61OvL71pwfFvAyVEzTCjIuj8cUYg3KGS2osHum6z/QmZfemk4+5xwnWjrplzIGZzAOKyCMAFxYGjmN997DSifkXEn0RN/1OwPZGF6eYBgIFCQOkSMjmHVqN7EMNM2QLVMOMQqAUllGsiISFRuCpph5YIusJO/cpLpE4LeyW+8mMUzIMYAqQFooyD0gpgKQ/wPcaKFylXXyWrbEMqOiYb8t9z/gL49bcVYF8iIwAAAABJRU5ErkJggg=="><span>Telegram</span></a>-->
+<!--                                    </div>-->
+<!--                                    <div>-->
+<!--                                        <span style="color: red">当前剩余能量大约可以支付<span id="use_energy_num">0</span>笔转账的能量消耗</span>-->
+<!--                                        <i class="layui-icon layui-icon-help" style="font-size: 10px;"-->
+<!--                                           onmouseover="showTips(this,3,3)" onmouseleave="close_tips()"></i>-->
+<!--                                    </div>-->
+<!--                                    <div>-->
+<!--                                        <form class="layui-form layui-form-pane" action="">-->
+<!--                                            <label class="layui-form-label" style="width: 128px">快速购买出款能量</label>-->
+<!--                                            <div class="layui-input-inline">-->
+<!--                                                <input type="number" id="buy_energy_num" name="buy_energy_num"-->
+<!--                                                       required="" lay-verify="required" placeholder="请输入能量数值"-->
+<!--                                                       autocomplete="off" min="100000" style="width: 120px"-->
+<!--                                                       class="layui-input">-->
+<!--                                            </div>-->
+<!--                                            <div class="layui-input-inline" style="width: 60px">-->
+<!--                                                <select id="buy_energy_day" name="buy_energy_day"-->
+<!--                                                        lay-verify="buy_energy_day">-->
+<!--                                                    <option value="1">1天</option>-->
+<!--                                                    <option value="3" selected="">3天</option>-->
+<!--                                                </select>-->
+<!--                                                <div class="layui-unselect layui-form-select">-->
+<!--                                                    <div class="layui-select-title"><input type="text" placeholder="请选择"-->
+<!--                                                                                           value="3天" readonly=""-->
+<!--                                                                                           class="layui-input layui-unselect"><i-->
+<!--                                                            class="layui-edge"></i></div>-->
+<!--                                                    <dl class="layui-anim layui-anim-upbit">-->
+<!--                                                        <dd lay-value="1" class="">1天</dd>-->
+<!--                                                        <dd lay-value="3" class="layui-this">3天</dd>-->
+<!--                                                    </dl>-->
+<!--                                                </div>-->
+<!--                                            </div>-->
+<!--                                            <div class="layui-input-inline">-->
+<!--                                                <button id="buy_energy_btn" class="layui-btn layui-btn-normal"-->
+<!--                                                        style="text-align:center" lay-submit="" lay-filter="buy_energy">-->
+<!--                                                    购买-->
+<!--                                                </button>-->
+<!--                                            </div>-->
+<!--                                        </form>-->
+<!--                                    </div>-->
+<!--                                    <div>-->
+<!--                                        <span id="buy_energy_money_show"></span><span id="buy_energy_money_number"-->
+<!--                                                                                      style="color: red"></span>-->
+<!--                                    </div>-->
+<!--                                    <span style="display:block;line-height:25px;font-size:15px;">bep20打款钱包-->
+<!--                            <button class="layui-btn layui-btn-xs layui-bg-green layui-btn-normal wallet-refresh"-->
+<!--                                    style="margin-left: 10px" onclick="getData('energy',true)">-->
+<!--                            <i class="layui-icon"></i>点击刷新</button></span>-->
+                                    <div>
+                                        <label>{:lang('打款地址')}：</label><span style="word-break:break-all"
+                                                                    id="BEP20_brok_addr"></span>
+                                    </div>
+                                    <div>
+                                        <label>U{:lang('余额')}：</label><span id="BEP20_brok_u_balance">--</span>
+                                        <label style="margin-left: 20px">BNB{:lang('余额')}：</label><span
+                                            id="BEP20_brok_bnb_balance">--</span>
+                                    </div>
+                                </div>
+                                <div class="layui-col-md3 wallet">
+                        <span style="display:block;line-height:25px;font-size:15px;">{:lang('能量平台')}<button
+                                class="layui-btn layui-btn-xs layui-bg-green layui-btn-normal" style="margin-left: 10px"
+                                onclick="getData('energy',true)">
+                        <i class="layui-icon"></i>{:lang('点击刷新')}</button></span>
+                                    <div>
+                                        <label>{:lang('能量余额')}：</label><span id="energy_balance">0</span>
+                                    </div>
+                                    <div class="layui-col-xs12 layui-col-md12">
+                                        <div class="layui-col-md12">
+                                            <label style="color: red">{:lang('用于用户钱包激活归集，仅支持trx,勿充其他虚拟币')}</label><br>
+                                            <label>{:lang('地址')}：</label><span style="word-break:break-all"
+                                                                      id="energy_addr"></span>
+                                            <br>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+<!--                                        <div class="layui-col-md5">-->
+<!--                                            <p id="qrcode"-->
+<!--                                               style="width:90px;height:100px;line-height:110px;background-repeat:no-repeat;background-position:30px"-->
+<!--                                               title="">-->
+<!--                                                <canvas width="100" height="100" style="display: none;"></canvas>-->
+<!--                                                <img alt="Scan me!"-->
+<!--                                                     src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAYAAABw4pVUAAAAAXNSR0IArs4c6QAABV1JREFUeF7tne166jAMg+H+L5rzdGNnpSXOK+EyNrSfI82HZSuyE8r5dDpdTgf+XS7f3Z/P55uRRp+t/7+d2raPaurV2HTJHX3QsZZ2i4UCSGGxALJ4yCqq3jpCKkPQsKO0tPTX4X0UPLo2d/7UPjMHu6EsOulqcHdByt6wHj+ATFwhgGixsrXXMEIUj6VKqgpXSl9KFK/X0BFJirO56i+ALFJzJccpcI/sgZXzBZAA8h3MI8+s6DKUBfYouodQQ9N2H5ntJvsfKTDK/29FWa7xKpnr9tlRtqFCZOvTL7OHuMYLIBMqUBBXKACw466sUikkRbp/ja3M99dHyKxsEEA21d4jEFc8LoAEkJ0PKA50hAM/tbioFCVJtByRLbuA0PnOaDuANGXqAeRqgW7aeKkIcVF2K5s0OaPSdmtM5zma0R9hq4/Kw284U3cMuy2rULACyNXVnmn0CqwAEkBu2O98UerZDxInLWW4U6L9d5V+HjTH3ccDyOT2i+scLlgB5NUAWassqukrxUIlcNfG2jFn94CN5iyKvawzdWUAepbRYRR63nKEM1QlEcVeAUSgrEoSBxCxdHJEYngIZY1krxL+tIpLFUtXckYNRve9Dlk9rfYGkFqgUtFAQQ0gA0tRb386IFT2uuHv0JQyFm1L50Hpd5b4USB3e1sAmZn2+3MaVcsTAeSOXeklagrJjwIy23xGi6AUQo1QFQLdPpS1Uapry1FGlKVMusrG158pHuYA7gLUIfEDiGv9CbW5ERlA3g0QJYyVtoTCaJlj6csduxHPj66U6kK5z1LZW+0TrlFGzwWQq7Vt7Qy/NEOFQgABgNDzisroVBJTqbmlCuXcoUMZKvMcUXVLpt6lKOgkK76n14eqPqijuApMcVJ8QJUI2UOaCJnkEH+CstbnIVQtKRKPUoVLPdRLu+bsyGXFUW6uAQUQx9zzZwIIKI9QiT8397yFBEh3YqgollHbLhVHaZCCo6yNJtK27HUHqEolAWT/9jwsewOI/+pBqfIQyvKPW0mhdGlzCCBd/EkWIS0AvuuKZvtUps/KNu54mLICiObpAWTyelnXQB17Z1XL2n1Gby7SCFE098hIR1CWe57vSmI3yR5+YeeIXGCeQn22CCBiZiuVk4vDq0TI/ug3ETIJ26dTFs1D6MQoLd2jptGzHfyvRPVImitUqtjhZrwAwjPwAHJ1nbeKkA7ZS8OTGpZK7Nm4lGZpu+14HYdjh+QhM8N8fR5A7sv6mz0kEcKLi0+PEOrBNCKUdh00pfTh0hRdk9s/PlOnE3HbKcakCeVIvm4l9xGOGEDE365yDUYdzu0/ESK+xfupgNDB3Hb0bhSVk1X2rWzAtDJbrZuubVah+NHXM43COoC4Li8+R73orQH5y28lpSqLtqMOpai48l6W6PCoeaU2KGU5F95m+8soCruMTlVWALkiFUCEL0YqZe4qeigV0XZd0bMer4wQdzPtXlBH1j6TvSMglbsEdN2I26+NnvrrCNTDAsiEVyWE4Y/YV0okgNwBRCm4USVVKR9XlVS0UTkS3dQVZxztDUolAF8lpYtTOJjyeLUJBpA7yCRC9kZxIz4RsrGlQtUua1iyV5kYjRCFSykVUU+ke4GSA1HZS9Xl0t9TIySAfEJYOVEA2YROIqRRclNZrbSjpRlKidXYL0tZ7v6lGHrE/26EBJA7kRVAAN1QFUTbbY1Oyyxuu5ehrK4Q7KggV3NxDUZp8QggywM3+t5eCpBSOqF9BpAHLBVAPo3nHju/zE+vulFAF/6Aj/1/tFJg1d6mJMQBREAqgFyNRaNAMZiAQyJEyScoWA4AM4lNqYi2W8b7B6PWk/iv1W9nAAAAAElFTkSuQmCC"-->
+<!--                                                     style="display: block;"></p>-->
+<!--                                        </div>-->
+<!--                                    </div>-->
+<!--                                </div>-->
+<!--                                <div class="layui-col-md3 wallet">-->
+<!--                        <span style="display:block;line-height:25px;font-size:15px;">积分 <i-->
+<!--                                class="layui-icon layui-icon-help" style="font-size: 10px;"></i><button-->
+<!--                                class="layui-btn layui-btn-xs layui-bg-green layui-btn-normal" style="margin-left: 10px"-->
+<!--                                onclick="getData('contribute',true)">-->
+<!--                        <i class="layui-icon"></i>点击刷新</button></span>-->
+<!--                                    <div>-->
+<!--                                        <label>系统剩余积分：</label><span id="contribute_balance">0</span>-->
+<!--                                    </div>-->
+<!--                                    <div class="layui-col-xs12 layui-col-md12">-->
+<!--                                        <div class="layui-col-md7">-->
+<!--                                            <label style="color: red">充值二维码</label><br>-->
+<!--                                            <label>充值地址：</label><span style="word-break:break-all"-->
+<!--                                                                      id="contribute_addr"></span>-->
+<!--                                            <br>-->
+<!--                                            <button class="layui-btn layui-btn-normal" style="text-align:center"-->
+<!--                                                    lay-submit="" lay-filter="score_recharge">充值完成-->
+<!--                                            </button>-->
+<!--                                        </div>-->
+<!--                                        <div class="layui-col-md5">-->
+<!--                                            <p id="score_qrcode"-->
+<!--                                               style="width:90px;height:100px;line-height:110px;background-repeat:no-repeat;background-position:30px"-->
+<!--                                               title="TKKB9788LRvVJZu73mLGTom5JN37GckmmS">-->
+<!--                                                <canvas width="100" height="100" style="display: none;"></canvas>-->
+<!--                                                <img alt="Scan me!"-->
+<!--                                                     src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAYAAABw4pVUAAAAAXNSR0IArs4c6QAABTpJREFUeF7tnOt24kAMg8P7PzR7KJw2JIzzSXjSZVf924kzI/kim4HLsizXZeLf9dpr/nK54N2u3608t35Bhw284WVZbqfrRWzz9hCi0BFCDtH61Qjp8OZtaqA2q5TSAYq7j+rd1GbF+vbcTylrxguozRBypy2EbNy3inA3+lsiRFElNKw7DjQDMDc63VRaPTeMkBBy92vX2aqoCCEHWioR8gCIFvw1nklZh0p9TliPXrsl0fVuat91ho9MWYDr3ZIQAlCbUfioBydCXiDlEkJlI601lJztEehzSv36yJQVQpYFj07O7kOolypd72iMngh5IOCGfFIWKOSjJTNAX9uk5LxxhOGjHaOfo+g8dbjopqUQ8oZ7JUI08Mqirpliqx1JXDV/s//nOhRD43jVqZ+p08POBv0GyygN0j0eQ+utCCGTRuweHSdfcqDe919HyPVEHTlDZVUKzFFnM6StEi2XEPIMVwh54FEFqhsFHxkh65uLdNinhCAFmtqcnWFpnaP7fbWuxCSE8JSlDFzp+H03SgkhIeQbAcfjkrJexF4XKLRbdvM1rYnOum23v90jrZ27nstJWSHkDv+UviqE1NeY1p7v3nipPgPZ2Vw3hlS3u9KQHoiuc1NZlV6UukYzhdJsPnXqIaROQ0qdWK8NIWLo0KJ+OiGUVbeYVbmUNlKKt1U2ldQk8vu13E1nw+FiV53oAIV+6qgAF0JeoEVBCSEvNDbNszRUj3T8SG7+8ymr43vq1IO7ak9V60ZpS3EUmvpohFN7X04aQhS4nteGkKY65FNwMiEzwtqR0solByd9KZ06HRIqNkf1cZeyQsi+Uw8hL5oqd6RDUxMVJUpj66rS9svWSiM42vR/nbLotNf1Usf73F5DUT00PbtSneK1i7oQUie2EHIwJVBSIh1YujZpwafR2NYYljKu+Ek+ulF6UU4h4MzP8xXCWzr1ELKH3HG2RMgDRypRqYy+rQshB2hRKa0oNSVFjtZu34d/L8tl3Eln9F2Kx1KglXd31Lad7KXXgOhGFZk4WkvfFUIAAiHkDhKNSDtCABdfS6g2p/aUdbROKDK0o+Ar+8I1hAITQo4lcFl7aA0JIX4aSoQ8vMcZ8LnXnxQJ3BIhbi6l0163CNLIpYC5k+ZdcTZHRriGhBCNekVtri2HEOGXHBRK2gmpQlAqUqvQdRVYR9qjzaabspTnrBoSQu4IzCAyhEwC9in3b4o4zQa7bDPqQxTVQHOrvcki7VFp+5sqbotPiUMIoe7Uty6EvDHs66Phx1II+SRCPv3nmejkdoZaokVdksQh5JlSBbwQIsjXG1hUgVFgaTRu+xeF5PZrQIrEGwGhTAIqMN2B4vo5d0pAU+Suvej4BhU9OPWwEDJD2z1sUk+hNzhoc3l0JDq9ToSc9P2QjyCEejNNPUpxs8fVcJqs7HlUQxQbbiS3f2FH+QjU8dJqxuY6lOsMrjqr3hdC3vghslMJUaajbuEbpQDX048KOfm/cm5i72gNHr8rGwshR7CP/x9CDrBTHNGn4efJEBJCrt8QzFAzlUSlzSb19GqCsLVBFWQ5OnGNdNQQWsgVUkPICb+zFUJAPLsRMooKpbB2RDU44tcSd19KM4tvLlabDiF7dOjo5K9SWYmQ/UW8RAjNV7+dsoR9Pi2VPq4cTGqVAaUzma1yeiVfK0zaxAa9KEcJCiHH9aTlbm8IqRGYEiEUdGUdlaVUlSgdMVV/9DwK6NRm2am7RlxJTPM/BUKpPXQysN4j3cc7OJ56Dcg9EH0uhABXSMoCIK2W/AFR3XnRdt/iIgAAAABJRU5ErkJggg=="-->
+<!--                                                     style="display: block;"></p>-->
+<!--                                        </div>-->
+<!--                                    </div>-->
+<!--                                </div>-->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/static/admin/js/jquery.min.js?v=2.1.4"></script>
+<script src="/static/admin/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="/static/admin/js/content.min.js?v=1.0.0"></script>
+<script src="/static/admin/js/plugins/validate/jquery.validate.min.js"></script>
+<script src="/static/admin/js/plugins/validate/messages_zh.min.js"></script>
+<script src="/static/admin/js/plugins/iCheck/icheck.min.js"></script>
+<script src="/static/admin/js/plugins/layer/layer.min.js"></script>
+<script src="/static/admin/js/jquery.form.js"></script>
+<script src="/static/admin/js/layui/layui.js"></script>
+<script type="text/javascript">
+    function getData(type = 'recharge', is_tip = false) {
+        $.getJSON("{:url('synthesis')}", {'type': type}, function (res) {
+            if (res.code == 1) {
+                let data = res.data;
+                switch (type) {
+                    case "recharge":
+                        $("#recharge_num").text(data.recharge_num);
+                        $("#recharge_rep").text(data.recharge_rep)
+                        $("#TRC20_addr").text(data.TRC20_addr)
+                        $("#TRC20_u_balance").text(data.TRC20_u_balance)
+                        $("#TRC20_t_balance").text(data.TRC20_t_balance)
+                        $("#BEP20_addr").text(data.BEP20_addr)
+                        $("#BEP20_u_balance").text(data.BEP20_u_balance)
+                        $("#BEP20_bnb_balance").text(data.BEP20_bnb_balance)
+                        break;
+                    case "brokerage":
+                        $("#brokerage_all").text(data.brokerage_all);
+                        $("#TRC20_brok_addr").text(data.TRC20_brok_addr)
+                        $("#TRC20_brok_u_balance").text(data.TRC20_brok_u_balance)
+                        $("#TRC20_brok_t_balance").text(data.TRC20_brok_t_balance)
+                        $("#TRC20_brok_energy").text(data.TRC20_brok_energy)
+                        $("#BEP20_brok_addr").text(data.BEP20_brok_addr)
+                        $("#BEP20_brok_u_balance").text(data.BEP20_brok_u_balance)
+                        $("#BEP20_brok_bnb_balance").text(data.BEP20_brok_bnb_balance)
+                        break;
+                    case "energy":
+                        $("#energy_addr").text(data.TRC20_trx_addr)
+                        $("#energy_balance").text(data.TRC20_trx_t_balance)
+                        break;
+                    case "user_money":
+                        $("#user_money_all").text(data.user_money_all)
+                        break;
+                    case "finance_product":
+                        $("#finance_product_user_num").text(data.finance_product_user_num)
+                        $("#finance_product_money").text(data.finance_product_money)
+                        break;
+                    case "new_user":
+                        $("#new_user_num").text(data.new_user_num)
+                        $("#new_user_money").text(data.new_user_money)
+                        break;
+                    case "active_user":
+                        $("#active_user_num").text(data.active_user_num)
+                        $("#active_user_num_money").text(data.active_user_num_money)
+                        break;
+                    case "balance":
+                        $("#today_add_balance_user_num").text(data.today_add_balance_user_num)
+                        $("#add_user_balance").text(data.add_user_balance)
+                        $("#add_balance_user_num").text(data.add_balance_user_num)
+                        $("#today_sub_balance_user_num").text(data.today_sub_balance_user_num)
+                        $("#sub_user_balance").text(data.sub_user_balance)
+                        $("#sub_balance_user_num").text(data.sub_balance_user_num)
+                        break;
+                    // case "contribute":
+                    //     $("#contribute_all").text(data.contribute_all);
+                    //     $("#contribute_addr").text(data.contribute_addr);
+                    //     $("#contribute_balance").text(data.contribute_balance);
+                    //     break;
+                }
+                if (is_tip) {
+                    layer.msg(res.msg, {anim: 6});
+                }
+
+            } else {
+                if (is_tip) {
+                    layer.alert(res.msg, {title: "{:lang('友情提示')}", icon: 2});
+                }
+            }
+        });
+    }
+
+    $(document).ready(function () {
+        layui.use('laydate', function () {
+            var laydate = layui.laydate;
+            laydate.render({
+                elem: '#start_time',
+                type: 'datetime'
+                , trigger: 'click'
+            });
+            laydate.render({
+                elem: '#end_time',
+                type: 'datetime'
+                , trigger: 'click'
+            });
+        });
+        getData('recharge');
+        getData('brokerage');
+        getData('energy');
+        getData('user_money');
+        getData('finance_product');
+        getData('new_user');
+        getData('active_user');
+        getData('balance');
+        // getData('contribute');
+
+
+    });
+</script>
+</body>
+</html>

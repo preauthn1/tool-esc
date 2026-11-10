@@ -1,0 +1,119 @@
+    {include file="header" /}
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>{:lang("添加")}</h5>
+                </div>
+                <div class="ibox-content">
+                    <form class="form-horizontal m-t" id="dataForm" method="post" action="{:url('add')}">
+                        <input type="hidden" name="id" value="{$info.id}"/>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">{:lang("语言")}：</label>
+                            <div class="input-group col-sm-4">
+                                <select name='lang' class="form-control">
+                                    {volist name='langs' id='lang'}
+                                    <option value="{$lang.lang}" {if $info.lang eq $lang.lang} selected{/if}>{$lang.title|lang}</option>
+                                    {/volist}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">{:lang("网站域名")}：</label>
+                            <div class="input-group col-sm-4">
+                                <input type="text" class="form-control" value="{$info.domain}" name="domain" required />
+                                <p class="help-block">添加域名前请先解析域名至IP地址:<code>{$SERVER_ADDR}</code></p>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">{:lang("网站标题")}：</label>
+                            <div class="input-group col-sm-4">
+                                <input type="text" class="form-control" value="{$info.title}" name="title" required />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">{:lang("LOGO")}：</label>
+                            <input name="logo" id="img" value="{$info.logo}" type="hidden" />
+                            <div class="form-inline">
+                                <div class="input-group col-sm-2">
+                                    <button type="button" class="layui-btn" id="uploader">
+                                        <i class="layui-icon">&#xe67c;</i>{:lang("上传图片")}
+                                    </button>
+                                </div>
+                                <div class="input-group col-sm-3">
+                                    <div id="sm">{if $info.logo}<img src="{$info.logo|toMedia}" style="width:40px; height: 40px;"/>{/if}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">{:lang("安卓下载地址")}：</label>
+                            <div class="form-inline">
+                                <div class="input-group col-sm-5">
+                                    <input name="android_url" placeholder="下载链接或上传apk格式" class="form-control" id="android_url" value="{$info.android_url}" type="text" />
+                                    <span class="input-group-btn">
+                                        <button type="button" class="btn btn-primary" id="uploaderAndroidFile">
+                                            <i class="layui-icon">&#xe67c;</i>{:lang("上传")}
+                                        </button>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">{:lang("IOS下载地址")}：</label>
+                            <div class="form-inline">
+                                <div class="input-group col-sm-5">
+                                    <input name="ios_url" placeholder="下载链接或上传mobileconfig格式" class="form-control" id="ios_url" value="{$info.ios_url}" type="text" />
+                                    <span class="input-group-btn">
+                                        <button type="button" class="btn btn-primary" id="uploaderIosFile">
+                                            <i class="layui-icon">&#xe67c;</i>{:lang("上传")}
+                                        </button>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">{:lang("状态")}：</label>
+                            <div class="input-group col-sm-4">
+                                <select class="form-control" name="status">
+                                    <option value="1" {if $info.status eq 1} selected {/if}>{:lang("启用")}</option>
+                                    <option value="0" {if $info.status neq 1} selected {/if}>{:lang("停用")}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-4 col-sm-offset-6">
+                                <button class="btn btn-primary" type="submit">{:lang("提交")}</button>
+                                <a class="btn btn-default" href="{:url('index')}">{:lang("返回")}</a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+{include file="footer" /}
+<script type="text/javascript">
+    // 单张上传图片
+    layui.use('upload', function(){
+        var upload = layui.upload;
+        upload.render({
+            elem: '#uploaderAndroidFile' //绑定元素
+            ,accept: 'file'
+            ,exts:'apk'
+            ,url: "{:url('upload/upload')}" //上传接口
+            ,done: function(res){
+                $("#android_url").val(res.data.path);
+            }
+        });
+        upload.render({
+            elem: '#uploaderIosFile' //绑定元素
+            ,accept: 'file'
+            ,exts:'mobileconfig'
+            ,url: "{:url('upload/upload')}" //上传接口
+            ,done: function(res){
+                $("#ios_url").val(res.data.path);
+            }
+        });
+    });
+</script>

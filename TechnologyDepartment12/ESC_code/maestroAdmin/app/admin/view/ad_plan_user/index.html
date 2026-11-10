@@ -1,0 +1,188 @@
+{include file="header" /}
+<!-- Panel Other -->
+<div class="ibox float-e-margins">
+    <div class="ibox-title">
+        <h5>广告计划用户列表</h5>
+    </div>
+    <div class="ibox-content">
+        <div class="row m-b">
+            <div class="col-sm-12">
+                <form class="form-inline" id="searchForm">
+                    <div class="form-group">
+                        <label for="id">用户ID</label>
+                        <input type="text" class="form-control" id="id" name="id" placeholder="用户ID">
+                    </div>
+                    <div class="form-group">
+                        <label for="user_name">账号</label>
+                        <input type="text" class="form-control" id="user_name" name="user_name" placeholder="用户账号">
+                    </div>
+                    <div class="form-group">
+                        <label for="ad_plan_id">当前计划</label>
+                        <select class="form-control" id="ad_plan_id" name="ad_plan_id">
+                            <option value="">全部</option>
+                            {foreach name="adPlans" item="plan"}
+                                <option value="{$plan.id}">{$plan.name}</option>
+                            {/foreach}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="day">当前天数</label>
+                        <input type="number" min="1" class="form-control" id="day" name="day" placeholder="天数">
+                    </div>
+                    <div class="form-group">
+                        <label for="next_id">下一计划</label>
+                        <select class="form-control" id="next_id" name="next_id">
+                            <option value="">全部</option>
+                            {foreach name="adPlans" item="plan"}
+                                <option value="{$plan.id}">{$plan.name}</option>
+                            {/foreach}
+                        </select>
+                    </div>
+                    <button type="button" class="btn btn-primary" id="search-btn">搜索</button>
+                    <button type="reset" class="btn btn-default">重置</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="example-wrap">
+            <div class="example">
+                <div id="LAY-ad-plan-user-table" lay-filter="LAY-ad-plan-user-table"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 操作列模板 -->
+<script type="text/html" id="table-operate-bar">
+    {{#  if(d.ad_plan){ }}
+    <a class="layui-btn layui-btn-xs" lay-event="detail">调整计划</a>
+    {{#} else { }}
+    -
+    {{#} }}
+</script>
+
+<!-- 修改用户信息模板 -->
+<script type="text/html" id="user_info">
+    <div class="user-info-cell">
+        <p><strong>ID:</strong> {{d.id}}</p>
+        <p><strong>账号:</strong> {{d.user_name}}</p>
+    </div>
+</script>
+
+<!-- 修改用户信息模板 -->
+<script type="text/html" id="ad_plan">
+    {{#  if(d.ad_plan){ }}
+    {{d.ad_plan.name}}
+    {{#} else { }}
+    -
+    {{#} }}
+</script>
+<!-- 修改用户信息模板 -->
+<script type="text/html" id="next_plan">
+    {{#  if(d.ad_plan){ }}
+        {{# if (d.ad_plan.next_plan) { }}
+            {{d.ad_plan.next_plan.name}}
+        {{#} else { }}
+            -
+        {{#} }}
+    {{#} else { }}
+    -
+    {{#} }}
+</script>
+
+<style>
+
+</style>
+
+<script>
+    layui.use(['table', 'form', 'jquery'], function () {
+        var table = layui.table,
+            $ = layui.jquery,
+            form = layui.form;
+
+        // 渲染表格
+        table.render({
+            elem: '#LAY-ad-plan-user-table',
+            url: 'index',
+            method: 'get',
+            page: true,
+            lineStyle: 'height: 70px;', // 定义表格的多行样式
+            limits: [10, 30, 50, 100, 500],
+            limit: 10,
+            // 移除line皮肤，使用默认边框样式
+            // skin: 'line',
+            cols: [[
+                {title: '用户信息', templet: '#user_info'},
+                {field: 'create_time', title: '参与时间'},
+                {field: 'ad_plan', title: '当前参与计划', templet: '#ad_plan'},
+                {field: 'day', title: '当前所处天数'},
+                {field: 'next_plan_name', title: '下一计划', templet: '#next_plan'},
+                {title: '操作', toolbar: '#table-operate-bar', fixed: 'right', width: 100}
+            ]],
+            parseData: function (res) {
+                return {
+                    'code': res.code,
+                    "count": res.data.total,
+                    "data": res.data.data
+                };
+            },
+            response: {
+                statusCode: 1
+            }
+        });
+
+        // 表格工具栏事件
+        table.on('toolbar(LAY-ad-plan-user-table)', function (obj) {
+            if (obj.event === 'refresh') {
+                table.reload('LAY-ad-plan-user-table');
+            }
+        });
+
+        // 监听行工具事件
+        table.on('tool(LAY-ad-plan-user-table)', function (obj) {
+            var data = obj.data;
+            if (obj.event === 'detail') {
+                // 修改为打开ad_plan/edit页面并传入用户id
+                layer.open({
+                    type: 2,
+                    title: '调整用户广告计划',
+                    area: ['100%', '100%'],
+                    content: "{:url('ad_plan/edit')}"+'?user_id=' + data.id,
+                    maxmin: true
+                });
+            }
+        });
+
+        // 搜索功能
+        form.on('submit(LAY-ad-plan-user-search)', function (data) {
+            var field = data.field;
+            table.reload('LAY-ad-plan-user-table', {
+                where: field,
+                page: {curr: 1}
+            });
+            return false;
+        });
+
+        // 搜索按钮事件绑定
+        $('#search-btn').on('click', function () {
+            var formData = $('#searchForm').serializeArray();
+            var params = {};
+
+            $.each(formData, function (i, field) {
+                params[field.name] = field.value;
+            });
+
+            // 重新加载表格
+            table.reload('LAY-ad-plan-user-table', {
+                where: params,
+                page: {curr: 1}
+            });
+        });
+
+        // 刷新按钮绑定事件
+        $(document).on('click', '.btn-refresh', function () {
+            table.reload('LAY-ad-plan-user-table');
+        });
+    });
+</script>
+{include file="footer" /}

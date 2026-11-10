@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>奖品列表</title>
+    <link rel="shortcut icon" href="{$admin_icon|toMedia}">
+    <link href="/static/admin/css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
+    <link href="/static/admin/css/font-awesome.min.css?v=4.4.0" rel="stylesheet">
+    <link href="/static/admin/css/plugins/bootstrap-table/bootstrap-table.min.css" rel="stylesheet">
+    <link href="/static/admin/css/animate.min.css" rel="stylesheet">
+    <link href="/static/admin/css/style.min.css?v=4.1.0" rel="stylesheet">
+    <link href="/static/admin/css/plugins/sweetalert/sweetalert.css" rel="stylesheet">
+    <link href="/static/admin/js/layui/css/layui.css" rel="stylesheet">
+</head>
+<body class="gray-bg">
+<div class="wrapper wrapper-content animated fadeInRight">
+    <!-- Panel Other -->
+    <div class="ibox float-e-margins">
+        <div class="ibox-title">
+            <h5>中奖记录</h5>
+        </div>
+        <div class="ibox-content">
+            <!--搜索框开始-->
+            <form id='commentForm' role="form" method="post" class="form-inline pull-right" onkeydown="if (event.keyCode == 13) { return false; }">
+                <div class="content clearfix m-b">
+                    <div class="form-group">
+                        <label>用户类型：</label>
+                        <select class="form-control" name="user_type" id="user_type">
+                            <option value="-1" selected="selected">全部用户</option>
+                            <option value="0">真实用户</option>
+                            <option value="1">虚拟用户</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>选择时间：</label>
+                        <input type="text" class="form-control" id="start_time" name="startTime"
+                               placeholder="yyyy-MM-dd" lay-key="1" autocomplete="off" style="width: 105px" value="{:date('Y-m-d', strtotime('-30 day'))}">
+                        -
+                        <input type="text" class="form-control" id="end_time" name="endTime"
+                               placeholder="yyyy-MM-dd" lay-key="2" autocomplete="off" style="width: 105px" value="{:date('Y-m-d', time())}">
+                    </div>
+                    <div class="form-group">
+                        <label>手机号码：</label>
+                        <input type="text" class="form-control" id="mobile" name="mobile" style="width: 150px">
+                    </div>
+                    <div class="form-group">
+                        <label>奖品类型：</label>
+                        <select class="form-control" name="type" id="type">
+                            <option value="-1" selected="selected">全部</option>
+                            {foreach $prize_type as $key => $vo}
+                            <option value="{$key}">{$vo}</option>
+                            {/foreach}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>奖品名称：</label>
+                        <input type="text" class="form-control" id="name" name="name">
+                    </div>
+                    <div class="form-group">
+                        <input type="hidden" value="1" name="export"/>
+                        <button class="btn btn-primary" type="button" style="margin-top:5px" id="search">
+                            <strong>{:lang('搜索')}</strong>
+                        </button>
+                        <button class="btn btn-danger" type="submit" style="margin-top:5px" id="export">
+                            <strong>{:lang("导出")}</strong>
+                        </button>
+                    </div>
+                </div>
+            </form>
+            <div class="example-wrap">
+                抽奖支付总金额：<span style="color: red" id="total_money">0</span>
+                红包总返还：<span style="color: red" id="total_red">0</span>
+                新增抢单总次数：<span style="color: red" id="total_grab">0</span>
+                实物总个数：<span style="color: red" id="total_entity">0</span>
+                谢谢参与总次数：<span style="color: red" id="total_thank">0</span>
+                <br>
+                <br>
+            </div>
+            <!--搜索框结束-->
+            <div class="example-wrap">
+                <div class="example">
+                    <table id="cusTable">
+                        <thead>
+                        <th data-field="id">ID</th>
+                        <th data-field="nick_name">昵称</th>
+                        <th data-field="mobile">手机号码</th>
+                        <th data-field="user_type">虚拟账号</th>
+                        <th data-field="money">抽奖支付</th>
+                        <th data-field="name">奖品名称</th>
+                        <th data-field="num">奖品库存</th>
+                        <th data-field="type">奖品类型</th>
+                        <th data-field="value">奖品类型对应数值</th>
+                        <th data-field="probability">中奖几率</th>
+                        <th data-field="create_time">时间</th>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+            <!-- End Example Pagination -->
+        </div>
+    </div>
+</div>
+<!-- End Panel Other -->
+</div>
+
+<script src="/static/admin/js/jquery.min.js?v=2.1.4"></script>
+<script src="/static/admin/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="/static/admin/js/content.min.js?v=1.0.0"></script>
+<script src="/static/admin/js/plugins/bootstrap-table/bootstrap-table.min.js"></script>
+<script src="/static/admin/js/plugins/bootstrap-table/bootstrap-table-mobile.min.js"></script>
+<script src="/static/admin/js/plugins/bootstrap-table/locale/bootstrap-table-zh-CN.min.js"></script>
+<script src="/static/admin/js/plugins/suggest/bootstrap-suggest.min.js"></script>
+<script src="/static/admin/js/plugins/sweetalert/sweetalert.min.js"></script>
+<script src="/static/admin/js/plugins/layer/layer.min.js"></script>
+<script src="/static/admin/js/layui/layui.js"></script>
+<script type="text/javascript">
+    function initTable() {
+        //先销毁表格
+        $('#cusTable').bootstrapTable('destroy');
+        //初始化表格,动态从服务器加载数据
+        $("#cusTable").bootstrapTable({
+            method: "get",  //使用get请求到服务器获取数据
+            url: "./awardList", //获取数据的地址
+            striped: true,  //表格显示条纹
+            pagination: true, //启动分页
+            pageSize: 10,  //每页显示的记录数
+            pageNumber: 1, //当前第几页
+            pageList: [5, 10, 15, 20, 25],  //记录数可选列表
+            sidePagination: "server", //表示服务端请求
+            paginationFirstText: "{:lang('首页')}",
+            paginationPreText: "{:lang('上一页')}",
+            paginationNextText: "{:lang('下一页')}",
+            paginationLastText: "{:lang('尾页')}",
+            queryParamsType: "undefined",
+            queryParams: function queryParams(params) {   //设置查询参数
+                var param = {
+                    pageNumber: params.pageNumber,
+                    pageSize: params.pageSize,
+                    startTime: $('#start_time').val(),
+                    endTime: $('#end_time').val(),
+                    searchText: $('#name').val(),
+                    mobile: $('#mobile').val(),
+                    userType: $('#user_type').val(),
+                    type: $('#type').val(),
+                };
+                return param;
+            },
+            onLoadSuccess: function (res) {  //加载成功时执行
+                if (111 == res.code) {
+                    window.location.reload();
+                }
+                $("#total_money").text(0);
+                $("#total_red").text(0);
+                $("#total_grab").text(0);
+                $("#total_entity").text(0);
+                $("#total_thank").text(0);
+                if(res.total_data != undefined){
+                    $("#total_money").text(res.total_data.total_money);
+                    $("#total_red").text(res.total_data.total_red);
+                    $("#total_grab").text(res.total_data.total_grab);
+                    $("#total_entity").text(res.total_data.total_entity);
+                    $("#total_thank").text(res.total_data.total_thank);
+                }
+                layer.msg("加载成功", {time: 1000});
+            },
+            onLoadError: function () {  //加载失败时执行
+                layer.msg("{:lang('加载数据失败')}");
+            }
+        });
+    }
+
+    $(document).ready(function () {
+        layui.use('laydate', function () {
+            var laydate = layui.laydate;
+            laydate.render({
+                elem: '#start_time'
+                , trigger: 'click'
+            });
+            laydate.render({
+                elem: '#end_time'
+                , trigger: 'click'
+            });
+        });
+        //调用函数，初始化表格
+        initTable();
+        //当点击查询按钮的时候执行
+        $("#search").bind("click", initTable);
+    });
+
+</script>
+</body>
+</html>

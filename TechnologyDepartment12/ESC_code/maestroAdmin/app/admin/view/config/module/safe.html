@@ -1,0 +1,18 @@
+<div class="form-group">
+    <label class="col-sm-3 control-label">{:lang("修改用户余额是否需要谷歌验证码")}：</label>
+    <div class="input-group col-sm-4">
+        <div class="layui-form">
+            <input type="radio" name="update_money_google_secret" value="1" title="开启" {if $config['update_money_google_secret'] == 1}checked{/if}>
+            <input type="radio" name="update_money_google_secret" value="0" title="关闭" {if $config['update_money_google_secret'] == 0}checked{/if}>
+        </div>
+        <p class="help-block">update_money_google_secret：改用户余额是否需要谷歌验证码。</p>
+    </div>
+</div>
+
+<div class="form-group">
+    <label class="col-sm-3 control-label">{:lang("谷歌验证码")}：</label>
+    <div class="input-group col-sm-4">
+        <input type="text" class="form-control" name="google_verify_code" value="">
+        <p class="help-block" style="color: red">##### 重要变量修改需填写验证码 ######</p>
+    </div>
+</div>

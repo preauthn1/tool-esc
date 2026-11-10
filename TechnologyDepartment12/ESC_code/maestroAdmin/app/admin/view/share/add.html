@@ -1,0 +1,311 @@
+{include file="header" /}
+<div class="row">
+    <div class="col-sm-12">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h5>{:lang("添加/修改")}</h5>
+            </div>
+            <div class="ibox-content">
+                <form class="form-horizontal m-t" id="dataForm" method="post" action="{:url('add')}">
+                    <div id="myTabContent" class="tab-content">
+                        <div class="tab-pane fade in active" id="home">
+                            <input type="hidden" name="id" value="{$info.id}"/>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label"><span
+                                        class="x-red">*</span>{:lang("分享图片")}：</label>
+                                <input name="img" id="img" value="{$info.img}" type="hidden"/>
+                                <div class="form-inline">
+                                    <div class="input-group col-sm-2">
+                                        <button type="button" class="layui-btn" id="uploader">
+                                            <i class="layui-icon">&#xe67c;</i>{:lang("上传图片")}
+                                        </button>
+                                    </div>
+                                    <div class="input-group col-sm-3">
+                                        <div id="sm">{if $info.img}<img src="{$info.img|toMedia}" style="width:40px; height: 40px;"/>{/if}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label"><span
+                                        class="x-red">*</span>{:lang("奖励类型")}：</label>
+                                <div class="input-group col-sm-6">
+                                    <select class="form-control" name="account_type">
+                                        {foreach name='account_type' item='vo' key='key'}
+                                        <option value="{$key}" {if $info.account_type eq $key} selected {/if}>{:lang($vo)}</option>
+                                        {/foreach}
+                                    </select>
+                                </div>
+
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">
+                                    <span class="x-red">*</span>{:lang("佣金金额")}
+                                </label>
+                                <div class="input-group col-sm-4">
+                                    <input type="number" id="money" name="money" required
+                                           value="{$info.money}" class="form-control">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">
+                                    <span class="x-red">*</span>{:lang("奖励vip天数")}
+                                </label>
+                                <div class="input-group col-sm-4">
+                                    <input type="number" id="days" name="days" required
+                                           value="{$info.days}" class="form-control">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">
+                                    <span class="x-red">*</span>{:lang("奖励vip等级")}
+                                </label>
+                                <div class="input-group col-sm-4">
+                                    <input type="number" id="level_id" name="level_id" required
+                                           value="{$info.level_id}" class="form-control">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">
+                                    <span class="x-red">*</span>{:lang("排序")}
+                                </label>
+                                <div class="input-group col-sm-4">
+                                    <input type="number" id="sort" name="sort" required
+                                           value="{$info.sort}" class="form-control">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label"><span
+                                        class="x-red">*</span>{:lang("奖励次数")}：</label>
+                                <div class="input-group col-sm-6">
+                                    <select class="form-control" name="award">
+                                        {foreach name='award_type' item='vo' key='key'}
+                                        <option value="{$key}" {if $info.award eq $key} selected {/if}>{:lang($vo)}</option>
+                                        {/foreach}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label"><span
+                                        class="x-red">*</span>{:lang("状态")}：</label>
+                                <div class="input-group col-sm-6">
+                                    <select class="form-control" name="status">
+                                        {foreach name='status_type' item='vo' key='key'}
+                                        <option value="{$key}" {if $info.status eq $key} selected {/if}>{:lang($vo)}</option>
+                                        {/foreach}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-3 col-sm-offset-3">
+                                <button class="btn btn-primary btn-block" type="submit">{:lang("提交")}</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-tab layui-tab-brief" style="width: 1000px;margin: 0 auto">
+                        <ul class="layui-tab-title">
+                            <li class="layui-this">标题</li>
+                            <li>步骤</li>
+                            <li>内容</li>
+                        </ul>
+                        <div class="layui-tab-content">
+                            <div class="layui-tab-item layui-show">
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">
+                                        <span class="x-red">*</span>{:lang("标题原文")}
+                                    </label>
+                                    <div class="input-group col-sm-4">
+                                        <input type="text" name="title"
+                                               value="{$info.title}" class="form-control">
+                                    </div>
+                                    <div style="text-align: center;margin-top: 5px">
+                                        <button type="button" class="layui-btn layui-btn-primary" lay-on="translate_title">一键翻译</button>
+                                        <br>
+                                        <span style="color: red">如果翻译内容过大耐心等待，如果一直报错请到谷歌翻译网站进行翻译</span><br>
+                                        <a target="_blank" href="https://translate.google.com/">谷歌翻译网址：https://translate.google.com/</a>
+                                    </div>
+                                </div>
+                                {foreach name='lang_list' item='vo' key='key'}
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">
+                                        {:lang($vo.remark)}
+                                    </label>
+                                    <div class="input-group col-sm-4">
+                                        <input id="title_{$vo.lang}" type="text" name="tr_title[{$vo.lang}]"
+                                               value="{$tr_title[$vo.lang]}" class="form-control">
+                                    </div>
+                                </div>
+                                {/foreach}
+                            </div>
+                            <div class="layui-tab-item">
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">
+                                        <span class="x-red">*</span>{:lang("步骤原文")}
+                                    </label>
+                                    <div class="input-group col-sm-4">
+                                        <textarea type="text" name="step" class="form-control">{$info.step}</textarea>
+                                    </div>
+                                    <div style="text-align: center;margin-top: 5px">
+                                        <button type="button" class="layui-btn layui-btn-primary" lay-on="translate_step">一键翻译</button>
+                                        <br>
+                                        <span style="color: red">如果翻译内容过大耐心等待，如果一直报错请到谷歌翻译网站进行翻译</span><br>
+                                        <a target="_blank" href="https://translate.google.com/">谷歌翻译网址：https://translate.google.com/</a>
+                                    </div>
+                                </div>
+                                {foreach name='lang_list' item='vo' key='key'}
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">
+                                        {:lang($vo.remark)}
+                                    </label>
+                                    <div class="input-group col-sm-4">
+                                        <textarea id="step_{$vo.lang}" type="text" name="tr_step[{$vo.lang}]" class="form-control">{$tr_step[$vo.lang]}</textarea>
+                                    </div>
+                                </div>
+                                {/foreach}
+                            </div>
+                            <div class="layui-tab-item">
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">
+                                        <span class="x-red">*</span>{:lang("内容原文")}
+                                    </label>
+                                    <div class="input-group col-sm-4">
+                                        <textarea type="text" name="content" class="form-control">{$info.content}</textarea>
+                                    </div>
+                                    <div style="text-align: center;margin-top: 5px">
+                                        <button type="button" class="layui-btn layui-btn-primary" lay-on="translate_content">一键翻译</button>
+                                        <br>
+                                        <span style="color: red">如果翻译内容过大耐心等待，如果一直报错请到谷歌翻译网站进行翻译</span><br>
+                                        <a target="_blank" href="https://translate.google.com/">谷歌翻译网址：https://translate.google.com/</a>
+                                    </div>
+                                </div>
+                                {foreach name='lang_list' item='vo' key='key'}
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">
+                                        {:lang($vo.remark)}
+                                    </label>
+                                    <div class="input-group col-sm-4">
+                                        <textarea id="content_{$vo.lang}" type="text" name="tr_content[{$vo.lang}]" class="form-control">{$tr_content[$vo.lang]}</textarea>
+                                    </div>
+                                </div>
+                                {/foreach}
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{include file="footer" /}
+<link href="/static/admin/css/css.css" rel="stylesheet">
+<script src="/static/admin/js/move.js"></script>
+<script src="/static/admin/js/publishImg.js"></script>
+<script type="text/javascript">
+    function deleteElement(Obj, tip) {
+        var ul = $(Obj).closest('ul');
+        $(Obj).closest('li').remove();
+        imgMove(ul.prop('id'));
+        $("#" + tip).text(ul.find('li').length);
+        mainPic();
+    }
+
+    function mainPic() {
+        var main_pic = [];
+        $("#imgMainList").find('li').each(function (i, e) {
+            main_pic.push($(e).data('path'));
+        })
+        $("#main_pic").val(main_pic.join(','));
+    }
+
+    $(document).ready(function(){
+        // 单张上传图片
+        layui.use('upload', function(){
+            var upload = layui.upload;
+            var util = layui.util;
+            //上传图片
+            var uploadInst = upload.render({
+                elem: '#uploader' //绑定元素
+                ,url: "{:url('upload/upload')}" //上传接口
+                ,done: function(res){
+                    //上传完毕回调
+                    $("#img").val(res.data.path);
+                    $("#sm").html('<img src="' + res.data.src + '" />');
+                }
+                ,error: function(){
+                    //请求异常回调
+                }
+            });
+
+
+            util.on({
+                translate_title: function (othis) {
+                    let content = $('input[name=title]').val()
+                    // 发起翻译请求
+                    let url = "{:url('articles/translate')}"
+                    index = layer.load(0);
+                    $.ajax({
+                        type: 'POST',
+                        url: url,
+                        data: {text: content},
+                        dataType: 'json',
+                        success: function (res) {
+                            layer.closeLast('loading');
+                            // 循环语言
+                            for (let key in res.data) {
+                                $('#title_' + key).val(res.data[key])
+                            }
+                        },
+                        error: function (xhr, type) {
+                            layer.closeLast('loading');
+                        }
+                    });
+                },
+                translate_step: function (othis) {
+                    let content = $('textarea[name=step]').val()
+                    // 发起翻译请求
+                    let url = "{:url('articles/translate')}"
+                    index = layer.load(0);
+                    $.ajax({
+                        type: 'POST',
+                        url: url,
+                        data: {text: content},
+                        dataType: 'json',
+                        success: function (res) {
+                            layer.closeLast('loading');
+                            // 循环语言
+                            for (let key in res.data) {
+                                $('#step_' + key).val(res.data[key])
+                            }
+                        },
+                        error: function (xhr, type) {
+                            layer.closeLast('loading');
+                        }
+                    });
+                },
+                translate_content: function (othis) {
+                    let content = $('textarea[name=content]').val()
+                    // 发起翻译请求
+                    let url = "{:url('articles/translate')}"
+                    index = layer.load(0);
+                    $.ajax({
+                        type: 'POST',
+                        url: url,
+                        data: {text: content},
+                        dataType: 'json',
+                        success: function (res) {
+                            layer.closeLast('loading');
+                            // 循环语言
+                            for (let key in res.data) {
+                                $('#content_' + key).val(res.data[key])
+                            }
+                        },
+                        error: function (xhr, type) {
+                            layer.closeLast('loading');
+                        }
+                    });
+                },
+            });
+        });
+    });
+</script>

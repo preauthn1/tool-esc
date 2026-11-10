@@ -1,0 +1,64 @@
+{include file="header" /}
+    <!-- Panel Other -->
+    <div class="ibox float-e-margins">
+        <div class="ibox-title">
+            <h5>{$title|lang}</h5>
+        </div>
+        <div class="ibox-content">
+            <form id='commentForm' role="form" method="post" class="form-inline pull-right">
+                <div class="content clearfix m-b">
+                    <div class="form-group">
+                        <label>{:lang("选择时间")}：</label>
+                        <input type="text" class="form-control" id="start_time" name="startTime" placeholder="yyyy-MM-dd" value="{:getDateStr()}" lay-key="1" autocomplete="off">
+                        -
+                        <input type="text" class="form-control" id="end_time" name="endTime" placeholder="yyyy-MM-dd" value="{:getDateStr()}" lay-key="2" autocomplete="off">
+                    </div>
+                    <div class="form-group">
+                        <button class="btn btn-primary" type="button" style="margin-top:5px" id="search"><strong>{:lang('搜索')}</strong></button>
+                    </div>
+                </div>
+            </form>
+            <div class="example-wrap">
+                <div class="example">
+                    <table id="cusTable">
+                        <thead>
+                        <th data-field="name">{:lang("充值渠道")}</th>
+                        <th data-field="PayAmount">{:lang("充值总额")}</th>
+                        <th data-field="OrderSuccess">{:lang("充值成功订单笔数")}</th>
+                        <th data-field="OrderTotal">{:lang("充值订单总笔数（包含未付款订单数量）")}</th>
+                        <th data-field="PayRatio">{:lang("付款成功率")}</th>
+                        <th data-field="Date">{:lang("统计时间")}</th>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+            <!-- End Example Pagination -->
+        </div>
+    </div>
+    
+<script type="text/javascript">
+    index_url = '{:url("recharge")}';
+    function queryParams(params) {   //设置查询参数
+        params.startTime = $('#start_time').val(); 
+        params.endTime = $('#end_time').val();
+        return params;
+    }
+    $(document).ready(function () {
+        layui.use('laydate', function(){
+            var laydate = layui.laydate;
+            laydate.render({
+                elem: '#start_time'
+                ,trigger: 'click'
+            });
+            laydate.render({
+                elem: '#end_time'
+                ,trigger: 'click'
+            });
+        });
+        initTable();
+        $("#search").on("click", function(){
+            initTable();
+        });
+    });
+</script>
+{include file="footer" /}

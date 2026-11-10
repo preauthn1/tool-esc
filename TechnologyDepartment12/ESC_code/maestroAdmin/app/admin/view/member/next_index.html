@@ -1,0 +1,650 @@
+{include file="header" /}
+<!-- Panel Other -->
+<style xmlns="http://www.w3.org/1999/html">
+    .layui-layer-tips {
+        width: fit-content !important;
+    }
+
+    .nav-tabs > li > a {
+        color: #000;
+    }
+
+    .sta-div {
+        margin: 15px 10px;
+    }
+
+    .sta-item {
+        margin: 5px 20px;
+        font-weight: bold;
+    }
+
+    .sta-item-1 {
+        color: #1E9FFF;
+    }
+
+    .sta-item-2 {
+        color: #0f0f0f;
+    }
+
+    .sta-item-3 {
+        color: #FF5722;
+    }
+    .sta-item-4 {
+        color: #0f0f0f;
+    }
+
+    .sta-item-5 {
+        color: #FF5722;
+    }
+</style>
+<div class="ibox float-e-margins animated fadeInRight">
+    <div class="ibox-title">
+        【{$info.user_name}】{:lang("团队下级")}
+    </div>
+    <div class="ibox-content">
+        <ul class="nav nav-tabs">
+            <li role="presentation" class="{if $level eq 99}active{/if}"><a
+                    href="{:url('next_index', ['id' => $id, 'level' => 99])}">{:lang('所有下级')}（{$level_team_count[0]}）</a></li>
+            <li role="presentation" class="{if $level eq 1}active{/if}"><a
+                    href="{:url('next_index', ['id' => $id, 'level' => 1])}">{:lang('一级')}（{$level_team_count[1]}）</a></li>
+            <li role="presentation" class="{if $level eq 2}active{/if}"><a
+                    href="{:url('next_index', ['id' => $id, 'level' => 2])}">{:lang('二级')}（{$level_team_count[2]}）</a></li>
+            <li role="presentation" class="{if $level eq 3}active{/if}"><a
+                    href="{:url('next_index', ['id' => $id, 'level' => 3])}">{:lang('三级')}（{$level_team_count[3]}）</a></li>
+            <li role="presentation" class="{if $level eq 4}active{/if}"><a
+                    href="{:url('next_index', ['id' => $id, 'level' => 4])}">{:lang('四级')}（{$level_team_count[4]}）</a></li>
+            <li role="presentation" class="{if $level eq 5}active{/if}"><a
+                    href="{:url('next_index', ['id' => $id, 'level' => 5])}">{:lang('五级')}（{$level_team_count[5]}）</a></li>
+            <li role="presentation" class="{if $level eq 6}active{/if}"><a
+                    href="{:url('next_index', ['id' => $id, 'level' => 6])}">{:lang('六级')}（{$level_team_count[6]}）</a></li>
+            <li role="presentation" class="{if $level eq 7}active{/if}"><a
+                    href="{:url('next_index', ['id' => $id, 'level' => 7])}">{:lang('七级')}（{$level_team_count[7]}）</a></li>
+        </ul>
+        <div class="sta-div">
+            <span class="sta-item sta-item-1">下级总数：{$team_count}</span>
+            <span class="sta-item sta-item-2">充值人数：{$recharge_count} </span>
+            <span class="sta-item sta-item-3">充值金额：{$recharge_money}</span>
+            <span class="sta-item sta-item-4">提现笔数：{$withdraw_count}</span>
+            <span class="sta-item sta-item-5">提现金额：{$withdraw_money}</span>
+            <span class="sta-item sta-item-5">购买广告位总额：<span class="finance_product_order_amount"></span></span>
+            <span class="sta-item sta-item-5">总提现：<span class="withdrawal_sum"></span></span>
+            <span class="sta-item sta-item-5">总充值：<span class="recharge_sum"></span></span>
+        </div>
+        <table class="layui-table">
+            <colgroup>
+                <col width="150">
+                <col width="150">
+                <col>
+            </colgroup>
+            <thead>
+            <tr>
+                <th colspan="4" style="text-align:center;">汇总</th>
+                <th colspan="6" style="text-align:center;">充值</th>
+                <th colspan="3" style="text-align:center;">提现</th>
+                <th colspan="5" style="text-align:center;">团队数据</th>
+            </tr>
+            <tr>
+                {/*                汇总 start*/}
+                <th>下级总数</th>
+                <th>三方充值总额</th>
+                <th>三方提现总额</th>
+                <th>领取的总佣金（已领取的佣金池+推广奖励）</th>
+                {/*                汇总 end*/}
+
+                {/*                充值 start*/}
+                <th>当日充值总额</th>
+                <th>当日充值总人数</th>
+                <th>当日复充人数</th>
+                <th>当日基础金额</th>
+                <th>当日首充金额</th>
+                <th>当日首充人数</th>
+                {/*                充值 end*/}
+
+                {/*                提现 start*/}
+                <th>当日提现总额</th>
+                <th>当日提现人数</th>
+                <th>当日已出款金额</th>
+                {/*                提现 end*/}
+
+                {/*                团队数据 start*/}
+                <th>今日新增注册量</th>
+                <th>团队活跃人数（当天）</th>
+                <th>做任务人数（当天）</th>
+                <th>当日冻结资金</th>
+                <th>当日领取的佣金（已领取的佣金池+推广奖励）</th>
+                <th>当日团队总余额</th>
+                {/*                团队数据 end*/}
+
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>{$team_count}</td><!-- 下级总数 -->
+                <td>{$third_recharge_success_money}</td><!-- 三方充值总额 -->
+                <td>{$third_withdrawal_success_money}</td><!-- 三方提现总额 -->
+                <td>{$total_task_rebate}</td><!-- 领取的总佣金（已领取的佣金池+推广奖励） -->
+
+                <td>{$today_recharge_amount}</td><!-- 当日充值总额 -->
+                <td>{$today_recharge_count}</td><!-- 当日充值总人数 -->
+                <td>{$today_repeat_recharge_count}</td><!-- 当日复充人数 -->
+                <td>{$today_team_money}</td><!-- 当日基础金额 -->
+                <td>{$today_first_recharge_money}</td><!-- 当日首充金额 当日第一次充值（包含之前注册的账号）-->
+                <td>{$today_register_and_recharge_count}</td><!-- 当日首充人数 这边指的是当日注册当日充值的账号-->
+
+
+                <td>{$today_withdrawal_money}</td><!-- 当日提现总额 -->
+                <td>{$today_withdrawal_count}</td><!-- 当日提现人数 -->
+                <td>{$today_third_withdrawal_success_money}</td><!-- 当日已出款金额  当日三方已经出款的金额-->
+
+                <td>{$today_register_count}</td><!-- 今日新增注册量 -->
+                <td>{$active_user_count}</td><!-- 团队活跃人数（当天） -->
+                <td>{$today_task_user_count}</td><!-- 做任务人数（当天） -->
+                <td>{$freeze_money}</td><!-- 当日冻结资金 -->
+                <td>{$today_task_rebate}</td><!-- 当日领取的佣金（已领取的佣金池+推广奖励） -->
+                <td>{$team_amount}</td><!-- 当日团队总余额 基础资金加上冻结金额 -->
+
+            </tr>
+            </tbody>
+        </table>
+        <!--搜索框开始-->
+        <form id='commentForm' role="form" style="width: 100%;" method="post" class="form-inline pull-right" action="{$export_url}">
+            <div class="content clearfix m-b">
+                <div class="form-group">
+                    <label>{:lang("用户id")}：</label>
+                    <input type="text" class="form-control" id="uid" name="uid">
+                </div>
+                <div class="form-group">
+                    <label>{:lang("账号")}：</label>
+                    <input type="text" class="form-control" id="user_name" name="user_name">
+                </div>
+                <div class="form-group">
+                    <label>{:lang("邀请码")}：</label>
+                    <input type="text" class="form-control" id="invite_code" name="invite_code">
+                </div>
+                <div class="form-group">
+                    <div id="ID-laydate-rangeLinked">
+                    <label>{:lang("日期")}：</label>
+                    <input type="text" class="form-control" id="startDate" name="startDate" placeholder="yyyy-MM-dd">
+                    -
+                    <input type="text" class="form-control" id="endDate" name="endDate" placeholder="yyyy-MM-dd">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>{:lang("用户类型")}：</label>
+                    <select class="form-control" id="user_type" name="user_type">
+                        <option value="-1">{:lang("所有")}</option>
+                        <option value="1">{:lang("未登录过的用户")}</option>
+                        <option value="2">{:lang("未绑定银行卡的用户")}</option>
+                        <option value="3">{:lang("已绑定银行卡的用户")}</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <button class="btn btn-primary" type="button" style="margin-top:5px" id="search"><strong>{:lang('搜索')}</strong>
+                    </button>
+                </div>
+
+                <br>
+            </div>
+        </form>
+        <div class="sta-div">
+            <a href="{:url('member/batch', ['id' => $id, 'type' =>'1'])}" class="btn btn-danger btn-sm"
+               onclick="return window.confirm('确定操作?')">{:lang('封停整条线')}</a>
+            <a href="{:url('member/batch', ['id' => $id, 'type' =>'2'])}" class="btn btn-success btn-sm"
+               onclick="return window.confirm('确定操作?')">{:lang('解封整条线')}</a>
+            <a href="{:url('member/withdraw', ['id' => $id, 'type' =>'0'])}" class="btn btn-danger btn-sm"
+               onclick="return window.confirm('确定操作?')">{:lang('整条线提现禁用')}</a>
+            <a href="{:url('member/withdraw', ['id' => $id, 'type' =>'1'])}" class="btn btn-success btn-sm"
+               onclick="return window.confirm('确定操作?')">{:lang('整条线提现启用')}</a>
+            <a href="{:url('member/do_task_status', ['id' => $id, 'type' =>'0'])}" class="btn btn-danger btn-sm"
+               onclick="return window.confirm('确定操作?')">{:lang('整条线禁用广告位')}</a>
+            <a href="{:url('member/do_task_status', ['id' => $id, 'type' =>'1'])}" class="btn btn-success btn-sm"
+               onclick="return window.confirm('确定操作?')">{:lang('整条线启用广告位')}</a>
+            <a href="{:url('member/inviteCodeStatus', ['id' => $id, 'type' =>'0'])}" class="btn btn-danger btn-sm"
+               onclick="return window.confirm('确定操作?')">{:lang('整条线邀请码禁用')}</a>
+            <a href="{:url('member/inviteCodeStatus', ['id' => $id, 'type' =>'1'])}" class="btn btn-success btn-sm"
+               onclick="return window.confirm('确定操作?')">{:lang('整条线邀请码启用')}</a>
+            <a href="{:url('member/financeProductCountDown', ['id' => $id, 'type' =>'0'])}" class="btn btn-danger btn-sm"
+               onclick="return window.confirm('确定操作?')">{:lang('整条线广告位缓冲倒计时禁用')}</a>
+            <a href="{:url('member/financeProductCountDown', ['id' => $id, 'type' =>'1'])}" class="btn btn-success btn-sm"
+               onclick="return window.confirm('确定操作?')">{:lang('整条线广告位缓冲倒计时启用')}</a>
+            <a href="{:url('member/teamInfoMonthReset', ['id' => $id, 'type' =>'0'])}" class="btn btn-danger btn-sm"
+               onclick="return window.confirm('确定操作?')">{:lang('整条线团队数据每月重新统计禁用')}</a>
+            <a href="{:url('member/teamInfoMonthReset', ['id' => $id, 'type' =>'1'])}" class="btn btn-success btn-sm"
+               onclick="return window.confirm('确定操作?')">{:lang('整条线团队数据每月重新统计启用')}</a>
+            <a href="#" class="btn btn-success btn-sm" id="configExcessAdRatioBtn">{:lang('整条线超额单控广告位比例配置')}</a>
+            <a href="#" class="btn btn-success btn-sm" id="setButtonLoadingTime">{:lang('设置按钮loading时长')}</a>
+            <a href="javascript:void(0)" class="btn btn-outline layui-bg-red btn-sm" onclick="disableMember(2)">{:lang('禁用')}</a>
+            <a href="javascript:void(0)" class="btn btn-outline btn-primary btn-sm" onclick="disableMember(1)">{:lang('启用')}</a>
+        </div>
+        <!--搜索框结束-->
+        <div class="example-wrap">
+            <div class="example">
+                <table id="cusTable" data-toolbar="#toolbar">
+                    <thead>
+                    <th data-checkbox="true" data-formatter="stateFormatter">ID</th>
+                    <th data-field="userinfo" data-formatter="userInfoFormatter">{:lang("用户信息")}</th>
+                    <th data-field="user_money" data-formatter="userMoneyFormatter">{:lang("余额")}</th>
+                    <th data-field="recharge_withdraw" data-formatter="rechargeWithdrawFormatter">{:lang("充提/钱包")}
+                    </th>
+                    <th data-field="register_login" data-formatter="registerLoginFormatter">{:lang("注册/登录")}</th>
+                    <th data-field="agent" data-formatter="agentFormatter">{:lang("推广员")}</th>
+                    <th data-field="operate" data-formatter="operateFormatter">{:lang("操作")}</th>
+                    <th data-field="other" data-formatter="otherFormatter">{:lang("其他信息")}</th>
+                    <th data-field="vip_info" data-formatter="vipInfoFormatter">{:lang("VIP信息")}</th>
+                    </thead>
+                </table>
+            </div>
+        </div>
+        <!-- End Example Pagination -->
+    </div>
+</div>
+
+<script type="text/javascript">
+    tableCheckbox = true;
+    index_url = "{$url|raw}";
+    var is_disable_member = 0;
+    $table = $("#cusTable");
+
+    function userInfoFormatter(value, row, index) {
+        // let url = "{:url('member/index')}?id=" + row.id;
+        let user_name = row.user_name;
+
+        var html = "";
+        // var onstr = openUrl('"+url+"');
+        html += "<p>ID:" + row.id + "";
+        if (user_name.length > 20) {
+            user_name = row.user_name.substring(0, 20) + '...'
+            html += '<p onmouseover="show_name(this)" data-user_name="' + row.user_name + '">账号:' + user_name + "</p>";
+        } else {
+            html += "<p>账号:" + user_name + "</p>";
+        }
+
+        let online_status = row.online_status ? '<span style="color: mediumseagreen;font-weight: bold ">(在线)</span>' : '<span style="color: #c8c2b6">(离线)</span>';
+        html += "<p>等级:" + row.level_id + online_status + "</p>";
+
+        let status = row.status == 2 ? '<span style="color:red;">|禁登</span>' : '';
+        let withdraw_status = row.withdraw_status == 0 ? '<span style="color:red;">|禁提</span>' : '';
+        let do_task_status = row.do_task_status == 0 ? '<span style="color:red;">|禁广告</span>' : '';
+        let is_upgrade = row.is_upgrade == 1 ? '<span style="color:red;">|必升</span>' : '';
+        let invite_code_status = row.invite_code_status == 0 ? '<span style="color:red;">|邀请码失效</span>' : '';
+        let user_water_status = '';
+        if (row.user_water_status == 0) {
+          user_water_status = '<span style="color:red;">|不限制流水</span>'
+        } else if (row.user_water_status == 2) {
+          user_water_status = '<span style="color:red;">|限制流水</span>'
+        }
+      let is_finance_product_count_down = row.is_finance_product_count_down == 1 ? '<span style="color:red;">|广告位缓冲倒计时</span>' : ''
+      let team_info_month_reset = row.team_info_month_reset == 1 ? '<span style="color:red;">|团队数据每月重新统计</span>' : ''
+      let plan_name = row.plan_name ? '<span style="color: red;">|(' + row.plan_name + ')</span>' : ''
+      let ad_plan_name = row.ad_plan_name ? '<span style="color: red;">|(' + row.ad_plan_name + ')</span>' : ''
+
+      html += "<p>语言:" + row.lang + status + withdraw_status + is_upgrade + do_task_status + invite_code_status + user_water_status + is_finance_product_count_down + team_info_month_reset + plan_name + ad_plan_name + "</p>";
+      if (row.is_xuni == 1) {
+            return "<span style='color:red'>" + html + "</span>";
+        }
+        return "<span>" + html + "</span>";
+    }
+
+    function userMoneyFormatter(value, row, index) {
+        var html = "<div style='min-width: 150px'>";
+        html += "<p>基础:" + row.user_money + "</p>";
+        html += "<p>佣金:" + row.brokerage_money + "</p>";
+        html += "<p>体验:" + row.tyj_money + "</p>";
+        // html += "<p style='color: #dd6920ba;font-weight: bold'>能量:0</p>";
+        return "<span>" + html + "</span></div>";
+    }
+
+    function rechargeWithdrawFormatter(value, row, index) {
+        var html = "";
+        html += "<p>总充值:" + row.recharge_money + "</p>";
+        html += "<p>总提现:" + row.withdraw + "</p>";
+        html += "<p>冻结资金:" + row.product_frozen_money + "</p>";
+        html += "<p>trx/usdt:" + row.trx_address_money + "/" + row.usdt_address_money + "</p>";
+        // html += "<p>bnb/usdt:0</p>";
+        return "<span>" + html + "</span>";
+    }
+
+    function registerLoginFormatter(value, row, index) {
+        var html = "<div style='min-width: 200px'>";
+        html += "<p>注册:" + row.create_time + "</p>";
+        html += "<p style='color: red;'>IP:" + row.reg_ip + "</p>";
+        html += "<p>最后:" + row.last_login_time + "</p>";
+        html += "<p style='color: red;'>IP:" + row.login_ip + "</p>";
+        return "<span>" + html + "</span></div>";
+    }
+
+    function agentFormatter(value, row, index) {
+        var html = "";
+        html += "<p>一级:" + row.leader1 + '/' + row.leader1_user_name + "</p>";
+        html += "<p>二级:" + row.leader2 + '/' + row.leader2_user_name + "</p>";
+        html += "<p>三级:" + row.leader3 + '/' + row.leader3_user_name + "</p>";
+        html += "<p>邀请码:" + row.invite_code + "</p>";
+        return "<span>" + html + "</span>";
+    }
+
+    function vipInfoFormatter(value, row, index) {
+        var html = "<div style='min-width: 200px'>";
+        // html += "<p>已做/剩余天数:</p>";
+        // html += "<p>有效类型: 按每24小时次数</p>";
+        // html += "<p>开始时间:" + row.level_star_time + "</p>";
+        // html += "<p>结束时间:" + row.level_end_time + "</p>";
+      html += "<p>最后广告位购买时间:" + row.last_finance_product_buy_time + "</p>";
+      html += "<p>最后广告位结束时间:" + row.last_finance_product_end_time + "</p>";
+        return "<p>" + html + "</p><div>";
+    }
+
+    function otherFormatter(value, row, index) {
+        var html = "";
+
+        let user_mobile = row.mobile ? row.mobile : '';
+        if (user_mobile.length > 15) {
+            user_mobile = row.mobile.substring(0, 15) + '...'
+            html += '<p onmouseover="show_mobile(this)" data-user_mobile="' + row.mobile + '">联系方式:' + user_mobile + "</p>";
+        } else {
+            html += "<p>联系方式:" + user_mobile + "</p>";
+        }
+        // html += "<p>注册/邀请抽奖:"+ row.lottery_num + '/' + row.lottery_num_invite +"</p>";
+        // html += "<p>信用分: "+ row.credit_score +"</p>";
+        html += "<p>所在层级: <span style='color: #1aa094;font-weight: bolder'>" + row.tree_level + "</span></p>";
+        html += "<p>账户账号: <span style='color: #1aa094;font-weight: bolder'>" + (row.document_id ? row.document_id : '') + "</span></p>";
+        html += "<p>真实姓名: <span style='color: #1aa094;font-weight: bolder'>" + (row.true_name ? row.true_name : '') + "</span></p>";
+        html += "<p>备注:<span style='color: #1aa094;font-weight: bolder'>" + (row.remark ? row.remark : '') + "</span></p>";
+        return "<span>" + html + "</span>";
+    }
+
+    function operateFormatter(value, row, index) {
+        return '<div class="layui-btn-container     ">  \n' +
+            '  <button type="button" class="layui-btn layui-bg-blue layui-btn-sm" lay-on="edit" data-id="' + row.id + '">详情</button>\n' +
+            // '  <button type="button" class="layui-btn  layui-btn-sm" lay-on="queryRecharge" data-id="'+row.id+'">补单</button>\n' +
+            '  <button type="button" class="layui-btn layui-bg-blue layui-btn-sm" lay-on="money" data-id="' + row.id + '">操作</button>\n' +
+            // '  <button type="button" class="layui-btn layui-bg-blue layui-btn-sm" lay-on="usdt" data-id="'+row.id+'">查钱usdt</button>\n' +
+            // '  <button type="button" class="layui-btn layui-bg-red layui-btn-sm" lay-on="editMoney" data-id="'+row.id+'">改钱</button>\n' +
+            // '  <button type="button" class="layui-btn layui-bg-blue layui-btn-sm" lay-on="subordinateRecharge" data-id="'+row.id+'">下级充值</button>\n' +
+            // '  <button type="button" class="layui-btn  layui-btn-sm" lay-on="forceOffline" data-id="'+row.id+'">下线</button>\n' +
+            '</div> ';
+    }
+
+    function disableMember(val) {
+        is_disable_member = val;
+        var ids = getIdSelections();
+        var info = "禁用";
+        if (val == 1) {
+            info = "启用";
+        }
+        if (ids.length == 0) {
+            layer.msg('请勾选要禁用的用户');
+            return;
+        }
+        layer.confirm('确认' + info + '用户么?', {icon: 3, title: '提示'}, function (index) {
+            //do something
+            $.post("{:url('member/userBatch')}", {
+                'ids': ids.join(","),
+                'disable_member': is_disable_member
+            }, function (res) {
+                if (1 == res.code) {
+                    layer.alert(res.msg, {title: "{:lang('友情提示')}", icon: 1, closeBtn: 0}, function (inx) {
+                        layer.close(inx);
+                        initTable();
+                    });
+                } else if (111 == res.code) {
+                    window.location.reload();
+                } else {
+                    layer.alert(res.msg, {title: "{:lang('友情提示')}", icon: 2});
+                }
+            }, 'json');
+            layer.close(index);
+        })
+    }
+
+    var $remove = $("#remove");
+    $remove.click(function () {
+        var ids = getIdSelections();
+        userDel(ids.join(","));
+    });
+
+    function stateFormatter(value, row, index) {
+        if (row.user_money > 0) {
+            return {
+                //disabled: true
+            }
+        }
+        return value;
+    }
+
+    function getIdSelections() {
+        return $.map($table.bootstrapTable('getSelections'), function (row) {
+            console.log(row)
+            return row.id
+        })
+    }
+
+    function viewTopId(tree_id) {
+        var tree = tree_id.split('/');
+        var html = '<div style="padding:15px;">';
+        for (var i = 0; i < tree.length; i++) {
+            if (i == tree.length - 1) {
+//                html += '<p>自己:' + tree[i] + '</p>';
+            } else {
+                html += '<p>第' + (i + 1) + '级: <code>' + tree[i] + '</code></p>';
+            }
+        }
+        html += '</div>';
+        layer.open({
+            type: 1,
+            area: ['500px', '300px'],
+            title: '上级列表',
+            content: html //这里content是一个普通的String
+        });
+    }
+
+    $(document).ready(function () {
+        layui.use(['laydate', 'util'], function () {
+            var laydate = layui.laydate;
+            var util = layui.util;
+          // 日期范围 - 左右面板联动选择模式
+          laydate.render({
+            elem: '#ID-laydate-rangeLinked', // 绑定到第一个输入框
+            range: ['#startDate', '#endDate'],
+            rangeLinked: true // 开启日期范围选择时的区间联动标注模式
+          });
+
+            util.on({
+                edit: function (e) {
+                    let id = e.data('id')
+                    let url = "{:url('member/userEdit')}?id=" + id
+                    // 在此处输入 layer 的任意代码
+                    layer.open({
+                        type: 2,
+                        area: ['100%', '100%'],
+                        title: '详情',
+                        maxmin: true, // 允许全屏最小化
+                        anim: 0, // 0-6 的动画形式，-1 不开启
+                        content: url
+                    });
+                },
+                money: function (e) {
+                    let id = e.data('id')
+                    let url = "{:url('member/money')}?uid=" + id
+                    layer.open({
+                        type: 2,
+                        area: ['100%', '100%'],
+                        title: '详情',
+                        maxmin: true, // 允许全屏最小化
+                        anim: 0, // 0-6 的动画形式，-1 不开启
+                        content: url
+                    });
+                },
+                usdt: function (e) {
+                    let id = e.data('id')
+                    let url = "{:url('member/wallet_balance')}?id=" + id
+                    index = layer.load(0);
+                    $.ajax({
+                        type: 'GET',
+                        url: url,
+                        dataType: 'json',
+                        success: function (res) {
+                            layer.closeLast('loading');
+                            layer.msg(res.msg)
+                        },
+                        error: function (xhr, type) {
+                            layer.closeLast('loading');
+                        }
+                    });
+                }
+            });
+
+          $('#configExcessAdRatioBtn').click(function () {
+            var userId = "{$id}";
+            layer.open({
+              type: 2, // iframe layer
+              title: '超额单控广告位比例配置',
+              shadeClose: true,
+              shade: 0.8,
+              area: ['800px', '600px'], // Adjust size as needed
+              content: "{:url('home_user_excess_ad_ratio_config/index')}?uid=" + userId // URL for the dialog content
+            });
+          });
+
+          $('#setButtonLoadingTime').click(function () {
+            var userId = "{$id}";
+            // 先尝试从表单中获取当前值，如果表单中没有该字段，则使用服务器返回的值
+            var currentValue = $('input[name="finance_product_button_count_down"]').val() || "{$info.finance_product_button_count_down|default=0}";
+
+            layer.open({
+              type: 1,
+              title: '设置按钮loading时长',
+              area: ['400px', '200px'],
+              content: '<div style="padding: 20px;"><div class="layui-form-item">' +
+                '<label class="layui-form-label">时长(秒)</label>' +
+                '<div class="layui-input-block">' +
+                '<input type="number" id="buttonLoadingTime" class="layui-input" value="' + currentValue + '" placeholder="请输入按钮loading时长(秒)">' +
+                '</div></div></div>',
+              btn: ['确定', '取消'],
+              yes: function(index) {
+                var loadingTime = $('#buttonLoadingTime').val();
+                if (loadingTime === '' || isNaN(loadingTime)) {
+                  layer.msg('请输入有效的数字', {icon: 2});
+                  return;
+                }
+
+                // 显示加载中
+                var loadingIndex = layer.load(1, {shade: [0.8, '#393D49']});
+
+                // 发送AJAX请求更新用户信息
+                $.ajax({
+                  url: "{:url('member/updateButtonLoadingTime')}",
+                  type: "POST",
+                  data: {
+                    id: userId,
+                    finance_product_button_count_down: loadingTime
+                  },
+                  dataType: 'json',
+                  success: function(res) {
+                    layer.close(loadingIndex);
+                    if (res.code == 1) {
+                      // 添加一个隐藏字段到表单或更新现有字段的值
+                      if ($('input[name="finance_product_button_count_down"]').length === 0) {
+                        $('form#commentForm').append('<input type="hidden" name="finance_product_button_count_down" value="' + loadingTime + '">');
+                      } else {
+                        $('input[name="finance_product_button_count_down"]').val(loadingTime);
+                      }
+                      layer.msg('设置成功', {icon: 1});
+                      layer.close(index);
+                    } else {
+                      layer.msg(res.msg || '设置失败，请重试', {icon: 2});
+                    }
+                  },
+                  error: function() {
+                    layer.close(loadingIndex);
+                    layer.msg('网络错误，请重试', {icon: 2});
+                  }
+                });
+              }
+            });
+          });
+
+        });
+
+        initTable();
+
+        $('#cusTable').on('check.bs.table uncheck.bs.table ' + 'check-all.bs.table uncheck-all.bs.table', function () {
+            $remove.prop('disabled', !$('#cusTable').bootstrapTable('getSelections').length);
+        })
+        //当点击查询按钮的时候执行
+        $("#search").bind("click", initTable);
+    });
+
+    function userDel(id) {
+        layer.confirm('确认删除此用户?', {icon: 3, title: '提示'}, function (index) {
+            //do something
+            $.getJSON("{:url('member/userDel')}", {'id': id}, function (res) {
+                if (1 == res.code) {
+                    layer.alert(res.msg, {title: "{:lang('友情提示')}", icon: 1, closeBtn: 0}, function (inx) {
+                        layer.close(inx);
+                        initTable();
+                    });
+                } else if (111 == res.code) {
+                    window.location.reload();
+                } else {
+                    layer.alert(res.msg, {title: "{:lang('友情提示')}", icon: 2});
+                }
+            });
+            layer.close(index);
+        })
+    }
+
+    function onLoadSuccess(res) {
+      if (res.stat) {
+       $('.finance_product_order_amount').text(res.stat.finance_product_order_amount)
+        $('.withdrawal_sum').text(res.stat.withdrawal_sum)
+        $('.recharge_sum').text(res.stat.recharge_sum)
+      }
+      layer.msg("{:lang('加载成功')}", {time: 1000});
+    }
+
+    function queryParams(params) {   //设置查询参数
+        params.uid = $('#uid').val();
+        params.user_name = $('#user_name').val();
+        params.invite_code = $('#invite_code').val();
+        params.startDate = $('#startDate').val();
+        params.endDate = $('#endDate').val();
+        params.time_type = $('#time_type').val();
+        params.user_type = $('#user_type').val();
+        return params;
+    }
+
+    $(document).ready(function () {
+        layui.use(['util'], function () {
+            var util = layui.util;
+            util.on({
+                add: function (e) {
+                    let url = "{:url('member/useradd')}"
+                    // 在此处输入 layer 的任意代码
+                    layer.open({
+                        type: 2,
+                        area: ['500px', '500px'],
+                        title: '新增',
+                        maxmin: true, // 允许全屏最小化
+                        anim: 0, // 0-6 的动画形式，-1 不开启
+                        content: url,
+                    });
+                },
+            });
+        })
+    });
+
+    function show_name(t) {
+        let user_name = $(t).data().user_name
+        layer.tips(user_name, t, {
+            tips: 1
+        })
+    }
+
+    function show_mobile(t) {
+        let user_mobile = $(t).data().user_mobile
+        layer.tips(user_mobile, t, {
+            tips: 1
+        })
+    }
+</script>
+{include file="footer" /}

@@ -1,0 +1,186 @@
+{include file="header" /}
+<!-- Panel Other -->
+<div class="ibox float-e-margins">
+    <div class="ibox-title">
+        <h5>{$title}</h5>
+    </div>
+    <div class="ibox-content">
+        <div class="form-group clearfix col-sm-4 col-md-8">
+            {if authCheck('investment_product_settlement_time/edit')}
+            <a id="investment_product_settlement_time" href="{:url('investment_product_settlement_time/edit')}">
+                <button class="btn btn-outline btn-primary" type="button">{:lang("添加结算时间点")}</button>
+            </a>
+            {/if}
+            {if authCheck('investment_product_settlement_cycle/index')}
+            <button id="set-settlement-cycle-btn" class="btn btn-outline btn-primary" type="button">{:lang("设置收益结算周期")}</button>
+            {/if}
+            <!-- 新增隐藏input用于存储当前周期值 -->
+            <input type="hidden" id="current-settlement-cycle" value="{$investment_product_settlement_cycle|default=''}">
+        </div>
+        <div class="example-wrap">
+            <div class="example">
+                <table id="cusTable"
+                       data-total-field="total"
+                       data-data-field="data"
+                >
+                    <thead>
+                        <th data-field="settlement_time">{:lang("收益结算时间点")}</th>
+                        <th data-field="status" data-formatter="statusFormatter">{:lang("状态")}</th>
+                        <th data-field="sort">{:lang("排序")}</th>
+                        <th data-field="create_time">{:lang("创建时间")}</th>
+                        <th data-field="operate">{:lang("操作")}</th>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{include file="footer" /}
+<script type="text/javascript">
+    function statusFormatter(value, row, index) {
+        let checkbox = '';
+        let checked = row.status ? 'checked' : '';
+        checkbox = '<div class="layui-form"><input type="checkbox" name="status" value="1" title="开|关" lay-skin="switch" data-id="'+row.id+'" data-val="'+row.status+'" lay-filter="changeStatus"'+ checked +'></div>';
+        return checkbox;
+    }
+
+    function queryParams(params) {
+        return params;
+    }
+
+    $(document).ready(function () {
+        initTable();
+
+        // 设置收益结算周期弹窗
+        $('#set-settlement-cycle-btn').on('click', function () {
+            // 读取隐藏input的当前值
+            var currentCycle = $('#current-settlement-cycle').val();
+            var html = `
+                <form class="layui-form" style="margin:20px 30px 0 0;">
+                  <div class="layui-form-item">
+                    <label class="layui-form-label" style="width:120px;">收益结算周期</label>
+                    <div class="layui-input-inline" style="width:200px;">
+                      <input type="number" name="cycle" min="0.01" step="0.01" value="` + currentCycle + `" required lay-verify="required|number" placeholder="请输入周期" autocomplete="off" class="layui-input">
+                    </div>
+                     <div class="layui-form-mid layui-text-em">小时</div>
+                  </div>
+                </form>
+            `;
+            layer.open({
+                type: 1,
+                area: ['400px', '200px'],
+                title: '设置收益结算周期',
+                content: html,
+                btn: ['确定', '取消'],
+                yes: function(index, layero){
+                    var cycle = layero.find('input[name="cycle"]').val();
+                    // 发送AJAX请求
+                    $.ajax({
+                        url: '{:url("config/index")}',
+                        type: 'POST',
+                        data: {investment_product_settlement_cycle: cycle},
+                        dataType: 'json',
+                        success: function(res) {
+                            layer.close(index);
+                            if (res.code == 1) {
+                                // 保存成功后，更新隐藏input的值
+                                $('#current-settlement-cycle').val(cycle);
+                                layer.msg(res.msg || '保存成功', {icon: 1, time: 1500}, function() {
+                                    // 如果需要刷新页面或跳转，可以在这里添加代码
+                                    // 例如：window.location.reload();
+                                });
+                            } else {
+                                layer.msg(res.msg || '保存失败', {icon: 2});
+                            }
+                        },
+                        error: function() {
+                            layer.msg('网络错误，请稍后重试', {icon: 2});
+                        }
+                    });
+                }
+            });
+        });
+    });
+
+    function initTable() {
+        $('#cusTable').bootstrapTable({
+            url: "{:url('investment_product_settlement_time/index')}",
+            method: 'post',
+            pagination: true,
+            pageSize: 10,
+            search: false,
+            showRefresh: false,
+            showToggle: false,
+            showColumns: false,
+            toolbar: false,
+            queryParams: queryParams,
+            onLoadSuccess: onLoadSuccess
+        });
+    }
+
+    function onLoadSuccess(res) {
+        $("#investment_product_settlement_time").on('click', function (e) {
+            add(e.currentTarget.href)
+            return false;
+        });
+        $("td a").on('click', function (e) {
+            if (e.currentTarget.href.indexOf('javascript') === -1) {
+                add(e.currentTarget.href)
+                return false;
+            }
+            return true;
+        });
+
+        layui.use(['form'], function(){
+            var form = layui.form;
+            form.on('switch(changeStatus)', function(data){
+                var elem = data.elem;
+                let id = elem.dataset.id;
+                let val = elem.dataset.val;
+
+                $.ajax({
+                    url: "{:url('investment_product_settlement_time/change_status')}",
+                    type: 'POST',
+                    data: {id: id},
+                    success: function(res) {
+                        if(res.code == 1) {
+                            layer.msg(res.msg);
+                            elem.dataset.val = val == '1' ? '0' : '1';
+                        } else {
+                            layer.msg(res.msg);
+                            $(elem).prop('checked', !data.elem.checked);
+                            form.render('checkbox');
+                        }
+                    }
+                });
+            });
+            form.render();
+        });
+    }
+
+    function add(url) {
+        layer.open({
+            type: 2,
+            area: ['800px', '500px'],
+            title: '{:lang("添加/编辑")}',
+            maxmin: true,
+            anim: 0,
+            content: url
+        });
+    }
+
+    function del(id) {
+        layer.confirm('{:lang("确定删除此时段？")}', {
+            btn: ['{:lang("确定")}', '{:lang("取消")}']
+        }, function () {
+            $.getJSON("{:url('investment_product_settlement_time/del')}", {'id': id}, function (res) {
+                if (res.code == 1) {
+                    layer.msg(res.msg);
+                    $('#cusTable').bootstrapTable('refresh');
+                } else {
+                    layer.msg(res.msg);
+                }
+            });
+        });
+    }
+</script>

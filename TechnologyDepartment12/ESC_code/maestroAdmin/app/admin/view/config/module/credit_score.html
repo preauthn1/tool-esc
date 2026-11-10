@@ -1,0 +1,106 @@
+<div class="layui-collapse">
+    <div class="layui-colla-item">
+        <div class="layui-colla-title">广告位缓冲倒计时</div>
+        <div class="layui-colla-content layui-show">
+            <div class="form-group">
+                <label class="col-sm-3 control-label">{:lang("「否」是否可以点击")}：</label>
+                <div class="input-group col-sm-4">
+                    <div class="layui-form">
+                        <input type="radio" name="finance_product_no_can_click" value="1" title="可以" {if $config['finance_product_no_can_click']
+                        == 1}checked{/if}>
+                        <input type="radio" name="finance_product_no_can_click" value="0" title="不可以" {if $config['finance_product_no_can_click']
+                        == 0}checked{/if}>
+                    </div>
+                    <p class="help-block">finance_product_no_can_click：「否」是否可以点击。</p>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">{:lang("「是」是否可以点击")}：</label>
+                <div class="input-group col-sm-4">
+                    <div class="layui-form">
+                        <input type="radio" name="finance_product_yes_can_click" value="1" title="可以" {if $config['finance_product_yes_can_click']
+                        == 1}checked{/if}>
+                        <input type="radio" name="finance_product_yes_can_click" value="0" title="不可以" {if $config['finance_product_yes_can_click']
+                        == 0}checked{/if}>
+                    </div>
+                    <p class="help-block">finance_product_yes_can_click：「是」是否可以点击。</p>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-sm-3 control-label">{:lang("弹框倒计时时长")}：</label>
+                <div class="input-group col-sm-4">
+                    <input type="text" class="form-control" name="finance_product_dialog_count_down"
+                           value="{$config.finance_product_dialog_count_down|default=3}">
+                    <p class="help-block">finance_product_dialog_count_down：弹框倒计时。</p>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-sm-3 control-label">{:lang("【否】按钮loading时长")}：</label>
+                <div class="input-group col-sm-4">
+                    <input type="text" class="form-control" name="finance_product_dialog_btn_cancel"
+                           value="{$config.finance_product_dialog_btn_cancel|default=3}">
+                    <p class="help-block">finance_product_dialog_btn_cancel：【否】按钮loading时长。</p>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-sm-3 control-label">{:lang("【是】按钮loading时长")}：</label>
+                <div class="input-group col-sm-4">
+                    <input type="text" class="form-control" name="finance_product_button_count_down"
+                           value="{$config.finance_product_button_count_down|default=3}">
+                    <p class="help-block">finance_product_button_count_down：【是】按钮loading时长。</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<div class="layui-collapse">
+    <div class="layui-colla-item">
+        <div class="layui-colla-title">交易量信用分</div>
+        <div class="layui-colla-content layui-show">
+            <div class="form-group">
+                <label class="col-sm-3 control-label">{:lang("交易量信用分")}：</label>
+                <div class="input-group col-sm-4">
+                    <input type="text" class="form-control" name="credit_score_trade_num"
+                           value="{$config.credit_score_trade_num}">
+                    <p class="help-block">credit_score_trade_num：总分_多少交易量加一分（例如:30_200）</p>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-sm-3 control-label">{:lang("活跃人数信用分")}：</label>
+                <div class="input-group col-sm-4">
+                    <input type="text" class="form-control" name="credit_score_active_num"
+                           value="{$config.credit_score_active_num}">
+                    <p class="help-block">credit_score_active_num：总分:分值范围_m人加n分:分值范围_m人加n分（例如:40:0-20_1_10:21-30_2_5:31-40_3_6）</p>
+                </div>
+            </div>
+
+            <label class="col-sm-3 control-label">{:lang("新增人数信用分")}：</label>
+            <div class="input-group col-sm-4">
+                <input type="text" class="form-control" name="credit_score_new_num"
+                       value="{$config.credit_score_new_num}">
+                <p class="help-block">credit_score_new_num：总分:前n人_每人加m分（例如:30:5_3）</p>
+            </div>
+
+            <label class="col-sm-3 control-label">{:lang("逾期扣分")}：</label>
+            <div class="input-group col-sm-4">
+                <input type="text" class="form-control" name="credit_score_overdue"
+                       value="{$config.credit_score_overdue}">
+                <p class="help-block">credit_score_overdue：时长(小时）:扣分值_时长:扣分值（例如:24:5_36:20）,最多四组</p>
+            </div>
+
+            <label class="col-sm-3 control-label">{:lang("可预支本金倍数")}：</label>
+            <div class="input-group col-sm-4">
+                <input type="text" class="form-control" name="credit_score_times"
+                       value="{$config.credit_score_times}">
+                <p class="help-block">credit_score_times：倍数:最小分值-最大分值_倍数:最小分值-最大分值（例如: 1:50-59_2:60-69）</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+

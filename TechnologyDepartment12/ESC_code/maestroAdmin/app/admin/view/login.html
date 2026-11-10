@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <title>{:lang('登录')}</title>
+    <link href="/static/admin/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/admin/css/font-awesome.min.css?v=4.4.0" rel="stylesheet">
+    <link href="/static/admin/css/animate.min.css" rel="stylesheet">
+    <link href="/static/admin/css/style.min.css" rel="stylesheet">
+    <link href="/static/admin/css/login.min.css?v1" rel="stylesheet">
+    <!--[if lt IE 9]>
+    <meta http-equiv="refresh" content="0;ie.html" />
+    <![endif]-->
+    <script>
+        if(window.top!==window.self){window.top.location=window.location};
+    </script>
+
+</head>
+
+<body class="signin">
+<div class="signinpanel">
+    <div class="row">
+        <div class="col-sm-12">
+            <form method="post" action="index.html">
+                <div class="dropdown" style="float: right;">
+                    <a data-toggle="dropdown" class="dropdown-toggle" href="#" style="background: none; color: #FFF; font-size: 26px;">
+                        <i class="fa fa-globe"></i>
+                    </a>
+                    <ul class="dropdown-menu animated fadeInRight m-t-xs">
+                        {volist name='langs' id='row'}
+                        <li>
+                            <a href="javascript:;" onclick="goLang('{$row.lang}')" style="color: #000;">{$row.title}</a>
+                        </li>
+                        {/volist}
+                    </ul>
+                </div>
+                <p class="m-t-md" id="err_msg">{:lang('登录')}</p>
+                <input type="text" class="form-control uname" placeholder="{:lang('用户名')}" id="user_name" />
+                <input type="password" class="form-control pword m-b" placeholder="{:lang('密码')}" id="password" />
+                <input type="text" class="form-control pword m-b" placeholder="{:lang('谷歌验证码(未绑定不用填)')}" id="authy" />
+<!--                <div style="margin-bottom:70px">
+                    <input type="text" class="form-control" placeholder="验证码" style="color:black;width:120px;float:left;margin:0px 0px;" name="code" id="code"/>
+                    <img id="verify" src="{:url('checkVerify')}" onclick="javascript:this.src='{:url('checkVerify')}?tm='+Math.random();" style="float:right;cursor: pointer"/>
+                </div>-->
+                <input class="btn btn-success btn-block" type="button" id="login_btn" value="{:lang('登录')}"/>
+            </form>
+        </div>
+    </div>
+</div>
+<script src="/static/admin/js/jquery.min.js?v=2.1.4"></script>
+<script src="/static/admin/js/bootstrap.min.js?v=3.3.6"></script>
+<script type="text/javascript">
+    document.onkeydown=function(event){
+        var e = event || window.event || arguments.callee.caller.arguments[0];
+        if(e && e.keyCode==13){ // enter 键
+            $('#login_btn').click();
+        }
+    };
+    function goLang(range){
+        $.ajax({
+            type: "GET",
+            url: '{:url("login/check_lang")}',
+            data:{lang:range},
+            dataType: 'json',
+            success: function(){
+                window.location.reload();
+            }
+        });
+    }
+    var lock = false;
+    $(function () {
+        $('#login_btn').click(function(){
+            if(lock){
+                return;
+            }
+            lock = true;
+            $('#err_msg').hide();
+            $('#login_btn').removeClass('btn-success').addClass('btn-danger').val("{:lang('登录中')}...");
+            var username = $('#user_name').val();
+            var password = $('#password').val();
+            var code = $('#code').val();
+            var authy = $('#authy').val();
+            $.post("{:url('login/doLogin')}",{'user_name':username, 'password':password, 'code':code, 'authy':authy},function(data){
+                lock = false;
+                $('#login_btn').val("{:lang('登录')}").removeClass('btn-danger').addClass('btn-success');
+                if(data.code!=1){
+                    $('#verify').attr('src', "{:url('checkVerify')}?tm="+Math.random());
+                    $('#code').val('');
+                    $('#err_msg').show().html("<span style='color:red'>"+data.msg+"</span>");
+                    return;
+                }else{
+                    window.location.href=data.data;
+                }
+            });
+        });
+    });
+</script>
+</body>
+</html>

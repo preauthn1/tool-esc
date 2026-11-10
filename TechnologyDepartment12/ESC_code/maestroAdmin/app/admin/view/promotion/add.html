@@ -1,0 +1,145 @@
+{include file="header" /}
+<div class="row">
+    <div class="col-sm-12">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h5>{:lang("添加/修改")}</h5>
+            </div>
+            <div class="ibox-content">
+                <form class="form-horizontal m-t" id="dataForm" method="post" action="{:url('add')}">
+                    <div id="myTabContent" class="tab-content">
+                        <div class="tab-pane fade in active" id="home">
+                            <input type="hidden" name="id" value="{$info.id}"/>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label"><span
+                                        class="x-red">*</span>{:lang("平台")}：</label>
+                                <div class="input-group col-sm-6">
+                                    <select class="form-control" name="platform">
+                                        <option value="facebook" {if $info.platform eq 'facebook'} selected {/if}>facebook</option>
+                                        <option value="kwai" {if $info.platform eq 'kwai'} selected {/if}>kwai</option>
+                                        <option value="tiktok" {if $info.platform eq 'tiktok'} selected {/if}>tiktok</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">
+                                    {:lang("名称")}
+                                </label>
+                                <div class="input-group col-sm-4">
+                                    <input type="text" id="name" name="name" required
+                                           value="{$info.name}" class="form-control">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">
+                                    {:lang("推广人员账号")}
+                                </label>
+                                <div class="input-group col-sm-4">
+                                    <input type="text" id="user_name" name="user_name" required
+                                           value="{$info.user_name}" class="form-control">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">
+                                    {:lang("像素PIX")}
+                                </label>
+                                <div class="input-group col-sm-4">
+                                    <input type="text" id="pix" name="pix" required
+                                           value="{$info.pix}" class="form-control">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">
+                                    {:lang("测试事件")}
+                                </label>
+                                <div class="input-group col-sm-4">
+                                    <input type="text" id="test_event_code" name="test_event_code"
+                                           value="{$info.test_event_code}" class="form-control">
+                                    <label style="color: red">首次绑定时需要填写，绑定激活后删除</label>
+                                </div>
+
+                            </div>
+<!--                            <div class="form-group">-->
+<!--                                <label class="col-sm-3 control-label">-->
+<!--                                    <span class="x-red">*</span>{:lang("推广链接")}-->
+<!--                                </label>-->
+<!--                                <div class="input-group col-sm-4">-->
+<!--                                    <input type="text" id="url" name="url" required-->
+<!--                                           value="{$info.url}" class="form-control">-->
+<!--                                </div>-->
+<!--                            </div>-->
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">
+                                    <span class="x-red">*</span>{:lang("access_token")}
+                                </label>
+                                <div class="input-group col-sm-4">
+                                    <input type="text" id="access_token" name="access_token" required
+                                           value="{$info.access_token}" class="form-control">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label"><span
+                                        class="x-red">*</span>{:lang("默认")}：</label>
+                                <div class="radio i-checks col-sm-4">
+                                    <label>
+                                        <input type="radio" value="0" {if $info.is_default == 0} checked="checked"{/if} name='is_default' /> <i></i> 否
+
+                                    </label>
+                                    <label>
+                                        <input type="radio" value="1" {if $info.is_default == 1} checked="checked"{/if} name='is_default' /> <i></i> 是
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-3 col-sm-offset-3">
+                                <button class="btn btn-primary btn-block" type="submit">{:lang("提交")}</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{include file="footer" /}
+<link href="/static/admin/css/css.css" rel="stylesheet">
+<script src="/static/admin/js/move.js"></script>
+<script src="/static/admin/js/publishImg.js"></script>
+<script type="text/javascript">
+    function deleteElement(Obj, tip) {
+        var ul = $(Obj).closest('ul');
+        $(Obj).closest('li').remove();
+        imgMove(ul.prop('id'));
+        $("#" + tip).text(ul.find('li').length);
+        mainPic();
+    }
+
+    function mainPic() {
+        var main_pic = [];
+        $("#imgMainList").find('li').each(function (i, e) {
+            main_pic.push($(e).data('path'));
+        })
+        $("#main_pic").val(main_pic.join(','));
+    }
+
+    $(document).ready(function(){
+        // 单张上传图片
+        layui.use('upload', function(){
+            var upload = layui.upload;
+            //上传驾照正面
+            var uploadInst = upload.render({
+                elem: '#uploader' //绑定元素
+                ,url: "{:url('upload/upload')}" //上传接口
+                ,done: function(res){
+                    //上传完毕回调
+                    $("#img").val(res.data.path);
+                    $("#sm").html('<img src="' + res.data.src + '" />');
+                }
+                ,error: function(){
+                    //请求异常回调
+                }
+            });
+        });
+    });
+</script>

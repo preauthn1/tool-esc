@@ -1,0 +1,62 @@
+{include file="header" /}
+<div class="row">
+    <div class="col-sm-8">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h5>{$title}</h5>
+            </div>
+            <div class="ibox-content">
+                <form class="form-horizontal m-t" id="dataForm" method="post" action="{:url('edit')}">
+                    <input type="hidden" name="id" value="{$info.id|default=0}">
+
+<!--                    <div class="form-group">-->
+<!--                        <label class="col-sm-3 control-label">{:lang("基础广告位比例")}：</label>-->
+<!--                        <div class="input-group col-sm-4">-->
+<!--                            <input id="invest_rate" type="number" step="0.01" class="form-control" name="invest_rate" required=""-->
+<!--                                   aria-required="true" value="{$info.invest_rate|default=0}">-->
+<!--                            <span class="input-group-addon">%</span>-->
+<!--                        </div>-->
+<!--                    </div>-->
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">{:lang("投资金额")}：</label>
+                        <div class="input-group col-sm-4">
+                            <input id="money" type="number" step="0.01" class="form-control" name="money" required=""
+                                   aria-required="true" value="{$info.money|default=0}">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">{:lang("收益率")}：</label>
+                        <div class="input-group col-sm-4">
+                            <input id="profit" type="number" step="0.01" class="form-control" name="profit" required=""
+                                   aria-required="true" value="{$info.profit|default=0}">
+                            <span class="input-group-addon">%</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">{:lang("广告位周期")}：</label>
+                        <div class="input-group col-sm-4">
+                            <input id="cycle" type="number" min="0" step="0.01" class="form-control" name="cycle" required=""
+                                   aria-required="true" value="{$info.cycle|default=0}">
+                            <span class="input-group-addon">
+                                <select name="invest_period_type" id="invest_period_type">
+                                    <option value="day" {if isset($info.invest_period_type) && ($info.invest_period_type eq 'day' || empty($info.invest_period_type))} selected {/if}>{:lang("天")}</option>
+                                    <option value="hour" {if isset($info.invest_period_type) && $info.invest_period_type eq 'hour'} selected {/if}>{:lang("小时")}</option>
+                                </select>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-4 col-sm-offset-6">
+                            <button class="btn btn-primary" type="submit">{:lang("提交")}</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+</script>
+{include file="footer" /}

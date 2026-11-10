@@ -1,0 +1,180 @@
+{/*<div class="form-group">*/}
+{/*    <label class="col-sm-3 control-label">{:lang("任务过期时间")&cc;：</label>*/}
+{/*    <div class="input-group col-sm-4">*/}
+{/*        <input type="text" class="form-control" name="task_expired_time" value="{$config.task_expired_time|default=1440&cc;">*/}
+{/*        <p class="help-block">task_expired_time：任务过期时间，单位/分钟。</p>*/}
+{/*    </div>*/}
+{/*</div>*/}
+
+<div class="form-group">
+    <label class="col-sm-3 control-label">{:lang("是否观看视频才能做任务")}：</label>
+    <div class="input-group col-sm-4">
+        <div class="layui-form">
+            <input type="radio" name="is_watch_video" value="1" title="是" {if $config['is_watch_video'] == 1}checked{/if}>
+            <input type="radio" name="is_watch_video" value="0" title="否" {if $config['is_watch_video'] == 0}checked{/if}>
+        </div>
+        <p class="help-block">is_watch_video：是否观看视频才能做任务。</p>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-sm-3 control-label">{:lang("vip解锁方式")}：</label>
+    <div class="input-group col-sm-4">
+        <div class="layui-form">
+            <input type="radio" name="level_upgrade_type" value="1" title="根据基础余额直接升级不扣钱" {if $config['level_upgrade_type'] == 1}checked{/if}>
+            <input type="radio" name="level_upgrade_type" value="2" title="扣除基础余额，并返还之前等级解锁金额到佣金" {if $config['level_upgrade_type'] == 2}checked{/if}>
+        </div>
+        <p class="help-block">level_upgrade_type：vip解锁方式，1.根据基础余额直接升级不扣钱，2.扣除基础余额，并返还之前等级解锁金额到佣金。</p>
+    </div>
+</div>
+
+{/*<div class="form-group">*/}
+{/*    <label class="col-sm-3 control-label">{:lang("vip有效次数")&cc;：</label>*/}
+{/*    <div class="input-group col-sm-4">*/}
+{/*        <div class="layui-form">*/}
+{/*            <input type="radio" name="level_valid_type" value="1" title="按每24小时次数" {if $config['level_valid_type'] == 1&cc;checked{/if&cc;>*/}
+{/*            <input type="radio" name="level_valid_type" value="2" title="按总次数金" {if $config['level_valid_type'] == 2&cc;checked{/if&cc;>*/}
+{/*        </div>*/}
+{/*        <p class="help-block">level_valid_type：用户vip等级有效次数，1.按每24小时次数，2.按总次数。</p>*/}
+{/*    </div>*/}
+{/*</div>*/}
+
+{/*<div class="form-group">*/}
+{/*    <label class="col-sm-3 control-label">{:lang("自动解锁等级")&cc;：</label>*/}
+{/*    <div class="input-group col-sm-4">*/}
+{/*        <div class="layui-form">*/}
+{/*            <input type="radio" name="auto_unlock_level" value="1" title="开启" {if $config['auto_unlock_level'] == 1&cc;checked{/if&cc;>*/}
+{/*            <input type="radio" name="auto_unlock_level" value="0" title="关闭" {if $config['auto_unlock_level'] == 0&cc;checked{/if&cc;>*/}
+{/*        </div>*/}
+{/*        <p class="help-block">auto_unlock_level：自动解锁会员等级。true自动，false手动。</p>*/}
+{/*    </div>*/}
+{/*</div>*/}
+
+<div class="form-group">
+    <label class="col-sm-3 control-label">{:lang("任务重置方式")}：</label>
+    <div class="input-group col-sm-4">
+        <div class="layui-form">
+            <input type="radio" name="task_reset_type" lay-filter="task_reset_type" value="1" title="绝对24小时" {if $config['task_reset_type'] == 1}checked{/if}>
+            <input type="radio" name="task_reset_type" lay-filter="task_reset_type" value="2" title="某个时间重置" {if $config['task_reset_type'] == 2}checked{/if}>
+            <input type="radio" name="task_reset_type" lay-filter="task_reset_type" value="3" title="一天多场" {if $config['task_reset_type'] == 3}checked{/if}>
+        </div>
+        <p class="help-block">task_reset_type：任务重置方式。1.绝对24小时：今天这个时间做任务，明天的这个时间才可以再做；2.某个时间重置：所有人都固定在设定的时间才可以再做任务。</p>
+    </div>
+</div>
+
+<div id="task_reset_time_type" style="display:{if $config['task_reset_type'] == 2}block{else}none{/if};">
+<div class="form-group">
+    <label class="col-sm-3 control-label">{:lang("网站使用时区")}：</label>
+    <div class="input-group col-sm-4">
+        <div class="layui-form">
+            <select >
+                <option value="Pacific/Wake" {if $config['sys_data_time'] == 'Pacific/Wake'} selected {/if}>(GMT-12:00) 国际日期线西</option>
+                <option value="Pacific/Apia"  {if $config['sys_data_time'] == 'Pacific/Apia'} selected {/if}>(GMT-11:00) 萨摩亚、中途岛</option>
+                <option value="Pacific/Honolulu"  {if $config['sys_data_time'] == 'Pacific/Honolulu'} selected {/if}>(GMT-10:00) 夏威夷</option>
+                <option value="America/Anchorage"  {if $config['sys_data_time'] == 'America/Anchorage'} selected {/if}>(GMT-09:00) 阿拉斯加</option>
+                <option value="America/Los_Angeles"  {if $config['sys_data_time'] == 'America/Los_Angeles'} selected {/if}>(GMT-08:00) 太平洋时间（美国和加拿大）</option>
+                <option value="America/Chihuahua" {if $config['sys_data_time'] == 'America/Chihuahua'} selected {/if} >(GMT-07:00) 奇瓦瓦、拉巴斯</option>
+                <option value="America/Managua"  {if $config['sys_data_time'] == 'America/Managua'} selected {/if}>(GMT-06:00) 中美洲</option>
+                <option value="America/Chicago"  {if $config['sys_data_time'] == 'America/Chicago'} selected {/if}>(GMT-06:00) 中部时间（美国和加拿大）</option>
+                <option value="America/Mexico_City"  {if $config['sys_data_time'] == 'America/Mexico_City'} selected {/if}>(GMT-06:00) 墨西哥城</option>
+                <option value="America/Bogota"  {if $config['sys_data_time'] == 'America/Bogota'} selected {/if}>(GMT-05:00) 波哥大</option>
+                <option value="America/New_York"  {if $config['sys_data_time'] == 'America/New_York'} selected {/if}>(GMT-05:00) 美国东部时间</option>
+                <option value="America/Halifax"  {if $config['sys_data_time'] == 'America/Halifax'} selected {/if}>(GMT-04:00) 大西洋时间（加拿大）</option>
+                <option value="America/Caracas"  {if $config['sys_data_time'] == 'America/Caracas'} selected {/if}>(GMT-04:00) 加拉加斯</option>
+                <option value="America/Santiago"  {if $config['sys_data_time'] == 'America/Santiago'} selected {/if}>(GMT-04:00) 圣地亚哥</option>
+                <option value="America/St_Johns" {if $config['sys_data_time'] == 'America/St_Johns'} selected {/if} >(GMT-03:30) 纽芬兰</option>
+                <option value="America/Godthab" {if $config['sys_data_time'] == 'America/Godthab'} selected {/if} >(GMT-03:00) 格陵兰岛</option>
+                <option value="America/Sao_Paulo" {if $config['sys_data_time'] == 'America/Sao_Paulo'} selected {/if} >(GMT-03:00) 圣保罗</option>
+                <option value="America/Noronha"  {if $config['sys_data_time'] == 'America/Noronha'} selected {/if}>(GMT-02:00) 大西洋中部</option>
+                <option value="Atlantic/Azores"  {if $config['sys_data_time'] == 'Atlantic/Azores'} selected {/if}>(GMT-01:00) 亚速尔群岛</option>
+                <option value="Europe/London"  {if $config['sys_data_time'] == 'Europe/London'} selected {/if}>(GMT) 伦敦</option>
+                <option value="Europe/Paris" {if $config['sys_data_time'] == 'Europe/Paris'} selected {/if} >(GMT+01:00) 马德里、巴黎</option>
+                <option value="Europe/Berlin"  {if $config['sys_data_time'] == 'Europe/Berlin'} selected {/if}>(GMT+01:00) 罗马</option>
+                <option value="Europe/Helsinki" {if $config['sys_data_time'] == 'Europe/Helsinki'} selected {/if}>(GMT+02:00) 赫尔辛基</option>
+                <option value="Asia/Jerusalem"  {if $config['sys_data_time'] == 'Asia/Jerusalem'} selected {/if}>(GMT+02:00) 耶路撒冷</option>
+                <option value="Europe/Moscow"  {if $config['sys_data_time'] == 'Europe/Moscow'} selected {/if}>(GMT+03:00) 莫斯科、圣彼得堡</option>
+                <option value="Asia/Tehran"  {if $config['sys_data_time'] == 'Asia/Tehran'} selected {/if}>(GMT+03:30) 德黑兰</option>
+                <option value="Asia/Tbilisi"  {if $config['sys_data_time'] == 'Asia/Tbilisi'} selected {/if}>(GMT+04:00) 第比利斯、巴库</option>
+                <option value="Asia/Kabul" {if $config['sys_data_time'] == 'Asia/Kabul'} selected {/if} >(GMT+04:30) 喀布尔</option>
+                <option value="Asia/Karachi"  {if $config['sys_data_time'] == 'Asia/Karachi'} selected {/if}>(GMT+05:00) 伊斯兰堡、卡拉奇</option>
+                <option value="Asia/Calcutta"  {if $config['sys_data_time'] == 'Asia/Calcutta'} selected {/if}>(GMT+05:30) 孟买、新德里</option>
+                <option value="Asia/Katmandu"  {if $config['sys_data_time'] == 'Asia/Katmandu'} selected {/if}>(GMT+05:45) 加德满都</option>
+                <option value="Asia/Dhaka"  {if $config['sys_data_time'] == 'Asia/Dhaka'} selected {/if}>(GMT+06:00) 达卡、阿斯塔纳</option>
+                <option value="Asia/Rangoon"  {if $config['sys_data_time'] == 'Asia/Rangoon'} selected {/if}>(GMT+06:30) 仰光</option>
+                <option value="Asia/Bangkok"  {if $config['sys_data_time'] == 'Asia/Bangkok'} selected {/if}>(GMT+07:00) 曼谷、河内</option>
+                <option value="Asia/Hong_Kong" {if $config['sys_data_time'] == 'Asia/Hong_Kong'} selected {/if}>(GMT+08:00) 北京、新加坡</option>
+                <option value="Asia/Seoul"  {if $config['sys_data_time'] == 'Asia/Seoul'} selected {/if}>(GMT+09:00) 首尔</option>
+                <option value="Asia/Tokyo"  {if $config['sys_data_time'] == 'Asia/Tokyo'} selected {/if}>(GMT+09:00) 东京</option>
+                <option value="Australia/Adelaide"  {if $config['sys_data_time'] == 'Australia/Adelaide'} selected {/if}>(GMT+09:30) 阿德莱德</option>
+                <option value="Australia/Sydney"  {if $config['sys_data_time'] == 'Australia/Sydney'} selected {/if}>(GMT+10:00) 堪培拉、悉尼、墨尔本</option>
+                <option value="Asia/Magadan"  {if $config['sys_data_time'] == 'Asia/Magadan'} selected {/if}>(GMT+11:00) 马加丹、所罗门群岛</option>
+                <option value="Pacific/Auckland"  {if $config['sys_data_time'] == 'Pacific/Auckland'} selected {/if}>(GMT+12:00) 奥克兰、惠灵顿</option>
+                <option value="Pacific/Fiji"  {if $config['sys_data_time'] == 'Pacific/Fiji'} selected {/if}>(GMT+12:00) 斐济、马歇尔岛</option>
+                <option value="Pacific/Tongatapu"  {if $config['sys_data_time'] == 'Pacific/Tongatapu'} selected {/if}>(GMT+13:00) 努库阿洛法</option>
+            </select>
+        </div>
+        <p class="help-block">sys_data_time：网站当前使用的时区，请根据您的运营需要进行调整。</p>
+    </div>
+</div>
+
+<div class="form-group">
+    <label class="col-sm-3 control-label">{:lang("任务重置时间")}：</label>
+    <div class="input-group col-sm-4">
+        <input type="text" class="form-control" id="task_reset_time" name="task_reset_time" value="{$config.task_reset_time|default='00:00'}"  placeholder="H点m分">
+    </div>
+</div>
+</div>
+
+<!--<div class="form-group">-->
+<!--    <label class="col-sm-3 control-label">{:lang("升级是否重置新的任务")}：</label>-->
+<!--    <div class="input-group col-sm-4">-->
+<!--        <div class="layui-form">-->
+<!--            <input type="radio" name="is_upgrade_reset_task" value="1" title="重置任务" {if $config['is_upgrade_reset_task'] == 1}checked{/if}>-->
+<!--            <input type="radio" name="is_upgrade_reset_task" value="0" title="不重置" {if $config['is_upgrade_reset_task'] == 0}checked{/if}>-->
+<!--        </div>-->
+<!--        <p class="help-block">is_upgrade_reset_task：升级是否重置新的任务：比如会员充值VIP1做完任务后当天再充值VIP2是否要让他继续做任务。</p>-->
+<!--    </div>-->
+<!--</div>-->
+
+<div class="form-group">
+    <label class="col-sm-3 control-label">{:lang("做任务限制")}：</label>
+    <div class="input-group col-sm-4">
+        <div class="layui-form">
+            <input type="radio" name="is_task_count" value="1" title="开启" {if $config['is_task_count'] == 1}checked{/if}>
+            <input type="radio" name="is_task_count" value="0" title="关闭" {if $config['is_task_count'] == 0}checked{/if}>
+        </div>
+        <p class="help-block">is_task_count：如果开启，需要用户升级或者邀请有效用户才能获取一次做任务机会</p>
+    </div>
+</div>
+
+{/*<div class="form-group">*/}
+{/*    <label class="col-sm-3 control-label">{:lang("vip0做任务收益账户")&cc;：</label>*/}
+{/*    <div class="input-group col-sm-4">*/}
+{/*        <div class="layui-form">*/}
+{/*            <input type="radio" name="vip0_task_brokerage_account" value="1" title="基础账户" {if $config['vip0_task_brokerage_account'] == 1&cc;checked{/if&cc;>*/}
+{/*            <input type="radio" name="vip0_task_brokerage_account" value="2" title="佣金账户" {if $config['vip0_task_brokerage_account'] == 2&cc;checked{/if&cc;>*/}
+{/*        </div>*/}
+{/*        <p class="help-block">vip0_task_brokerage_account：vip0做任务收益到账账户。</p>*/}
+{/*    </div>*/}
+{/*</div>*/}
+
+{/*<div class="form-group">*/}
+{/*    <label class="col-sm-3 control-label">{:lang("是否开启分配任务")&cc;：</label>*/}
+{/*    <div class="input-group col-sm-4">*/}
+{/*        <div class="layui-form">*/}
+{/*            <input type="radio" name="is_distribute_task" value="1" title="开启" {if $config['is_distribute_task'] == 1&cc;checked{/if&cc;>*/}
+{/*            <input type="radio" name="is_distribute_task" value="0" title="关闭" {if $config['is_distribute_task'] == 0&cc;checked{/if&cc;>*/}
+{/*        </div>*/}
+{/*        <p class="help-block">is_distribute_task：是否开启分配任务：关闭后全体用户都不能做任务。</p>*/}
+{/*    </div>*/}
+{/*</div>*/}
+
+{/*<div class="form-group">*/}
+{/*    <label class="col-sm-3 control-label">{:lang("基础金额低于任务金额是否可以做任务")&cc;：</label>*/}
+{/*    <div class="input-group col-sm-4">*/}
+{/*        <div class="layui-form">*/}
+{/*            <input type="radio" name="basic_below_task_do" value="1" title="开启" {if $config['basic_below_task_do'] == 1&cc;checked{/if&cc;>*/}
+{/*            <input type="radio" name="basic_below_task_do" value="0" title="关闭" {if $config['basic_below_task_do'] == 0&cc;checked{/if&cc;>*/}
+{/*        </div>*/}
+{/*        <p class="help-block">basic_below_task_do：基础金额低于任务金额是否可以做任务 。</p>*/}
+{/*    </div>*/}
+{/*</div>*/}

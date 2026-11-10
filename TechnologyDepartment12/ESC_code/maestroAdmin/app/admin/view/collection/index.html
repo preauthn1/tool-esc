@@ -1,0 +1,191 @@
+{include file="header" /}
+<!-- Panel Other -->
+<div class="ibox float-e-margins">
+    <div class="ibox-title">
+        <h5>{:lang("归集列表")}</h5>
+    </div>
+    <div class="ibox-content">
+        <!--搜索框开始-->
+        <form id='commentForm' role="form" method="post" class="form-inline pull-right">
+            <div class="content clearfix m-b">
+                <div class="form-group">
+                    <label>{:lang("选择时间")}：</label>
+                    <input type="text" class="form-control" id="start_time" name="start_time" placeholder="yyyy-MM-dd"
+                           lay-key="1" autocomplete="off">
+                    -
+                    <input type="text" class="form-control" id="end_time" name="end_time" placeholder="yyyy-MM-dd"
+                           lay-key="2" autocomplete="off">
+                </div>
+                <div class="form-group">
+                    <label>{:lang("搜索")}：</label>
+                    <input type="text" class="form-control" id="searchText" name="searchText"
+                           placeholder="订单号">
+                </div>
+                <div class="form-group">
+                    <button class="btn btn-primary" type="button" style="margin-top:5px" id="search"><strong>{:lang('搜索')}</strong>
+                    </button>
+                </div>
+            </div>
+        </form>
+        <!--搜索框结束-->
+        <div class="example-wrap">
+            <div class="example">
+                <table id="cusTable">
+                    <thead>
+                    <th data-checkbox="true"></th><!--复选框-->
+                    <th data-field="batch_no">{:lang("订单号")}</th>
+                    <!--                    <th data-field="chain">{:lang("链协议")}</th>-->
+                    <th data-field="coin" data-formatter="coinFormatter">{:lang("币种")}</th>
+                    <!--                    <th data-field="merchant_no">{:lang("商户号")}</th>-->
+                    <!--                    <th data-field="count">{:lang("归集数量")}</th>-->
+                    <!--                    <th data-field="success">{:lang("成功数量")}</th>-->
+                    <th data-field="money" data-formatter="monetFormatter">{:lang("归集金额")}</th>
+                    <th data-field="form_address" data-formatter="formAddressFormatter">{:lang("发送地址")}</th>
+                    <th data-field="to_address" data-formatter="toAddressFormatter">{:lang("接收地址")}</th>
+                    <th data-field="status" data-formatter="statusFormatter">{:lang("状态")}</th>
+                    <th data-field="create_time_str">{:lang("归集时间")}</th>
+                    <th data-field="finish_time_str">{:lang("完成时间")}</th>
+                    <th data-field="operate" data-formatter="operateFormatter">{:lang("操作")}</th>
+                    </thead>
+                </table>
+            </div>
+        </div>
+        <!-- End Example Pagination -->
+    </div>
+</div>
+
+{include file="footer" /}
+<script type="text/javascript">
+    function formAddressFormatter(value, row, index) {
+        if (row.detail.length === 1) {
+            return row.detail[0].from_address
+        }
+    }
+    function toAddressFormatter(value, row, index) {
+        if (row.detail.length === 1) {
+            return row.detail[0].to_address
+        }
+    }
+
+    function monetFormatter(value, row, index) {
+        // 返回row.detail内的amount求和
+        if (row.detail.length > 0) {
+            return row.detail.reduce((sum, detail) => sum + parseFloat(detail.amount), 0).toFixed(5);
+        }
+        return 0; // 如果没有detail或者detail为空，返回0
+    }
+
+    function coinFormatter(value, row, index) {
+        let coin_name = '';
+        switch(row.coin) {
+            case 'USDT':
+                coin_name = '<span style="color: purple;">'+row.coin+'</span>'
+                break;
+            case 'TRX':
+                coin_name = '<span style="color: green;">'+row.coin+'</span>'
+                break;
+            default:
+        }
+        return coin_name
+    }
+
+    function statusFormatter(value, row, index) {
+        if (row.detail.length === 1) {
+            let status = row.detail[0].status
+            let status_text = '';
+            switch (status) {
+                case 3:
+                    status_text = '<span style="color: #33e16eba;">归集成功</span>';
+                    break;
+                case 4:
+                    status_text = '<span style="color: red;">归集失败</span>';
+                    break;
+                case 1:
+                    status_text = '<span style="color: #c8c2b6">处理中</span>';
+                    break;
+            }
+            return status_text
+        }
+    }
+
+    function operateFormatter(value, row, index) {
+        let check = '';
+        if (!row.status) {
+            check = ' <button type="button" class="layui-btn layui-bg-blue layui-btn-sm" lay-on="check" data-id="'+row.id+'">{:lang("查询")}</button>';
+        }
+        return [
+            check
+        ].join('');
+    }
+
+    tableCheckbox = true;
+    $(document).ready(function () {
+        layui.use(['laydate', 'util'], function () {
+            var laydate = layui.laydate;
+            var util = layui.util;
+            laydate.render({
+                elem: '#start_time'
+                , trigger: 'click'
+            });
+            laydate.render({
+                elem: '#end_time'
+                , trigger: 'click'
+            });
+
+            util.on({
+                // collection: function (othis) {
+                //     let type = othis.data('type')
+                //     // 发起归集请求
+                //     let url = "{:url('collection/swapCollect')}?type="+type
+                //     index = layer.load(0);
+                //     $.ajax({
+                //         type: 'POST',
+                //         url: url,
+                //         dataType: 'json',
+                //         success: function (res) {
+                //             layer.closeLast('loading');
+                //             layer.msg(res.msg)
+                //             setTimeout(() => {
+                //                 initTable();
+                //             }, 3000)
+                //         },
+                //         error: function (xhr, type) {
+                //             layer.closeLast('loading');
+                //         }
+                //     });
+                // },
+                check: function (e) {
+                    let id = e.data('id')
+                    // 查询归集结果
+                    let url = "{:url('collection/swapRecord')}?id="+id
+                    index = layer.load(0);
+                    $.ajax({
+                        type: 'POST',
+                        url: url,
+                        dataType: 'json',
+                        success: function (res) {
+                            layer.closeLast('loading');
+                            layer.msg(res.msg)
+                            setTimeout(() => {
+                                initTable();
+                            }, 3000)
+                        },
+                        error: function (xhr, type) {
+                            layer.closeLast('loading');
+                        }
+                    });
+                },
+            });
+        });
+        initTable();
+        //当点击查询按钮的时候执行
+        $("#search").bind("click", initTable);
+    });
+
+    function queryParams(params) {   //设置查询参数
+        params.searchText = $('#searchText').val();
+        params.startTime = $('#start_time').val()
+        return params;
+    }
+
+</script>

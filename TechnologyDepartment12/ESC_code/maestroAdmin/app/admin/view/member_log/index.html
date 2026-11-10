@@ -1,0 +1,160 @@
+    {include file="header" /}
+    <!-- Panel Other -->
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h5>会员日志</h5>
+            </div>
+            <div class="ibox-content">
+                <!--搜索框开始-->
+                <form id='commentForm' role="form" method="post" class="form-inline pull-left">
+
+                    <div class="content clearfix m-b">
+                        <div class="form-group">
+                            <label>用户账号：</label>
+                            <input type="text" class="form-control" id="user_name" name="user_name" value="{$user_name}" placeholder="用户账号">
+                        </div>
+                        <div class="form-group">
+                            <label>行为类型：</label>
+                            <select class="form-control" id="type" name="type">
+                                <option value="">全部</option>
+                                {foreach ($types as $key =>  $type)}
+                                <option value="{$key}">{$type}</option>
+                                {/foreach}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>ip地址：</label>
+                            <input type="text" class="form-control" id="ip" name="ip">
+                        </div>
+                        <div class="form-group">
+                            <label>设备id：</label>
+                            <input type="text" class="form-control" id="uuid" name="uuid">
+                        </div>
+                        <div class="form-group">
+                            <label>选择时间：</label>
+                            <input type="text" class="form-control" id="start_time" name="startTime" placeholder="yyyy-MM-dd"
+                                   lay-key="1" autocomplete="off">
+                            -
+                            <input type="text" class="form-control" id="end_time" name="endTime" placeholder="yyyy-MM-dd"
+                                   lay-key="2" autocomplete="off">
+                        </div>
+
+                        <div class="form-group">
+                            <button class="btn btn-primary" type="button" style="margin-top:5px" id="search"><strong>搜 索</strong>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+                <!--搜索框结束-->
+                <div class="example-wrap">
+                    <div class="example">
+                        <table id="cusTable">
+                            <thead>
+                            <th data-field="user_name">用户账号</th>
+                            <th data-field="ip">IP</th>
+                            <th data-field="area">地区</th>
+                            <th data-field="device">设备类型</th>
+                            <th data-field="type">行为类型</th>
+                            <th data-field="ip_count">同ip数量</th>
+                            <th data-field="uuid">设备id</th>
+                            <th data-field="create_time">操作时间</th>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+                <!-- End Example Pagination -->
+            </div>
+        </div>
+
+    <div id="ip-count-modal" style="display: none">
+        <table id="ip-count" lay-filter="ip-count"></table>
+    </div>
+
+    <script type="text/html" id="toolEventDemo">
+        <a class="layui-btn layui-btn-xs" lay-event="detail">查看</a>
+    </script>
+<script type="text/javascript">
+    $(document).ready(function () {
+      layui.use(['laydate', 'form', 'table'], function () {
+        var form = layui.form;
+        var laydate = layui.laydate;
+          var table = layui.table;
+
+
+        laydate.render({
+          elem: '#start_time'
+          , trigger: 'click'
+        });
+        laydate.render({
+          elem: '#end_time'
+          , trigger: 'click'
+        });
+
+          //单元格工具事件
+          table.on('tool(ip-count)', function(obj){
+              var data = obj.data; //获得当前行数据
+              var layEvent = obj.event; //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
+              var tr = obj.tr; //获得当前行 tr 的 DOM 对象（如果有的话）
+
+              if(layEvent === 'detail'){ //查看
+                  layer.closeAll('page')
+                  //do somehing
+                  $('#user_name').val(data.user_name)
+                  initTable()
+              }
+          })
+
+        $('body').on('click','.ip-count', function() {
+          var ip = $(this).data('ip');
+          var user_id = $(this).data('user_id')
+          layer.open({
+            type: 1, // page 层类型
+            area: ['30%', '80%'],
+            title: '查询用户行为日志',
+            shade: 0.6, // 遮罩透明度
+            shadeClose: true, // 点击遮罩区域，关闭弹层
+            maxmin: true, // 允许全屏最小化
+            anim: 0, // 0-6 的动画形式，-1 不开启
+            content: $("#ip-count-modal"),
+            success: function()  {
+              //执行渲染
+              //第一个实例
+              table.render({
+                elem: '#ip-count'
+                ,url: '{:url("getSameIpUser")}'
+                ,where: {
+                  'ip':ip,
+                  'user_id': user_id
+                }//数据接口
+                ,cols: [[ //表头
+                  {field: 'user_name', width: 180, title: '用户名',}
+                  ,{field: 'create_time', title: '时间', width: 200, sort: true}
+                  ,{title: '操作', width: 100, templet: '#toolEventDemo'}
+                ]],
+              });
+            }
+          });
+        })
+
+      })
+        initTable();
+        //当点击查询按钮的时候执行
+        $("#search").bind("click", initTable);
+
+
+
+
+    });
+    function queryParams(params) {   //设置查询参数
+        params.user_name = $('#user_name').val()
+        params.ip = $('#ip').val()
+        params.type = $('#type').val()
+        params.startTime = $('#start_time').val();
+        params.endTime = $('#end_time').val();
+        params.uuid = $('#uuid').val();
+        return params;
+    }
+
+
+</script>
+{include file="footer" /}

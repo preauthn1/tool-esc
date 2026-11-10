@@ -1,0 +1,39 @@
+{include file="header" /}
+    <!-- Panel Other -->
+    <div class="ibox float-e-margins">
+        <div class="ibox-title">
+            <h5>{$title|lang}</h5>
+        </div>
+        <div class="ibox-content">
+            <div class="form-group clearfix col-sm-1">
+                {if authCheck('rate/add') }
+                <a href="{:url('rate/add')}">
+                    <button class="btn btn-outline btn-primary" type="button">{:lang("添加")}</button>
+                </a>
+                {/if}
+            </div>
+            <div class="example-wrap">
+                <div class="example">
+                    <table id="cusTable">
+                        <thead>
+                            <th data-field="id">{:lang("ID")}</th>
+                            <th data-field="days">{:lang("天数")}</th>
+                            <th data-field="rate">{:lang("日利率/总利率")}</th>
+                            <th data-field="income">{:lang("万元收益")}</th>
+                            <th data-field="min_amount">{:lang("最低购买金额")}</th>
+                            <th data-field="max_amount">{:lang("最高购买金额")}</th>
+                            <th data-field="redemption_fee">{:lang("提前取出手续费")}</th>
+                            <th data-field="operate">{:lang("操作")}</th>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+            <!-- End Example Pagination -->
+        </div>
+    </div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        initTable();
+    });
+</script>
+{include file="footer" /}

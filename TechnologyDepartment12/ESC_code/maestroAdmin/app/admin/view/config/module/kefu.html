@@ -1,0 +1,33 @@
+<div class="form-group">
+    <label class="col-sm-3 control-label">{:lang("客服账号设置")}：</label>
+    <div class="input-group col-sm-4">
+        <textarea class="form-control" name="kefu_account" id="kefu_account" rows='6'>{$config['kefu_account']}</textarea>
+        <p class="help-block">每行设置一个，格式：文字|账号</p>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-sm-3 control-label">{:lang("关闭在线客服")}：</label>
+    <div class="input-group col-sm-4">
+        <input type="text" class="form-control" name="online_kefu_open" value="{$config.online_kefu_open|default=1}">
+        <p class="help-block">是否开启在线客服：0关闭，1开启</p>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-sm-3 control-label">{:lang("第三方客服链接")}：</label>
+    <div class="input-group col-sm-4">
+        <input type="text" class="form-control" id="meiqia_url" name="meiqia_url" value="{$config.meiqia_url}">
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-sm-3 control-label">{:lang("第三方客服代码")}：</label>
+    <div class="input-group col-sm-4">
+        <textarea class="form-control" name="kefu_code" rows='6'>{$config['kefu_code']}</textarea>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-sm-3 control-label">{:lang("快捷语言")}：</label>
+    <div class="input-group col-sm-4">
+        <textarea class="form-control" name="kefu_fast_message" rows='6'>{$config['kefu_fast_message']}</textarea>
+        <p class="help-block">每行设置一个</p>
+    </div>
+</div>

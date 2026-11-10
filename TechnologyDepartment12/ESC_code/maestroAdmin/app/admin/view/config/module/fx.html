@@ -1,0 +1,26 @@
+<div class="form-group">
+    <label class="col-sm-3 control-label">{:lang("限制非充值用户获得返佣")}：</label>
+    <div class="input-group col-sm-4">
+        <input type="text" class="form-control" name="limit_recharge_fx" value="{$config.limit_recharge_fx|default=0}">
+        <p class="help-block">是否开启：0关闭，1开启</p>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-sm-3 control-label">{:lang("分销级")}：</label>
+    <div class="input-group col-sm-4">
+        <input type="number" min="0" max="7" class="form-control" id="fx_level" name="fx_level" value="{$config.fx_level}">
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-sm-3 control-label"><h3>{:lang("各分佣比率")}（{:lang("单位")}：%）</h3></label>
+</div>
+
+{for start="1" end="$config.fx_level" comparison="elt"}
+<div class="form-group">
+    <label class="col-sm-3 control-label">{$i}{:lang("级")}：</label>
+    <div class="input-group col-sm-4">
+        <input type="text" class="form-control" id="fx_rate_{$i}" name="fx_rate_{$i}" value="{$config['fx_rate_'.$i]}">
+        <span class="input-group-addon">%</span>
+    </div>
+</div>
+{/for}

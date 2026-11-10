@@ -1,0 +1,82 @@
+{include file="header" /}
+<div class="row">
+    <div class="col-sm-12">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h5>{:lang("添加")}</h5>
+            </div>
+            <div class="ibox-content">
+                <form class="form-horizontal m-t" id="dataForm" method="post" action="{:url('add')}">
+                    <input type="hidden" name="id" value="{$info.id}"/>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">{:lang("活动标题")}：</label>
+                        <div class="input-group col-sm-4">
+                            <input type="text" class="form-control" value="{$info.title}" name="title" required />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">{:lang("活动开始时间")}：</label>
+                        <div class="input-group col-sm-4">
+                            <input type="text" class="form-control" value="{$info.start_time}" id="start_time" name="start_time" placeholder="yyyy-MM-dd HH:mm:ss" autocomplete="off">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">{:lang("活动结束时间")}：</label>
+                        <div class="input-group col-sm-4">
+                            <input type="text" class="form-control" value="{$info.end_time}" id="end_time" name="end_time" placeholder="yyyy-MM-dd HH:mm:ss" autocomplete="off">
+                        </div>
+                    </div>
+
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">{:lang("状态")}：</label>
+                        <div class="input-group col-sm-4">
+                            <select class="form-control" name="status">
+                                <option value="1" {if $info.status eq 1} selected {/if}>{:lang("启用")}</option>
+                                <option value="0" {if $info.status neq 1} selected {/if}>{:lang("停用")}</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- 移除任务完成周期配置 -->
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">第几次必中大奖：</label>
+                        <div class="input-group col-sm-4">
+                            <input id="fixed_times" type="number" class="form-control" name="fixed_times" required=""
+                                   aria-required="true" value="{$info.fixed_times|default=4}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-4 col-sm-offset-6">
+                            <button class="btn btn-primary" type="submit">{:lang("提交")}</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>
+<script type="text/javascript">
+  $(document).ready(function(){
+    layui.use('laydate', function(){
+      var laydate = layui.laydate;
+      laydate.render({
+        elem: '#start_time'
+        ,type: 'datetime',
+        fullPanel: true // 2.8+
+        ,trigger: 'click',
+
+      });
+      laydate.render({
+        elem: '#end_time'
+        ,type: 'datetime',
+        fullPanel: true, // 2.8+
+        trigger: 'click',
+      });
+    });
+  });
+</script>
+
+{include file="footer" /}

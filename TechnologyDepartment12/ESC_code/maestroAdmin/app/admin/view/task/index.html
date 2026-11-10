@@ -1,0 +1,170 @@
+{include file="header" /}
+    <!-- Panel Other -->
+    <div class="ibox float-e-margins">
+        <div class="ibox-title">
+            <h5>{:lang("任务记录")}</h5>
+        </div>
+        <div class="ibox-content">
+            <!--搜索框开始-->
+            <form id='commentForm' role="form" method="post" class="form-inline pull-right" target="_blank" onkeydown="if (event.keyCode == 13) { return false; }">
+                <div class="content clearfix m-b">
+                    <div class="form-group">
+                        <label>{:lang("选择时间")}：</label>
+                        <input type="text" class="form-control" id="startTime" name="startTime" placeholder="yyyy-MM-dd" autocomplete="off">
+                        -
+                        <input type="text" class="form-control" id="endTime" name="endTime" placeholder="yyyy-MM-dd" autocomplete="off">
+                    </div>
+                    <div class="form-group">
+                        <label>{:lang("uid")}：</label>
+                        <input type="text" class="form-control" id="searchText" name="searchText">
+                    </div>
+                    <div class="form-group">
+                        <label>{:lang("VIP等级")}：</label>
+                        <select class="form-control" name="level_id" id="level_id" >
+                            <option value="">所有</option>
+                            {volist name='level_list' id='v'}
+                            <option value="{$key}">{$v}</option>
+                            {/volist}
+                        </select>
+                    </div>
+                    <div class="form-group layui-form">
+                        <label>{:lang("所属代理")}：</label>
+                        <div class="layui-inline">
+                            <select lay-search="" id="leader1" name="leader1">
+                                <option value="">所有</option>
+                                {foreach name="agent" item="vo"}
+                                <option value="{$vo.id}">{$vo.id}/{$vo.user_name}{$vo.remark? '('.$vo.remark.')' : ''}</option>
+                                {/foreach}
+                            </select>
+                        </div>
+                    </div>
+<!--                    <div class="form-group">-->
+<!--                        <label>{:lang("状态")}：</label>-->
+<!--                        <select class="form-control" name="status" id="status" >-->
+<!--                            <option value="">所有</option>-->
+<!--                            {volist name='order_status' id='text'}-->
+<!--                            <option value="{$key}">{$text}</option>-->
+<!--                            {/volist}-->
+<!--                        </select>-->
+<!--                    </div>-->
+                    <div class="form-group">
+                        <label>{:lang("任务类型")}：</label>
+                        <select class="form-control" name="task_type" id="task_type" >
+                            <option value="">所有</option>
+                            {volist name='type_status' id='text'}
+                            <option value="{$key}">{$text}</option>
+                            {/volist}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>{:lang("派单类型")}：</label>
+                        <select class="form-control" name="order_type" id="order_type" >
+                            <option value="">所有</option>
+                            <option value="1">{:lang("自动派单")}</option>
+                            <option value="2">{:lang("手动派单")}</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <input type="hidden" value="1" name="export"/>
+                        <button class="btn btn-primary" type="button" style="margin-top:5px" id="search"><strong>{:lang('搜索')}</strong>
+                        </button>
+                        <button class="btn btn-danger" type="submit" style="margin-top:5px" id="export"><strong>{:lang("导出")}</strong>
+                        </button>
+                    </div>
+                </div>
+            </form>
+            <div class="form-group clearfix col-sm-7">
+<!--                <a href="javascript:;" >-->
+<!--                    <button class="btn btn-outline btn-primary" type="button">{:lang("批量派单")}</button>-->
+<!--                </a>-->
+                <a href="javascript:;" onclick="checkStatus(0, 1);">
+                    <button class="btn btn-outline btn-danger" type="button">{:lang("批量取消")}</button>
+                </a>
+            </div>
+            <!--搜索框结束-->
+            <div class="example-wrap">
+                <div class="example">
+                    <table id="cusTable">
+                        <thead>
+                        <th data-checkbox="true"></th><!--复选框-->
+                        <th data-field="level_name">{:lang("VIP等级")}</th>
+                        <th data-field="task_type_str">{:lang("任务类型")}</th>
+                        <th data-field="user_info">{:lang("用户信息")}</th>
+                        <th data-field="top_leader_remark">{:lang("所属代理")}</th>
+                        <th data-field="product_name">{:lang("任务信息")}</th>
+                        <th data-field="income_profit_str">{:lang("收益率")}</th>
+                        <th data-field="money">{:lang("佣金")}</th>
+                        <th data-field="finish_money">{:lang("完成任务金额")}</th>
+                        <th data-field="order_type_str">{:lang("派单类型")}</th>
+                        <th data-field="status_str">{:lang("状态")}</th>
+                        <th data-field="create_time_str">{:lang("添加时间")}</th>
+                        <th data-field="finish_time_str">{:lang("完成时间")}</th>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+            <!-- End Example Pagination -->
+        </div>
+    </div>
+
+{include file="footer" /}
+<script type="text/javascript">
+    tableCheckbox = true;
+    $(document).ready(function () {
+        layui.use('laydate', function(){
+            var laydate = layui.laydate;
+            laydate.render({
+                elem: '#startTime'
+                ,trigger: 'click'
+            });
+            laydate.render({
+                elem: '#endTime'
+                ,trigger: 'click'
+            });
+        });
+        initTable();
+        //当点击查询按钮的时候执行
+        $("#search").bind("click", initTable);
+    });
+    function queryParams(params) {   //设置查询参数
+        params.searchText = $('#searchText').val()
+        params.startTime = $('#startTime').val()
+        params.endTime = $('#endTime').val()
+        params.level_id = $('#level_id').val()
+        params.status = $('#status').val()
+        params.task_type = $('#task_type').val()
+        params.order_type = $('#order_type').val()
+        params.leader1 = $('#leader1').val()
+        return params;
+    }
+    function checkStatus(status, type = 0){
+        var getSelectRows = $("#cusTable").bootstrapTable('getSelections', function (row) {
+            return row;
+        });
+        var ids = new Array();  // 定义js数组用于存放自己所需的值
+        for(var i=0;i<getSelectRows.length;i++){
+            ids[i] = getSelectRows[i].id;
+        }
+        if (ids.length <= 0) {
+            layer.msg('请选择要操作的任务');
+            return;
+        }
+        layer.confirm('确认操作吗?', {icon: 3, title:'提示'}, function(index){
+            $.getJSON("{:url('task/checkStatus')}", {'id' : ids, 'status' : status, 'type' : type}, function(res){
+                if(1 == res.code){
+                    layer.alert(res.msg, {title: "{:lang('友情提示')}", icon: 1, closeBtn: 0}, function(inx){
+                        layer.close(inx);
+                        initTable();
+                    });
+                }else if(111 == res.code){
+                    window.location.reload();
+                }else{
+                    layer.alert(res.msg, {title: "{:lang('友情提示')}", icon: 2});
+                }
+            });
+
+            layer.close(index);
+        })
+    }
+
+</script>

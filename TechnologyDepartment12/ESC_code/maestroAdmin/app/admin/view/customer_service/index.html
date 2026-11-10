@@ -1,0 +1,94 @@
+{include file="header" /}
+    <!-- Panel Other -->
+    <div class="ibox float-e-margins">
+        <div class="ibox-title">
+            <h5>{:lang("客服设置")}</h5>
+        </div>
+        <div class="ibox-content">
+            <div class="form-group clearfix col-sm-1">
+                {if authCheck('customer_service/add') }
+                <a id="add" href="{:url('customer_service/add')}">
+                    <button class="btn btn-outline btn-primary" type="button">{:lang("新增")}</button>
+                </a>
+                {/if}
+            </div>
+            <!--搜索框开始-->
+            <form id='commentForm' role="form" method="post" class="form-inline pull-right">
+                <div class="content clearfix m-b">
+                    <div class="form-group">
+                        <label>{:lang("客服名称")}：</label>
+                        <input type="text" class="form-control" id="name" name="name">
+                    </div>
+                    <div class="form-group">
+                        <button class="btn btn-primary" type="button" style="margin-top:5px" id="search"><strong>{:lang('搜索')}</strong></button>
+                    </div>
+                </div>
+            </form>
+            <!--搜索框结束-->
+            <div class="example-wrap">
+                <div class="example">
+                    <table id="cusTable">
+                        <thead>
+                        <th data-field="id">{:lang("id")}</th>
+                        <th data-field="image">{:lang("图标")}</th>
+                        <th data-field="name">{:lang("客服名称")}</th>
+                        <th data-field="link">{:lang("链接")}</th>
+                        <th data-field="sort">{:lang("排序")}</th>
+                        <th data-field="create_time">{:lang("添加时间")}</th>
+                        <th data-field="status">{:lang("状态")}</th>
+                        <th data-field="operate">{:lang("操作")}</th>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+            <!-- End Example Pagination -->
+        </div>
+    </div>
+<!-- End Panel Other -->
+<script type="text/javascript">
+    function queryParams(params) {
+        params.searchText = $('#name').val();
+        return params;
+    }
+    $(document).ready(function () {
+        initTable();
+        $("#search").bind("click", initTable);
+    });
+    function onLoadSuccess(res) {
+        $("#add").on('click',function (e){
+            add(e.currentTarget.href)
+            return false;
+        });
+    }
+    function add(url){
+        // 在此处输入 layer 的任意代码
+        layer.open({
+            type: 2,
+            area: ['100%', '100%'],
+            title: '添加/编辑',
+            maxmin: true, // 允许全屏最小化
+            anim: 0, // 0-6 的动画形式，-1 不开启
+            content: url
+        });
+    }
+
+    function customerServiceDel(id) {
+        layer.confirm('确认删除此客服?', {icon: 3, title: '提示'}, function (index) {
+            //do something
+            $.getJSON("{:url('customer_service/customerServiceDel')}", {'id': id}, function (res) {
+                if (1 == res.code) {
+                    layer.alert(res.msg, {title: "{:lang('友情提示')}", icon: 1, closeBtn: 0}, function (inx) {
+                        layer.close(inx);
+                        initTable();
+                    });
+                } else if (111 == res.code) {
+                    window.location.reload();
+                } else {
+                    layer.alert(res.msg, {title: "{:lang('友情提示')}", icon: 2});
+                }
+            });
+            layer.close(index);
+        })
+    }
+</script>
+{include file="footer" /}

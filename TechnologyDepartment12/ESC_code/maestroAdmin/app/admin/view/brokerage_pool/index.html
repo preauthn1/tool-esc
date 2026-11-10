@@ -1,0 +1,106 @@
+{include file="header" /}
+    <!-- Panel Other -->
+    <div class="ibox float-e-margins">
+        <div class="ibox-title">
+            <h5>{$title|lang}</h5>
+        </div>
+        <div class="ibox-content">
+            <div class="form-group clearfix col-sm-4 col-md-8">
+                <a id="config" href="{:url('brokerage_pool/config')}">
+                    <button class="btn btn-outline btn-primary" type="button">{:lang("个人佣金池配置")}</button>
+                </a>
+            </div>
+            <!--搜索框开始-->
+            <form id='commentForm' role="form" method="post" class="form-inline pull-right">
+                <div class="content clearfix m-b">
+                    <div class="form-group">
+                        <label>{:lang("用户id")}：</label>
+                        <input type="text" class="form-control" id="user_id" name="user_id">
+                    </div>
+<!--                    <div class="form-group">-->
+<!--                        <label>{:lang("账号")}：</label>-->
+<!--                        <input type="text" class="form-control" id="user_name" name="user_name">-->
+<!--                    </div>-->
+                    <div class="form-group">
+                        <div id="ID-laydate-rangeLinked">
+                            <label>{:lang("日期")}：</label>
+                            <input type="text" class="form-control" id="startTime" name="startTime" placeholder="{:lang('开始日期')}" style="width: 170px;">
+                            <span style="margin: 0 5px;">-</span>
+                            <input type="text" class="form-control" id="endTime" name="endTime" placeholder="{:lang('结束日期')}" style="width: 170px;">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <button class="btn btn-primary" type="button" style="margin-top:5px" id="search"><strong>{:lang('搜索')}</strong>
+                        </button>
+                    </div>
+                </div>
+            </form>
+            <!--搜索框结束-->
+            <div class="example-wrap">
+                <div class="example">
+                    <table id="cusTable"
+                           data-total-field="total"
+                           data-data-field="data">
+                        <thead>
+                        <th data-field="user_info">{:lang("用户帐号/ID")}</th>
+                        <th data-field="money">{:lang("领取佣金")}</th>
+                        <th data-field="create_time">{:lang("领取时间")}</th>
+                        <th data-field="brokerage_pool">{:lang("总佣金额度")}</th>
+                        <th data-field="received">{:lang("已领取额度")}</th>
+                        <th data-field="brokerage_pool_receivable">{:lang("可领取额度")}</th>
+                        <th data-field="receivable">{:lang("待领取额度")}</th>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+            <!-- End Example Pagination -->
+        </div>
+    </div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        initTable();
+        //当点击查询按钮的时候执行
+        $("#search").bind("click", initTable);
+
+      layui.use('laydate', function() {
+        var laydate = layui.laydate;
+        //初始化日期范围选择器
+        laydate.render({
+          elem: '#ID-laydate-rangeLinked',
+          range: ['#startTime', '#endTime'],
+          rangeLinked: true, // 开启日期范围选择时的区间联动标注模式
+          type: 'datetime',
+          format: 'yyyy-MM-dd HH:mm:ss'
+        });
+      });
+    });
+
+    function queryParams(params) {   //设置查询参数
+      params.user_id = $('#user_id').val()
+      params.user_name = $('#user_name').val()
+      params.startTime = $('#startTime').val()
+      params.endTime = $('#endTime').val()
+      return params;
+    }
+
+    function onLoadSuccess(res) {
+      console.warn(res)
+      $("#config").on('click', function (e) {
+        add(e.currentTarget.href)
+        return false;
+      });
+    }
+
+    function add(url) {
+      // 在此处输入 layer 的任意代码
+      layer.open({
+        type: 2,
+        area: ['100%', '100%'],
+        title: '添加/编辑',
+        maxmin: true, // 允许全屏最小化
+        anim: 0, // 0-6 的动画形式，-1 不开启
+        content: url
+      });
+    }
+</script>
+{include file="footer" /}

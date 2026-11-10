@@ -1,0 +1,578 @@
+{include file="header" /}
+<style>
+    .operateBox{
+        padding: 10px 15px;
+    }
+</style>
+<!-- Panel Other -->
+<div class="ibox float-e-margins">
+    <div class="ibox-title">
+        <h5>{:lang("提币订单")}</h5>
+    </div>
+    <div class="ibox-content">
+        <div id="toolbar">
+            <button id="success" class="btn btn-success btn-xs" disabled>
+                <i class="glyphicon glyphicon-check"></i> 批量审核成功
+            </button>
+            <button id="remove" class="btn btn-danger btn-xs" disabled>
+                <i class="glyphicon glyphicon-remove"></i> 批量审核失败
+            </button>
+<!--            <a href="javascript:void(0)" class="btn btn-outline btn-primary btn-xs"-->
+<!--               onclick="setRepeatIPFlag()">只看重复IP用户</a>-->
+            <div id="stats" style=' float: right; padding: 2px 12px'></div>
+        </div>
+        <!--搜索框开始-->
+        <form id='commentForm' role="form" method="post" class="form-inline pull-right" target="_blank" onkeydown="if (event.keyCode == 13) { return false; }">
+            <div class="content clearfix m-b">
+                <div class="form-group">
+                    <label>{:lang("选择时间")}：</label>
+                    <select class="form-control" id="time_type" name="time_type">
+                        <option value="0" selected>{:lang("申请时间")}</option>
+                        <option value="1">{:lang("审核时间")}</option>
+                    </select>
+                    <input type="text" class="form-control" id="start_time" name="startTime" placeholder="yyyy-MM-dd"
+                           lay-key="1" autocomplete="off">
+                    -
+                    <input type="text" class="form-control" id="end_time" name="endTime" placeholder="yyyy-MM-dd"
+                           lay-key="2" autocomplete="off">
+                </div>
+                <div class="form-group">
+                    <label>{:lang("状态")}：</label>
+                    <select class="form-control" name="searchStatus" id="status">
+                        <option value="">请选择</option>
+                        {if !empty($status_arr)}
+                        {foreach name="status_arr" item="vo"}
+                        <option value="{$key}">{$vo}</option>
+                        {/foreach}
+                        {/if}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>{:lang("渠道")}：</label>
+                    <select class="form-control" name="channel" id="searchChannel">
+                        <option value="">全部</option>
+                        {if !empty($channels)}
+                        {foreach name="channels" item="vo"}
+                        <option value="{$vo.id}">{$vo.name}</option>
+                        {/foreach}
+                        {/if}
+                    </select>
+                </div>
+                <div class="form-group layui-form">
+                    <label>{:lang("所属代理")}：</label>
+                    <div class="layui-inline">
+                        <select lay-search="" id="leader1" name="leader1">
+                            <option value="">所有</option>
+                            {foreach name="agent" item="vo"}
+                            <option value="{$vo.id}">{$vo.id}/{$vo.user_name}{$vo.remark? '('.$vo.remark.')' : ''}</option>
+                            {/foreach}
+                        </select>
+                    </div>
+                </div>
+<!--                <div class="form-group">-->
+<!--                    <label>{:lang("用户")}：</label>-->
+<!--                    <select class="form-control" name="vuser" id="vuser">-->
+<!--                        <option value="-1">所有</option>-->
+<!--                        <option value="0">真实</option>-->
+<!--                        <option value="1">虚拟</option>-->
+<!--                        <option value="2">已冻结用户</option>-->
+<!--                        <option value="3">未冻结用户</option>-->
+<!--                    </select>-->
+<!--                </div>-->
+                <div class="form-group">
+                    <label>{:lang("订单号")}：</label>
+                    <input type="text" class="form-control" id="searchText" name="searchText"
+                           placeholder="订单号">
+                </div>
+                <div class="form-group">
+                    <label>{:lang("UID")}：</label>
+                    <input type="text" class="form-control" id="user_id" name="user_id"
+                           placeholder="用户名ID">
+                </div>
+                <div class="form-group">
+                    <label>{:lang("用户名")}：</label>
+                    <input type="text" class="form-control" id="user_name" name="user_name"
+                           placeholder="用户名">
+                </div>
+                <div class="form-group">
+                    <input type="hidden" value="1" name="export"/>
+                    <button class="btn btn-primary" type="button" style="margin-top:5px" id="search"><strong>{:lang('搜索')}</strong>
+                    </button>
+<!--                    <button class="btn btn-danger" type="submit" style="margin-top:5px" id="export"><strong>{:lang("导出")}</strong>-->
+<!--                    </button>-->
+                </div>
+            </div>
+        </form>
+        <div class="clearfix"></div>
+        <!--搜索框结束-->
+        <div class="example-wrap">
+            <div class="example">
+                <table id="cusTable" data-toolbar="#toolbar">
+                    <thead>
+                    <th data-checkbox="true" data-formatter="stateFormatter">ID</th>
+<!--                <th data-field="id">{:lang("ID")}</th>-->
+                    <th data-field="userinfo" data-formatter="userInfoFormatter">{:lang("用户信息")}</th>
+                    <th data-field="withdraw_amount" data-formatter="withdrawAmountFormatter">{:lang("提现金额")}</th>
+                    <th data-field="withdraw_info" data-formatter="withdrawInfoFormatter">{:lang("提现信息")}</th>
+                    <th data-field="check_status" data-formatter="checkStatusFormatter">{:lang("审核状态")}</th>
+                    <th data-field="tx_info" data-formatter="txInfoFormatter">{:lang("出款信息")}</th>
+                    <th data-field="register_login" data-formatter="registerLoginFormatter">{:lang("用户ip")}</th>
+<!--                    <th data-field="result">{:lang("转账结果")}</th>-->
+                    <th data-field="operate">{:lang("操作")}</th>
+                    </thead>
+                </table>
+            </div>
+        </div>
+        <!-- End Example Pagination -->
+    </div>
+
+    <div id="user-log-modal" style="display: none">
+        <table id="user-log" lay-filter="user-log"></table>
+    </div>
+
+    <div id="ip-count-modal" style="display: none">
+        <table id="ip-count" lay-filter="ip-count"></table>
+    </div>
+
+    <script type="text/html" id="toolEventDemo">
+        <a class="layui-btn layui-btn-xs" lay-event="detail">查看</a>
+    </script>
+
+</div>
+
+<div id="operateTmplate" style="display: none;">
+    <div class="operateBox">
+        <div class="form-group">
+            <label>快捷理由</label>
+            <select class="form-control" onchange="$(this).parent().siblings().find('.remark').val($(this).val())">
+                <option value="">无</option>
+                {volist name='remark' id='text'}
+                <option value="{$text}">{$text}</option>
+                {/volist}
+            </select>
+        </div>
+        <div class="form-group">
+            <label>审核理由</label>
+            <input type="text" name="remark" class="form-control remark" value=""/>
+        </div>
+    </div>
+</div>
+
+<!-- 发送站内信弹窗 -->
+<div class="modal fade" id="sendMessageModal" tabindex="-1" role="dialog" aria-labelledby="sendMessageModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="sendMessageModalLabel">发送站内信</h4>
+            </div>
+            <div class="modal-body">
+                <form id="sendMessageForm">
+                    <input type="hidden" name="id" id="message_withdraw_id">
+                    <div class="form-group">
+                        <label for="message_title">标题</label>
+                        <input type="text" class="form-control" id="message_title" name="title" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="message_content">内容</label>
+                        <textarea class="form-control" id="message_content" name="content" rows="3" required></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" onclick="submitMessage()">发送</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{include file="footer" /}
+<script type="text/javascript">
+    var $table = $('#cusTable');
+    var $success = $("#success");
+    var $remove = $("#remove");
+    var $success_agent = $("#success_agent");
+    var repeatIPFlag = 0;
+
+    function setRepeatIPFlag() {
+        repeatIPFlag = 1;
+        initTable();
+    }
+
+    $remove.click(function () {
+        var ids = getIdSelections();
+        checkStatus(ids.join(","), 3);
+    });
+    $success.click(function () {
+        var ids = getIdSelections();
+        checkStatus(ids.join(","), 2);
+    });
+    $success_agent.click(function () {
+        var ids = getIdSelections();
+        checkStatus(ids.join(","), 4);
+    });
+
+    function registerLoginFormatter(value, row, index) {
+      var html = "<div style='min-width: 200px'>";
+      html += "<p>注册时间:" + row.user_info.create_time + "</p>";
+      html += "<puser>提现IP:" + row.ip + "</p>";
+      html += "<puser>最后登录IP:" + row.last_login_ip + "</p>";
+      html += "<p>同IP用户:<span style='color: #0c80fe;cursor: pointer' class='user-log' data-user_id='" + row.user_info.id +"'>" + row.ip_count + "</span></p>";
+      html += "<p>广告位当日交易次数:" + row.today_finance_product_count + "</p>";
+      html += "<p>累计交易天数:" + row.finance_product_order_day + "</p>";
+      html += "<p>累计未交易天数:" + row.finance_product_no_order_day + "</p>";
+      html += "<p>备注:<span style='color: #0c80fe'>" + row.user_remark + "</span></p>";
+      html += "<p>等级：" + row.tree_level + "</p>";
+      return "<span>" + html + "</span></div>";
+    }
+
+    // 用户信息
+    function userInfoFormatter(value, row, index) {
+        var html = "";
+        html += "<p>用户：" + row.uid + "/" + row.user_name + "<a  style='color: #1aa094; cursor: pointer;' lay-on='show-money-log' data-user_name='"+row.user_name+"' data-user_id='"+row.uid+"'>查看流水</a></p>";
+        html += "<p>订单号：" + row.order_id + "</p>";
+        html += "<p>申请时间：" + row.create_time + "</p>";
+        html += "<p>最近充值：" + row.last_recharge_time + "</p>";
+        if (Object.keys(row.top_leader).length > 0) {
+          html += "<p>顶级代理：" + row.top_leader.id + "/" +row.top_leader.user_name + (row.top_leader.remark? "（"+row.top_leader.remark+"）": '')+"<a  style='color: #1aa094; cursor: pointer;' lay-on='show-money-log'" +
+            " data-user_name='"+row.top_leader.user_name+"' data-user_id='"+row.top_leader.id+"'" +
+            ">查看流水</a></p>";
+        }
+        return "<span>" + html + "</span>";
+    }
+
+    // 提现金额
+    function withdrawAmountFormatter(value, row, index) {
+        var html = "";
+        html += "<p>提现金额：" + row.original_money + "</p>";
+        html += "<p>手续费：" + row.handling_fee + "</p>";
+        html += "<p>实际到账：" + row.withdraw_money + "</p>";
+        return "<span>" + html + "</span>";
+    }
+
+    // 提现信息
+    function withdrawInfoFormatter(value, row, index) {
+        var html = "";
+        let coin = JSON.parse(row.channel.config).coin;
+        // let coin = row.channel.config.coin;
+        html += "<p>币种："+coin+"</p>";
+        html += "<p>提现地址：" + row.bank_number + "</p>";
+        html += "<p>出款地址：" + row.from_address + "</p>";
+        html += "<p>平台单号：" + row.trade_no + "</p>";
+        return "<span>" + html + "</span>";
+    }
+
+    // 审核状态
+    function checkStatusFormatter(value, row, index) {
+        var html = "";
+        html += "<p>审核状态：" + row.status_text + "</p>";
+        html += "<p>备注：" + row.remark + "</p>";
+        html += "<p>操作员：" + row.admin_id + '/' + row.admin_name + "</p>";
+        html += "<p>操作时间：" + row.check_time + "</p>";
+        return "<span>" + html + "</span>";
+    }
+
+    // 出款信息
+    function txInfoFormatter(value, row, index) {
+        var html = "";
+        html += "<p>打款状态：" + row.tx_status_text + "</p>";
+        html += "<p>出款金额：" + row.convert_money + "</p>";
+        // html += "<p>tx手续费：0</p>";
+        // html += "<p>打款tx：</p>";
+        return "<span>" + html + "</span>";
+    }
+
+    function stateFormatter(value, row, index) {
+        if (row.status !== 1) {
+            return {
+                disabled: true
+            }
+        }
+        return value;
+    }
+
+    function textFormatter(value, row, index) {
+        if (row.is_xuni == 1) {
+            return "<span style='color:red'>" + value + "</span>";
+        }
+        return "<span>" + value + "</span>";
+    }
+
+    function getIdSelections() {
+        return $.map($table.bootstrapTable('getSelections'), function (row) {
+            return row.id
+        })
+    }
+
+    function initTable() {
+        //先销毁表格
+        $table.bootstrapTable('destroy');
+        //初始化表格,动态从服务器加载数据
+        $table.bootstrapTable({
+            method: "get",  //使用get请求到服务器获取数据
+            url: '{:url("index")}', //获取数据的地址
+            striped: true,  //表格显示条纹
+            pagination: true, //启动分页
+            pageSize: 10,  //每页显示的记录数
+            pageNumber: 1, //当前第几页
+            pageList: [10, 30, 50, 100, 500],  //记录数可选列表
+            sidePagination: "server", //表示服务端请求
+            paginationFirstText: "{:lang('首页')}",
+            paginationPreText: "{:lang('上一页')}",
+            paginationNextText: "{:lang('下一页')}",
+            paginationLastText: "{:lang('尾页')}",
+            queryParamsType: "undefined",
+            queryParams: function queryParams(params) {   //设置查询参数
+                params.searchText = $('#searchText').val();
+                params.user_id = $('#user_id').val();
+                params.user_name = $('#user_name').val();
+                params.searchStatus = $('#status').val();
+                params.startTime = $('#start_time').val();
+                params.endTime = $('#end_time').val();
+                params.vuser = $('#vuser').val();
+                params.channel = $('#searchChannel').val();
+                params.type = 1;
+                params.repeatIP = repeatIPFlag;
+                params.leader1 = $('#leader1').val();
+                params.time_type = $('#time_type').val();
+                return params;
+            },
+            onLoadSuccess: function (res) {  //加载成功时执行
+                if (111 == res.code) {
+                    window.location.reload();
+                }
+                var stathtml = '';
+                if (res.stat) {
+                    $.each(res.stat, function (i, v) {
+                        stathtml += '<span class="label label-success">' + v.text + '：' + v.total + '</span> ';
+                    })
+                }
+                $("#stats").html(stathtml);
+                layer.msg("{:lang('加载成功')}", {time: 1000});
+            },
+            onLoadError: function () {  //加载失败时执行
+                layer.msg("{:lang('加载数据失败')}");
+            }
+        });
+        $table.on('check.bs.table uncheck.bs.table ' + 'check-all.bs.table uncheck-all.bs.table', function () {
+            $remove.prop('disabled', !$table.bootstrapTable('getSelections').length);
+            $success.prop('disabled', !$table.bootstrapTable('getSelections').length);
+            $success_agent.prop('disabled', !$table.bootstrapTable('getSelections').length);
+        })
+    }
+
+    $(document).ready(function () {
+        layui.use(['laydate', 'util', 'table'], function () {
+            var laydate = layui.laydate;
+          var util = layui.util;
+          var table = layui.table;
+            laydate.render({
+                elem: '#start_time'
+                , trigger: 'click'
+            });
+            laydate.render({
+                elem: '#end_time'
+                , trigger: 'click'
+            });
+
+          //单元格工具事件
+          table.on('tool(ip-count)', function(obj){
+            var data = obj.data; //获得当前行数据
+            var layEvent = obj.event; //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
+            var tr = obj.tr; //获得当前行 tr 的 DOM 对象（如果有的话）
+
+            if(layEvent === 'detail'){ //查看
+              layer.closeAll('page')
+              //     //do somehing
+              page('{:url("member_log/index")}?user_id='+data.user_id, '行为日志')
+            }
+          })
+
+            util.on({
+              "show-money-log": function (e) {
+                console.warn(e.data('user_name'))
+                let user_name = e.data('user_name');
+                let user_id = e.data('user_id');
+                page('{:url("money_log/index")}?user_id='+user_id, '会员流水')
+              }
+            })
+
+          $('body').on('click','.user-log', function() {
+            var user_id = $(this).data('user_id')
+            openUserLog(user_id)
+          })
+
+          $('body').on('click','.ip-count', function() {
+            layer.closeAll('page')
+            var ip = $(this).data('ip');
+            var user_id = $(this).data('user_id')
+            layer.open({
+              type: 1, // page 层类型
+              area: ['30%', '80%'],
+              title: '查询用户行为日志',
+              shade: 0.6, // 遮罩透明度
+              shadeClose: true, // 点击遮罩区域，关闭弹层
+              maxmin: true, // 允许全屏最小化
+              anim: 0, // 0-6 的动画形式，-1 不开启
+              content: $("#ip-count-modal"),
+              success: function()  {
+                //执行渲染
+                //第一个实例
+                table.render({
+                  elem: '#ip-count'
+                  ,url: '{:url("memberLog/getSameIpUser")}'
+                  ,where: {
+                    'ip':ip,
+                    'user_id': user_id
+                  }//数据接口
+                  ,cols: [[ //表头
+                    {field: 'user_name', width: 180, title: '用户名',}
+                    ,{field: 'create_time', title: '时间', width: 200, sort: true}
+                    ,{title: '操作', width: 100, templet: '#toolEventDemo'}
+                  ]],
+                });
+              },
+              cancel: function(index, layero){
+                // 重新打开行为列表
+                openUserLog(user_id)
+              }
+            });
+          })
+
+          function openUserLog(user_id) {
+            layer.open({
+              type: 1, // page 层类型
+              area: ['850px', '80%'],
+              title: '行为列表',
+              shade: 0.6, // 遮罩透明度
+              shadeClose: true, // 点击遮罩区域，关闭弹层
+              maxmin: true, // 允许全屏最小化
+              anim: 0, // 0-6 的动画形式，-1 不开启
+              content: $("#user-log-modal"),
+              success: function()  {
+                //执行渲染
+                layui.use('table', function () {
+                  var table = layui.table;
+                  table.render({
+                    elem: '#user-log'
+                    ,url: '{:url("member/getUserLog")}'
+                    ,where: {
+                      'user_id': user_id
+                    }//数据接口
+                    ,cols: [[ //表头
+                      {field: 'user_name', width: 180, title: '用户账号',}
+                      ,{field: 'ip', title: '登录IP', width: 200, sort: true}
+                      ,{field: 'user_ip_count', title: '同IP数', width: 200, sort: true, templet: function(d){
+                          // 返回模板内容
+                          return d.user_ip_count
+                        }}
+                      ,{field: 'create_time', title: '登录日期', width: 200, sort: true}
+                    ]],
+                  });
+                })
+
+              }
+            });
+          }
+        });
+        //调用函数，初始化表格
+        initTable();
+        //当点击查询按钮的时候执行
+        $("#search").bind("click", initTable);
+    });
+
+    function checkStatus(id, status) {
+        var status_text = ['', '', '成功', '失败', '自动出款']
+        if (status == 4) {
+            $("#operateTmplate").find(".channel-input").show();
+        } else {
+            $("#operateTmplate").find(".channel-input").hide();
+        }
+        layer.open({
+            title: "审核确认框",
+            type: 1,
+            content: $("#operateTmplate"),
+            area: ['400px', status == 4 ? '380px' : '280px'],
+            btn: ['确认审核' + status_text[status], '取消'],
+            yes: function (index, layero) {
+                var remark = layero.find(".remark").val();
+                var channel = layero.find("#channel").val();
+                if (!remark) {
+                    layer.msg('请填写备注');
+                    return;
+                }
+                $.getJSON("{:url('withdraw/checkStatus')}", {
+                    'id': id,
+                    'status': status,
+                    remark: remark,
+                    channel: channel
+                }, function (res) {
+                    if (1 == res.code) {
+                        layer.close(index);
+                        layer.alert(res.msg, {title: "{:lang('友情提示')}", icon: 1, closeBtn: 0}, function (inx) {
+                            layer.close(inx);
+                            initTable();
+                        });
+                    } else if (111 == res.code) {
+                        window.location.reload();
+                    } else {
+                        layer.msg(res.msg);
+                    }
+                });
+            }
+        });
+    }
+
+    function withdrawDel(id){
+        layer.confirm('确认删除此提现申请?', {icon: 3, title:'提示'}, function(index){
+            //do something
+            $.getJSON("{:url('withdraw/withdrawDel')}", {'id' : id}, function(res){
+                if(1 == res.code){
+                    layer.alert(res.msg, {title: "{:lang('友情提示')}", icon: 1, closeBtn: 0}, function(){
+                        initTable();
+                    });
+                }else if(111 == res.code){
+                    window.location.reload();
+                }else{
+                    layer.alert(res.msg, {title: "{:lang('友情提示')}", icon: 2});
+                }
+            });
+            layer.close(index);
+        })
+    }
+
+    function sendMessage(id) {
+        $('#message_withdraw_id').val(id);
+        $('#message_title').val('');
+        $('#message_content').val('');
+        $('#sendMessageModal').modal('show');
+    }
+
+    function submitMessage() {
+        var formData = $('#sendMessageForm').serialize();
+        var loading = layer.load(1, {
+            shade: [0.1,'#fff']
+        });
+        $.ajax({
+            url: '{:url("withdraw/sendMessage")}',
+            type: 'POST',
+            data: formData,
+            success: function(data) {
+                layer.close(loading);
+                if(data.code === 1) {
+                    layer.msg(data.msg, {icon: 1});
+                    $('#sendMessageModal').modal('hide');
+                } else {
+                    layer.msg(data.msg, {icon: 2});
+                }
+            },
+            error: function() {
+                layer.close(loading);
+                layer.msg('发送失败，请重试', {icon: 2});
+            }
+        });
+    }
+</script>
+
+

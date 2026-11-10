@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{:lang('绑定谷歌验证码')}</title>
+    <link rel="shortcut icon" href="{$admin_icon|toMedia}">
+    <link href="/static/admin/css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
+    <link href="/static/admin/css/font-awesome.min.css?v=4.4.0" rel="stylesheet">
+    <link href="/static/admin/css/animate.min.css" rel="stylesheet">
+    <link href="/static/admin/css/plugins/iCheck/custom.css" rel="stylesheet">
+    <link href="/static/admin/css/style.min.css?v=4.1.0" rel="stylesheet">
+</head>
+<body class="gray-bg">
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-8">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>{:lang('绑定谷歌验证码')}</h5>
+                </div>
+                <div class="ibox-content">
+                    <form method="post" action="{:url('user/authy')}" class="form-horizontal" autocomplete="off" id="commentForm">
+                        <input type="hidden" name="userid" value="{$userid}"/>
+                        <div class="form-group">
+                            <label class="control-label col-xs-3">{:lang('二维码')}：</label>
+                            <div class="col-xs-8">
+                                <img src="{$data}" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-xs-3">{:lang('密钥')}:</label>
+                            <div class="col-xs-8">
+                                <input type="text" class="form-control" name="secret" value="{$secret}" readonly>
+                                <div class="help-block">{:lang('如果不能扫码，可复制密钥添加')}</div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-xs-3">{:lang('验证码')}:</label>
+                            <div class="col-xs-8">
+                                <input type="text" class="form-control" name="code" autocomplete="off" required/>
+                                <div class="help-block">{:lang('当前时间')}：<span id="nowtime" data-time="{:time()}">{:timeToStr()}</span></div>
+                                <div class="help-block">{:lang('手机客户端下载地址')}: <a href="https://www.wandoujia.com/apps/32913" target="_blank">Android</a> / <a href="https://itunes.apple.com/cn/app/google-authenticator/id388497605?mt=8" target="_blank">IOS</a></div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-xs-3"></label>
+                            <div class="col-xs-8">
+                                <button type="submit" class="btn btn-primary fromSubmit">{:lang('保存')}</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<script src="/static/admin/js/jquery.min.js?v=2.1.4"></script>
+<script src="/static/admin/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="/static/admin/js/content.min.js?v=1.0.0"></script>
+<script src="/static/admin/js/plugins/validate/jquery.validate.min.js"></script>
+<script src="/static/admin/js/plugins/validate/messages_zh.min.js"></script>
+<script src="/static/admin/js/plugins/layer/layer.min.js"></script>
+<script src="/static/admin/js/jquery.form.js"></script>
+<script type="text/javascript">
+    var nowtime = "{:time()}";
+    var index = '';
+    function showStart(){
+        index = layer.load(0, {shade: false});
+        return true;
+    }
+
+    function showSuccess(res){
+        layer.ready(function(){
+            layer.close(index);
+            if(1 == res.code){
+                layer.alert(res.msg, {title: "{:lang('友情提示')}", icon: 1, closeBtn: 0, success(){
+                        window.location.reload();
+                }});
+            }else if(111 == res.code){
+                window.location.reload();
+            }else{
+                layer.msg(res.msg, {anim: 6});
+            }
+        });
+    }
+
+
+    $(document).ready(function(){
+        // 编辑管理员
+        var options = {
+            beforeSubmit:showStart,
+            success:showSuccess
+        };
+
+        $('#commentForm').submit(function(){
+            $(this).ajaxSubmit(options);
+            return false;
+        });
+    });
+
+    // 表单验证
+    $.validator.setDefaults({
+        highlight: function(e) {
+            $(e).closest(".form-group").removeClass("has-success").addClass("has-error")
+        },
+        success: function(e) {
+            e.closest(".form-group").removeClass("has-error").addClass("has-success")
+        },
+        errorElement: "span",
+        errorPlacement: function(e, r) {
+            e.appendTo(r.is(":radio") || r.is(":checkbox") ? r.parent().parent().parent() : r.parent())
+        },
+        errorClass: "help-block m-b-none",
+        validClass: "help-block m-b-none"
+    });
+    var nowtime = parseInt("{:time()}");
+    function gettime() {
+        setInterval(function(){
+            var date_str = new Date().toLocaleString("zh-CN", {timeZone: "{$Think.config.default_timezone|default='PRC'}"})
+            // var date_str = date.getFullYear() + "-" + date.getMonth() + "-" + date.getDay() + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds()
+            $("#nowtime").text(date_str);
+        }, 1000);
+    }
+    setInterval(function(){
+        nowtime += 1;
+    },1000);
+    gettime();
+</script>
+</body>
+</html>

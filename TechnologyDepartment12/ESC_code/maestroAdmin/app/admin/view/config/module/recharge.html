@@ -1,0 +1,115 @@
+<!--<div class="form-group">-->
+<!--    <label class="col-sm-3 control-label">{:lang("充值返利类型")}：</label>-->
+<!--    <div class="input-group col-sm-4">-->
+<!--        <div class="layui-form">-->
+<!--            <input type="radio" name="recharge_rebate_type" value="1" title="根据下级充值金额返佣" {if $config['recharge_rebate_type'] == 1}checked{/if}>-->
+<!--            <input type="radio" name="recharge_rebate_type" value="2" title="根据当前用户等级解锁金额返佣" {if $config['recharge_rebate_type'] == 2}checked{/if}>-->
+<!--        </div>-->
+<!--        <p class="help-block">recharge_rebate_type：1.根据下级充值金额返佣，2.根据当前用户等级解锁金额返佣。如果下级充值金额小于解锁金额，依旧使用下级充值金额。</p>-->
+<!--    </div>-->
+<!--</div>-->
+
+<div class="form-group">
+    <label class="col-sm-3 control-label">{:lang("首充送款开关")}：</label>
+    <div class="input-group col-sm-4">
+        <div class="layui-form">
+            <input type="radio" name="is_open_first_charge_rebate" value="1" title="开启" {if $config['is_open_first_charge_rebate'] == 1}checked{/if}>
+            <input type="radio" name="is_open_first_charge_rebate" value="0" title="关闭" {if $config['is_open_first_charge_rebate'] == 0}checked{/if}>
+        </div>
+        <p class="help-block">is_open_first_charge_rebate：首充送款开关。</p>
+    </div>
+</div>
+
+<div class="form-group">
+    <label class="col-sm-3 control-label">{:lang("首充送款最低金额")}：</label>
+    <div class="input-group col-sm-4">
+        <input type="text" class="form-control" name="first_charge_rebate_min" value="{$config.first_charge_rebate_min|default=0}">
+        <p class="help-block">first_charge_rebate_min：首充送款条件：充值金额大于等于x（最低要求），设置0不限制金额。</p>
+    </div>
+</div>
+
+<div class="form-group">
+    <label class="col-sm-3 control-label">{:lang("首充送款最高金额")}：</label>
+    <div class="input-group col-sm-4">
+        <input type="text" class="form-control" name="first_charge_rebate_max" value="{$config.first_charge_rebate_max|default=0}">
+        <p class="help-block">first_charge_rebate_max：首充送款条件：充值金额小于等于x（最高要求）</p>
+    </div>
+</div>
+
+<div class="form-group">
+    <label class="col-sm-3 control-label">{:lang("首充送款比例")}：</label>
+    <div class="input-group col-sm-4">
+        <input type="text" class="form-control" name="first_charge_rebate_percent" value="{$config.first_charge_rebate_percent|default=0}">
+        <p class="help-block">first_charge_rebate_percent：首充送款比例（例如 10% 设置 10 ）。</p>
+    </div>
+</div>
+
+<div class="form-group">
+    <label class="col-sm-3 control-label">{:lang("首充送款封顶")}：</label>
+    <div class="input-group col-sm-4">
+        <input type="text" class="form-control" name="first_charge_rebate_cap" value="{$config.first_charge_rebate_cap|default=0}">
+        <p class="help-block">first_charge_rebate_cap：首充送款额度：单次封顶设置，可选0不封顶。</p>
+    </div>
+</div>
+
+<!--<div class="form-group">-->
+<!--    <label class="col-sm-3 control-label">{:lang("复充送款开关")}：</label>-->
+<!--    <div class="input-group col-sm-4">-->
+<!--        <div class="layui-form">-->
+<!--            <input type="radio" name="is_open_again_charge_rebate" value="1" title="开启" {if $config['is_open_again_charge_rebate'] == 1}checked{/if}>-->
+<!--            <input type="radio" name="is_open_again_charge_rebate" value="0" title="关闭" {if $config['is_open_again_charge_rebate'] == 0}checked{/if}>-->
+<!--        </div>-->
+<!--        <p class="help-block">is_open_again_charge_rebate：复充送款开关。</p>-->
+<!--    </div>-->
+<!--</div>-->
+
+<!--<div class="form-group">-->
+<!--    <label class="col-sm-3 control-label">{:lang("复充送款最低金额")}：</label>-->
+<!--    <div class="input-group col-sm-4">-->
+<!--        <input type="text" class="form-control" name="again_charge_rebate_min" value="{$config.again_charge_rebate_min|default=0}">-->
+<!--        <p class="help-block">again_charge_rebate_min：复充送款条件：充值金额大于等于x（最低要求），设置0不限制金额。</p>-->
+<!--    </div>-->
+<!--</div>-->
+
+<!--<div class="form-group">-->
+<!--    <label class="col-sm-3 control-label">{:lang("团队充值满额奖励开关")}：</label>-->
+<!--    <div class="input-group col-sm-4">-->
+<!--        <div class="layui-form">-->
+<!--            <input type="radio" name="is_give_team_brokerage" value="1" title="开启" {if $config['is_give_team_brokerage'] == 1}checked{/if}>-->
+<!--            <input type="radio" name="is_give_team_brokerage" value="0" title="关闭" {if $config['is_give_team_brokerage'] == 0}checked{/if}>-->
+            <input type="hidden" name="is_give_team_brokerage" value="0" title="关闭">
+<!--        </div>-->
+<!--        <p class="help-block">is_give_team_brokerage：团队充值满额奖励开关。</p>-->
+<!--    </div>-->
+<!--</div>-->
+
+<!--<div class="form-group">-->
+<!--    <label class="col-sm-3 control-label">{:lang("团队充值奖励账户")}：</label>-->
+<!--    <div class="input-group col-sm-4">-->
+<!--        <div class="layui-form">-->
+<!--            <input type="radio" name="give_team_brokerage_account" value="1" title="基础账户" {if $config['give_team_brokerage_account'] == 1}checked{/if}>-->
+<!--            <input type="radio" name="give_team_brokerage_account" value="2" title="佣金账户" {if $config['give_team_brokerage_account'] == 2}checked{/if}>-->
+<!--        </div>-->
+<!--        <p class="help-block">give_team_brokerage_account：团队充值奖励账户，1.基础，2.佣金。</p>-->
+<!--    </div>-->
+<!--</div>-->
+
+<!--<div class="form-group">-->
+<!--    <label class="col-sm-3 control-label">{:lang("下级团队充值满多少奖励")}：</label>-->
+<!--    <div class="input-group col-sm-4">-->
+<!--        <input type="text" class="form-control" name="give_team_brokerage_limit" value="{$config.give_team_brokerage_limit|default=0}">-->
+<!--        <p class="help-block">give_team_brokerage_limit：下三级团队充值满多少奖励。</p>-->
+<!--    </div>-->
+<!--</div>-->
+
+<!--<div class="form-group">-->
+<!--    <label class="col-sm-3 control-label">{:lang("下级团队充值满额奖励多少")}：</label>-->
+<!--    <div class="input-group col-sm-4">-->
+<!--        <input type="text" class="form-control" name="give_team_brokerage_num" value="{$config.give_team_brokerage_num|default=0}">-->
+<!--        <p class="help-block">give_team_brokerage_num：下级团队充值满额奖励多少。</p>-->
+<!--    </div>-->
+<!--</div>-->
+
+
+
+

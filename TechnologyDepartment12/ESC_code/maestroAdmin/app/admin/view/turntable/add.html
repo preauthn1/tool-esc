@@ -1,0 +1,53 @@
+{include file="header" /}
+<div class="row">
+    <div class="col-sm-12">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h5>添加抽奖次数</h5>
+            </div>
+            <div class="ibox-content">
+                <form class="form-horizontal m-t" id="dataForm" method="post"
+                      action="{:url('countlist', ['act' => 'add'])}">
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">是否代理线：</label>
+                        <div class="input-group col-sm-4">
+                            <div class="radio i-checks col-sm-3">
+                                <label> <input type="radio" value="0" checked name="agent"> <i></i> 否</label>
+                                <label> <input type="radio" value="1" name="agent"> <i></i> 是</label>
+                            </div>
+                            <span class="help-block m-b-none">选着代理线时，指定账户id下的全部会员抽奖次数都会对应调整（不包含自己）</span>
+                        </div>
+
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">用户账号ID：</label>
+                        <div class="input-group col-sm-4">
+                            <input type="text" class="form-control" name="user_id" required/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">抽奖次数：</label>
+                        <div class="input-group col-sm-4">
+                            <input type="text" class="form-control" name="num" value="1"/>
+                            <span class="help-block m-b-none">负数表示减少次数，正数表示增加次数</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">备注：</label>
+                        <div class="input-group col-sm-4">
+                            <input type="text" class="form-control" name="remark" value=""/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-4 col-sm-offset-6">
+                            <button class="btn btn-primary" type="submit">{:lang("提交")}</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+{include file="footer" /}

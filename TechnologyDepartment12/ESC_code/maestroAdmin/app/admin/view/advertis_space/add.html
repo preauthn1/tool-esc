@@ -1,0 +1,72 @@
+    {include file="header" /}
+    <div class="row">
+        <div class="col-sm-10">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>{:lang("编辑")}</h5>
+                </div>
+                <div class="ibox-content">
+                    <form class="form-horizontal m-t" id="dataForm" method="post" action="{:url('AdvertisSpace/add')}">
+                        <input type="hidden" name="id" value="{$info.id ?? ''}">
+                        <div class="form-group">
+                        	<label class="col-sm-3 control-label">{:lang("库存名称")}：</label>
+                        	<div class="input-group col-sm-4">
+                        		<div class="layui-form">
+                        			<select name="advertis_name">
+                        				<option value="" ></option>
+                        				<option value="横幅广告" {if ($info.advertis_name ?? '') == '横幅广告'} selected {/if}>{:lang("横幅广告")}</option>
+                        				<option value="插屏广告" {if ($info.advertis_name ?? '') == '插屏广告'} selected {/if}>{:lang("插屏广告")}</option>
+                        				<option value="开屏广告" {if ($info.advertis_name ?? '') == '开屏广告'} selected {/if}>{:lang("开屏广告")}</option>
+                        				<option value="原生/信息流" {if ($info.advertis_name ?? '') == '原生/信息流'} selected {/if}>{:lang("原生/信息流")}</option>
+                        				<option value="视频广告" {if ($info.advertis_name ?? '') == '视频广告'} selected {/if}>{:lang("视频广告")}</option>
+                        			</select>
+                        		</div>
+                        	</div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">{:lang("总曝光量")}：</label>
+                            <div class="input-group col-sm-4">
+                                <input id="exposure" type="text" class="form-control" name="exposure" required="" aria-required="true" 
+                                value="{$info.exposure ?? ''}">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">{:lang("成交量")}：</label>
+                            <div class="input-group col-sm-4">
+                                <input id="turnover" type="text" class="form-control" name="turnover" required="" aria-required="true" 
+                                value="{$info.turnover ?? ''}">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">{:lang("成交笔数")}：</label>
+                            <div class="input-group col-sm-4">
+                                <input id="turnover_num" type="text" class="form-control" name="turnover_num" required="" aria-required="true" 
+                                value="{$info.turnover_num ?? ''}">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">{:lang("成交金额")}：</label>
+                            <div class="input-group col-sm-4">
+                                <input id="turnover_money" type="text" class="form-control" name="turnover_money" required="" aria-required="true" 
+                                value="{$info.turnover_money ?? ''}">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">{:lang("CPM千次曝光平均成本")}：</label>
+                            <div class="input-group col-sm-4">
+                                <input id="cpm_cost_money" type="text" class="form-control" name="cpm_cost_money" required="" aria-required="true" 
+                                value="{$info.cpm_cost_money ?? ''}">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-4 col-sm-offset-6">
+                                <button class="btn btn-primary" type="submit">{:lang("提交")}</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{include file="footer" /}

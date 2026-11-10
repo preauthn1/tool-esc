@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>奖品设置</title>
+    <link rel="shortcut icon" href="{$admin_icon|toMedia}">
+    <link href="/static/admin/css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
+    <link href="/static/admin/css/font-awesome.min.css?v=4.4.0" rel="stylesheet">
+    <link href="/static/admin/css/plugins/bootstrap-table/bootstrap-table.min.css" rel="stylesheet">
+    <link href="/static/admin/css/animate.min.css" rel="stylesheet">
+    <link href="/static/admin/css/style.min.css?v=4.1.0" rel="stylesheet">
+    <link href="/static/admin/css/plugins/sweetalert/sweetalert.css" rel="stylesheet">
+    <link href="/static/admin/js/layui/css/layui.css" rel="stylesheet">
+</head>
+<body class="gray-bg">
+<div class="wrapper wrapper-content animated fadeInRight">
+    <!-- Panel Other -->
+    <div class="ibox float-e-margins">
+        <div class="ibox-title">
+            <h5>奖品详情</h5>
+        </div>
+
+        <div class="layui-tab layui-tab-brief" lay-filter="docDemoTabBrief">
+            <ul class="layui-tab-title">
+                <li class="layui-this">注册奖品</li>
+                <li>邀请奖品</li>
+            </ul>
+            <div class="layui-tab-content">
+                <div class="layui-tab-item layui-show">
+                    <div class="ibox-content">
+                        <form class="form-horizontal" id="commentFormReg" method="post">
+                            <div class="tab-content ibox-content">
+                                <div class="layui-row">
+                                    {foreach $prize_reg_list as $prize}
+                                    <input name="id[{$prize.sort}]" value="{$prize.id}" hidden>
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label">{:lang($prize.name)}：</label>
+                                        <div class="layui-col-md4">
+                                            <div class="form-group">
+                                                <label class="col-sm-3 control-label">{:lang("金额")}/{$fiat_currency_unit}：</label>
+                                                <div class="input-group col-sm-4">
+                                                    <div class="layui-form">
+                                                        <input type="text" class="form-control"
+                                                               name="value[{$prize.sort}]"
+                                                               value="{$prize.value}">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="layui-col-md3">
+                                            <div class="form-group">
+                                                <label class="col-sm-3 control-label">{:lang("概率")}%：</label>
+                                                <div class="input-group col-sm-4">
+                                                    <div class="layui-form">
+                                                        <input type="text" class="form-control"
+                                                               name="probability[{$prize.sort}]"
+                                                               value="{$prize.probability}">
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {/foreach}
+                                </div>
+                            </div>
+                        </form>
+                        <div class="form-group">
+                            <div class="col-sm-4 col-sm-offset-6">
+                                <!--<input type="button" value="提交" class="btn btn-primary" id="postform"/>-->
+                                <button class="btn btn-primary" onclick="postform('commentFormReg')">{:lang("提交")}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-tab-item">
+                    <div class="ibox-content">
+                        <form class="form-horizontal" id="commentFormInv" method="post">
+                            <div class="tab-content ibox-content">
+                                <div class="layui-row">
+                                    {foreach $prize_inv_list as $prize}
+                                    <input name="id[{$prize.sort}]" value="{$prize.id}" hidden>
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label">{:lang($prize.name)}：</label>
+                                        <div class="layui-col-md4">
+                                            <div class="form-group">
+                                                <label class="col-sm-3 control-label">{:lang("金额")}/{$fiat_currency_unit}：</label>
+                                                <div class="input-group col-sm-4">
+                                                    <div class="layui-form">
+                                                        <input type="text" class="form-control"
+                                                               name="value[{$prize.sort}]"
+                                                               value="{$prize.value}">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="layui-col-md3">
+                                            <div class="form-group">
+                                                <label class="col-sm-3 control-label">{:lang("概率")}%：</label>
+                                                <div class="input-group col-sm-4">
+                                                    <div class="layui-form">
+                                                        <input type="text" class="form-control"
+                                                               name="probability[{$prize.sort}]"
+                                                               value="{$prize.probability}">
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {/foreach}
+                                </div>
+                            </div>
+                        </form>
+                        <div class="form-group">
+                            <div class="col-sm-4 col-sm-offset-6">
+                                <!--<input type="button" value="提交" class="btn btn-primary" id="postform"/>-->
+                                <button class="btn btn-primary" onclick="postform('commentFormInv')">{:lang("提交")}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Panel Other -->
+</div>
+
+<script src="/static/admin/js/jquery.min.js?v=2.1.4"></script>
+<script src="/static/admin/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="/static/admin/js/content.min.js?v=1.0.0"></script>
+<script src="/static/admin/js/plugins/layer/layer.min.js"></script>
+<script src="/static/admin/js/layui/layui.js"></script>
+<script type="text/javascript">
+
+    function postform(id) {
+        $.ajax({
+            type: 'POST',
+            url: "{:url('turntable/prizeList')}",
+            data: $("#" + id).serializeArray(),
+            dataType: 'json',
+            success: function (res) {
+                if (res.code == 1) {
+                    var index = parent.layer.getFrameIndex(window.name); // 先得到当前 iframe 层的索引
+                    parent.layer.close(index);
+                }else {
+                    layer.msg(res.msg, {icon: 2, time: 1000});
+                }
+            },
+            error: function (xhr, type) {
+                // 即使加载出错，也得重置
+
+            }
+        });
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,365 @@
+<div class="layui-collapse">
+    <div class="layui-colla-item">
+        <div class="layui-colla-title">虚拟币出款地址</div>
+        <div class="layui-colla-content layui-show">
+            <div class="form-group">
+                <label class="col-sm-3 control-label">{:lang("出款账户地址")}：</label>
+                <div class="input-group col-sm-4">
+                    <div class="layui-form" style="display: flex;">
+                        <input class="form-control" readonly id="payment_wallet"
+                               value="{$config.payment_wallet}" name="payment_wallet" type="text"/>
+                        <span class="input-group-btn">
+                            <button type="button" class="btn btn-primary" id="payment_wallet_generate"
+                                    onclick="walletGenerate()">
+                               {:lang("获取出款地址")}
+                            </button>
+                        </span>
+                    </div>
+                    <p class="help-block">payment_wallet：出款账户地址</p>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">{:lang("TRX出款账户地址")}：</label>
+                <div class="input-group col-sm-4">
+                    <div class="layui-form" style="display: flex;">
+                        <input class="form-control" readonly id="trx_payment_wallet"
+                               value="{$config.trx_payment_wallet}" name="trx_payment_wallet" type="text"/>
+                        <span class="input-group-btn">
+                            <button type="button" class="btn btn-primary" id="trx_payment_wallet_generate"
+                                    onclick="walletGenerate()">
+                               {:lang("获取出款地址")}
+                            </button>
+                        </span>
+                    </div>
+                    <p class="help-block">trx_payment_wallet：TRX出款账户地址</p>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">{:lang("bsc出款账户地址")}：</label>
+                <div class="input-group col-sm-4">
+                    <div class="layui-form" style="display: flex;">
+                        <input name="bsc_payment_wallet" readonly class="form-control" id="bsc_payment_wallet"
+                               value="{$config.bsc_payment_wallet}" type="text"/>
+                        <span class="input-group-btn">
+                            <button type="button" class="btn btn-primary" id="bsc_payment_wallet_generate"
+                                    onclick="walletGenerate()">
+                               {:lang("获取出款地址")}
+                            </button>
+                        </span>
+                    </div>
+                    <p class="help-block">bsc_payment_wallet：bsc出款账户地址</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="layui-colla-item">
+        <div class="layui-colla-title">提现基础设置</div>
+        <div class="layui-colla-content layui-show">
+            <div class="form-group">
+                <label class="col-sm-3 control-label">{:lang("提现开关")}：</label>
+                <div class="input-group col-sm-4">
+                    <div class="layui-form">
+                        <input type="radio" name="withdraw_open" value="1" title="开启" {if $config['withdraw_open'] ==
+                        1}checked{/if}>
+                        <input type="radio" name="withdraw_open" value="0" title="关闭" {if $config['withdraw_open'] ==
+                        0}checked{/if}>
+                    </div>
+                    <p class="help-block">withdraw_open：提现开关。</p>
+                </div>
+            </div>
+
+            <!--            <div class="form-group">-->
+            <!--                <label class="col-sm-3 control-label">{:lang("取款地址修改开关")}：</label>-->
+            <!--                <div class="input-group col-sm-4">-->
+            <!--                    <div class="layui-form">-->
+            <!--                        <input type="radio" name="is_change_withdraw_address" value="1" title="开启"-->
+            <!--                               {if $config['is_change_withdraw_address'] == 1}checked{/if}>-->
+            <!--                        <input type="radio" name="is_change_withdraw_address" value="0" title="关闭"-->
+            <!--                               {if $config['is_change_withdraw_address'] == 0}checked{/if}>-->
+            <!--                    </div>-->
+            <!--                    <p class="help-block">is_change_withdraw_address：客户取款地址绑定后是否可修改。</p>-->
+            <!--                </div>-->
+            <!--            </div>-->
+
+            <div class="form-group">
+                <label class="col-sm-3 control-label">{:lang("取款地址是否能重复")}：</label>
+                <div class="input-group col-sm-4">
+                    <div class="layui-form">
+                        <input type="radio" name="is_repeat_withdraw_address" value="1" title="开启"
+                               {if $config['is_repeat_withdraw_address'] == 1}checked{/if}>
+                        <input type="radio" name="is_repeat_withdraw_address" value="0" title="关闭"
+                               {if $config['is_repeat_withdraw_address'] == 0}checked{/if}>
+                    </div>
+                    <p class="help-block">is_repeat_withdraw_address：客户取款地址是否能重复。</p>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-sm-3 control-label">{:lang("第一次提现是否要求输入联系方式")}：</label>
+                <div class="input-group col-sm-4">
+                    <div class="layui-form">
+                        <input type="radio" name="first_withdraw_input_contact" value="1" title="开启"
+                               {if $config['first_withdraw_input_contact'] == 1}checked{/if}>
+                        <input type="radio" name="first_withdraw_input_contact" value="0" title="关闭"
+                               {if $config['first_withdraw_input_contact'] == 0}checked{/if}>
+                    </div>
+                    <p class="help-block">first_withdraw_input_contact：第一次提现是否要求输入联系方式。</p>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">{:lang("第一次提现是否单独设置最低金额")}：</label>
+                <div class="input-group col-sm-4">
+                    <div class="layui-form">
+                        <input type="radio" name="first_withdraw_is_min" value="1" title="开启"
+                               {if $config['first_withdraw_is_min'] == 1}checked{/if}>
+                        <input type="radio" name="first_withdraw_is_min" value="0" title="关闭"
+                               {if $config['first_withdraw_is_min'] == 0}checked{/if}>
+                    </div>
+                    <p class="help-block">first_withdraw_is_min：第一次提现是否单独设置最低金额。</p>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">{:lang("第一次提现最低提现金额")}：</label>
+                <div class="layui-form">
+                    <div class="input-group col-sm-4">
+                        <input type="number" class="form-control" name="first_withdraw_min_money"
+                               value="{$config.first_withdraw_min_money|default=0}">
+                        <p class="help-block">
+                            first_withdraw_min_money：第一次提现最低提现金额。</p>
+
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">{:lang("出款审核时间")}：</label>
+                <div class="layui-form">
+                    <div class="input-group col-sm-4">
+                        <input type="number" min="0" step="0.01" class="form-control" name="withdraw_check_hour"
+                               value="{$config.withdraw_check_hour|default=0}">
+                        <p class="help-block">
+                            withdraw_check_hour：出款审核时间(小时), 通过审核后才能出款。</p>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-sm-3 control-label">{:lang("每日提现次数")}：</label>
+                <div class="input-group col-sm-4">
+                    <input type="number" min="0" class="form-control" name="day_tx_count"
+                           value="{$config.day_tx_count|default=1}">
+                    <p class="help-block">day_tx_count：填0时为不限制提现次数</p>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-sm-3 control-label">{:lang("免审核提现次数")}：</label>
+                <div class="input-group col-sm-4">
+                    <input type="number" min="0" class="form-control" name="withdraw_no_auth_times"
+                           value="{$config.withdraw_no_auth_times|default=1}">
+                    <p class="help-block">withdraw_no_auth_times：填0时所有提现都需要审核</p>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">{:lang("提现是否需要实名认证")}：</label>
+                <div class="input-group col-sm-4">
+                    <div class="layui-form">
+                        <input type="radio" name="withdraw_need_kyc" value="1" title="开启"
+                               {if $config['withdraw_need_kyc'] == 1}checked{/if}>
+                        <input type="radio" name="withdraw_need_kyc" value="0" title="关闭"
+                               {if $config['withdraw_need_kyc'] == 0}checked{/if}>
+                    </div>
+                    <p class="help-block">withdraw_need_kyc：提现是否需要实名认证。</p>
+                </div>
+            </div>
+            {/*
+            <div class="form-group">*/}
+                {/* <label class="col-sm-3 control-label">{:lang("提现是否需要购买广告位或者AI智能托管")&cc;：</label>*/}
+                {/*
+                <div class="input-group col-sm-4">*/}
+                    {/*
+                    <div class="layui-form">*/}
+                        {/* <input type="radio" name="withdraw_need_package_or_balance" value="1" title="开启" {if
+                                   $config['withdraw_need_package_or_balance'] ==*/}
+                        {/* 1&cc;checked{/if&cc;>*/}
+                        {/* <input type="radio" name="withdraw_need_package_or_balance" value="0" title="关闭" {if
+                                   $config['withdraw_need_package_or_balance'] ==*/}
+                        {/* 0&cc;checked{/if&cc;>*/}
+                        {/*
+                    </div>
+                    */}
+                    {/* <p class="help-block">withdraw_need_package_or_balance：提现是否需要购买广告位或者AI智能托管。</p>
+                    */}
+                    {/*
+                </div>
+                */}
+                {/*
+            </div>
+            */}
+
+            <div class="form-group">
+                <label class="col-sm-3 control-label">{:lang("vip0是否可以提现")}：</label>
+                <div class="input-group col-sm-4">
+                    <div class="layui-form">
+                        <input type="radio" name="vip0_is_withdraw" value="1" title="开启"
+                               {if $config['vip0_is_withdraw'] == 1}checked{/if}>
+                        <input type="radio" name="vip0_is_withdraw" value="0" title="关闭"
+                               {if $config['vip0_is_withdraw'] == 0}checked{/if}>
+                    </div>
+                    <p class="help-block">vip0_is_withdraw：vip0是否可以提现。</p>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">{:lang("提现流水限制")}：</label>
+                <div class="layui-form">
+                    <div class="input-group col-sm-4">
+                        <input type="number" min="0" class="form-control" name="withdraw_water_limit"
+                               value="{$config.withdraw_water_limit|default=0}">
+                        <p class="help-block">withdraw_water_limit：提现流水限制 设置百分比数据（例如 10% 设置 10 ）</p>
+
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">{:lang("提现流水限制提示")}：</label>
+                    <div class="input-group col-sm-4">
+                        <input type="text" class="form-control" name="user_water_limit_tips"
+                               value="{$config.user_water_limit_tips}">
+                        <p class="help-block">user_water_limit_tips：提现流水限制提示</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="layui-colla-item">
+        <div class="layui-colla-title">出款金额设置</div>
+        <div class="layui-colla-content layui-show">
+            <div class="form-group">
+                <label class="col-sm-3 control-label">{:lang("自动出款开关")}：</label>
+                <div class="input-group col-sm-4">
+                    <div class="layui-form">
+                        <input type="radio" name="auto_payment" value="1" title="开启"
+                               {if $config['auto_payment'] == 1}checked{/if}>
+                        <input type="radio" name="auto_payment" value="0" title="关闭"
+                               {if $config['auto_payment'] == 0}checked{/if}>
+                    </div>
+                    <p class="help-block">auto_payment：是否自动出款。</p>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-sm-3 control-label">{:lang("自动出款安全值")}：</label>
+                <div class="layui-form">
+                    <div class="input-group col-sm-4">
+                        <input type="number" min="0" class="form-control" name="auto_payment_safety_value"
+                               value="{$config.auto_payment_safety_value|default=0}">
+                        <p class="help-block">
+                            auto_payment_safety_value：自动出款金额安全值,当出款金额大于该值时,需要后台人工审核出款。</p>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-sm-3 control-label">{:lang("最小提现金额配置")}：</label>
+                <div class="input-group col-sm-4">
+                    <div class="layui-form">
+                        <input type="radio" name="min_withdraw_config" value="global" title="全局" {if $config['min_withdraw_config']
+                        ==
+                        'global'}checked{/if}>
+                        <input type="radio" name="min_withdraw_config" value="local" title="局部" {if $config['min_withdraw_config']
+                        ==
+                        'local'}checked{/if}>
+                    </div>
+                    <p class="help-block">
+                        min_withdraw_config：最小提现金额配置，选择全局由充值币种菜单配置控制，选择局部由vip配置菜单里控制。</p>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">{:lang("整百金额提现")}：</label>
+                <div class="input-group col-sm-4">
+                    <div class="layui-form">
+                        <input type="radio" name="withdrawal_100_multiple" value="1" title="开启"
+                               {if array_key_exists('withdrawal_100_multiple', $config) &&
+                        $config['withdrawal_100_multiple'] == 1}checked{/if}>
+                        <input type="radio" name="withdrawal_100_multiple" value="0" title="关闭"
+                               {if array_key_exists('withdrawal_100_multiple', $config) &&
+                        $config['withdrawal_100_multiple'] == 0}checked{/if}>
+                    </div>
+                    <p class="help-block">
+                        withdrawal_100_multiple：整百金额提现。</p>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">{:lang("当日充提比例提醒")}：</label>
+                <div class="layui-form">
+                    <div class="input-group col-sm-4">
+                        <input type="number" min="0" class="form-control"
+                               name="today_recharge_withdraw_rate_warning"
+                               value="{$config.today_recharge_withdraw_rate_warning|default=0}">
+                        <p class="help-block">today_recharge_withdraw_rate_warning：当日充提比例提醒，当日有充值，提现超过当日充值百分百提醒
+                            设置百分比数据（例如 10% 设置 10 ）</p>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-sm-3 control-label">{:lang("免手续费笔数")}：</label>
+                <div class="layui-form">
+                    <div class="input-group col-sm-4">
+                        <input type="number" min="0" class="form-control" name="free_withdraw_fee_num"
+                               value="{$config.free_withdraw_fee_num|default=0}">
+                        <p class="help-block">free_withdraw_fee_num：单日免手续费笔数</p>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label
+                    class="col-sm-3 control-label">{:lang("最小手续费（单位：")}{$config.fiat_currency_unit}）：</label>
+                <div class="input-group col-sm-4">
+                    <input type="number" min="0" class="form-control" id="withdraw_fee_min" name="withdraw_fee_min"
+                           value="{$config.withdraw_fee_min|default=0}">
+                    <p class="help-block">withdraw_fee_min：最小手续费，单位{$config.fiat_currency_unit}。</p>
+                </div>
+            </div>
+            <div class="form-group">
+                <label
+                    class="col-sm-3 control-label">{:lang("最大手续费（单位：）")}{$config.fiat_currency_unit}）：</label>
+                <div class="input-group col-sm-4">
+                    <input type="number" min="0" class="form-control" id="withdraw_fee_max" name="withdraw_fee_max"
+                           value="{$config.withdraw_fee_max|default=0}">
+                    <p class="help-block">withdraw_fee_max：最大手续费，单位{$config.fiat_currency_unit}。</p>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-sm-3 control-label">{:lang("提现手续费百分比")}：</label>
+                <div class="input-group col-sm-4">
+                    <input type="number" min="0" step="0.01" class="form-control" id="withdraw_rate"
+                           name="withdraw_rate"
+                           value="{$config.withdraw_rate|default=0}">
+                    <p class="help-block">withdraw_rate：提现手续费百分比。</p>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-sm-3 control-label">{:lang("手续费扣除方式")}：</label>
+                <div class="input-group col-sm-4">
+                    <div class="layui-form">
+                        <input type="radio" name="withdraw_rate_method" value="0" title="从余额中扣除" {if $config['withdraw_rate_method']
+                        ==
+                        '0'}checked{/if}>
+                        <input type="radio" name="withdraw_rate_method" value="1" title="从提现金额中扣除" {if
+                               $config['withdraw_rate_method']
+                        ==
+                        '1'}checked{/if}>
+                    </div>
+                    <p class="help-block">
+                        withdraw_rate_method：手续费扣除方式。</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

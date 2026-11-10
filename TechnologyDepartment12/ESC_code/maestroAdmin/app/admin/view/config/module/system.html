@@ -1,0 +1,76 @@
+
+<div class="form-group">
+    <label class="col-sm-3 control-label">{:lang("货币汇率")}：</label>
+    <div class="input-group col-sm-4">
+        <input type="text" class="form-control" name="exchange_rate" value="{$config.exchange_rate|default=1}">
+        <p>
+            1USDT和货币的汇率值<br>
+            例如：1USDT=6.5人民币时填6.5
+        </p>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-sm-3 control-label">{:lang("开启多语言切换")}：</label>
+    <div class="input-group col-sm-4">
+        <input type="text" class="form-control" name="checkout_language" value="{$config.checkout_language|intval}">
+        <p class="help-block">填1为开启，0为关闭 </p>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-sm-3 control-label">{:lang("安卓下载地址")}：</label>
+    <div class="input-group col-sm-4">
+        <input name="android_url" placeholder="下载链接或上传apk格式" class="form-control" id="android_url" value="{$config.android_url}" type="text" />
+        <span class="input-group-btn">
+            <button type="button" class="btn btn-primary" id="uploaderAndroidFile">
+                <i class="layui-icon">&#xe67c;</i>{:lang("上传")}
+            </button>
+        </span>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-sm-3 control-label">{:lang("IOS下载地址")}：</label>
+    <div class="input-group col-sm-4">
+        <input name="ios_url" placeholder="下载链接或上传mobileconfig格式" class="form-control" id="ios_url" value="{$config.ios_url}" type="text" />
+        <span class="input-group-btn">
+            <button type="button" class="btn btn-primary" id="uploaderIosFile">
+                <i class="layui-icon">&#xe67c;</i>{:lang("上传")}
+            </button>
+        </span>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-sm-3 control-label">{:lang("统计代码")}：</label>
+    <div class="input-group col-sm-4">
+        <textarea class="form-control" id="stat_code" name="stat_code">{$config.stat_code}</textarea>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-sm-3 control-label">{:lang("发送短信验证")}：</label>
+    <div class="input-group col-sm-4">
+        <input type="text" class="form-control" name="send_sms_verify" value="{$config.send_sms_verify|default=0}">
+        <p class="help-block">
+            填1为开启，0为关闭<br>
+            发送短信时是否开启滑块验证
+        </p>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-sm-3 control-label">{:lang("短信签名")}：</label>
+    <div class="input-group col-sm-4">
+        <input type="text" class="form-control" id="sms_sign" placeholder="例如：聚惠集" name="sms_sign" value="{$config.sms_sign}">
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-sm-3 control-label">{:lang("代理后台授权码")}：</label>
+    <div class="input-group col-sm-4">
+        <input type="text" class="form-control" id="authorize" placeholder="代理后台登录所需授权码，不需要则不填" name="authorize" value="{$config.authorize}">
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-sm-3 control-label">{:lang("后台访问IP白名单")}：</label>
+    <div class="input-group col-sm-7">
+        <textarea class="form-control" name="admin_white_ip">{$config.admin_white_ip}</textarea>
+        <p class="help-block">每行一个IP<br>
+        当前的IP：{$ip}</p>
+    </div>
+</div>

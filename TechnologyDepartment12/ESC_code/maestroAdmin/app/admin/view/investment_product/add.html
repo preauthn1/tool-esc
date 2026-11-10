@@ -1,0 +1,199 @@
+{include file="header" /}
+<style>
+    .layui-form-label {
+        box-sizing: content-box;
+    }
+</style>
+<div class="row">
+    <div class="col-sm-8">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h5>{:lang("添加/修改")}</h5>
+            </div>
+            <div class="ibox-content">
+                <form class="form-horizontal m-t layui-form" id="dataForm" method="post" action="{:url('add')}">
+                    <input type="hidden" name="id" value="{$info.id|default=''}">
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">{:lang("托管名称")}</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="product_name" value="{$info.product_name|default=''}"
+                                   lay-verify="required" class="layui-input" required>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">{:lang("托管类型")}</label>
+                        <div class="layui-input-block">
+                            <select name="profit_type" class="form-control" lay-verify="required" id="typeSelect" lay-filter="profit_type">
+                                <option value="1" {if isset($info.profit_type) && $info.profit_type== 1} selected {/if}>{:lang("长期")}</option>
+                                <option value="2" {if isset($info.profit_type) && $info.profit_type== 2} selected {/if}>{:lang("短期")}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="layui-form-item" id="cycleFormItem">
+                        <label class="layui-form-label">{:lang("托管周期（天）")}</label>
+                        <div class="layui-input-block">
+                            <input type="number" min="1" step="1" name="cycle" value="{$info.cycle|default=1}"
+                                   lay-verify="required" class="layui-input" required id="cycleInput">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">{:lang("收益率")}(%)：</label>
+                        <div class="layui-input-block">
+                            <input type="number" min="0.01" step="0.01" name="profit" value="{$info.profit|default=''}"
+                                   lay-verify="required" class="layui-input" required>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">{:lang("最小余额限制")}：</label>
+                        <div class="layui-input-block">
+                            <input type="number" name="min_balance" value="{$info.min_balance|default=''}"
+                                   lay-verify="required" class="layui-input" required>
+                        </div>
+                    </div>
+                    <div class="layui-form-item" style="display: none">
+                        <label class="layui-form-label">{:lang("开始时间")}：</label>
+                        <div class="layui-input-block">
+                            <input type="text" class="form-control" id="start_time" name="start_time"
+                                   value="{$info.start_time|default='00:00:00'}" placeholder="H点m分">
+                        </div>
+                    </div>
+                    <div class="layui-form-item" style="display: none">
+                        <label class="layui-form-label">{:lang("结束时间")}：</label>
+                        <div class="layui-input-block">
+                            <input type="text" class="form-control" id="end_time" name="end_time"
+                                   value="{$info.end_time|default='23:59:59'}" placeholder="H点m分">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">{:lang("托管收益文本")}：</label>
+                        <div class="layui-input-block">
+                            <input class="form-control" id="income_text" name="income_text"
+                                   value="{$info.income_text|default=''}">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">{:lang("托管说明")}：</label>
+                        <div class="layui-input-block">
+                            <textarea class="form-control" id="description" name="description" rows='6'>{$info.description|default=''}</textarea>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">销售状态</label>
+                        <input type="checkbox" name="sales_status" title="启用|停用" lay-skin="switch" value="1" {if
+                               isset($info.sale_status) && $info.sales_status== 1} checked {/if}>
+                        <input type="hidden" name="sales_status" value="1">
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">状态</label>
+                        <input type="checkbox" name="status" title="启用|停用" lay-skin="switch" value="1" {if
+                               isset($info.status) && $info.status== 1} checked {/if}>
+                    </div>
+                    <!--                    <div class="layui-form-item">-->
+                    <!--                        <label class="layui-form-label">最低可购买VIP</label>-->
+                    <!--                        <div class="layui-input-block">-->
+                    <input type="hidden" name="level_id" value="{$info.level_id|default=0}" lay-verify="required"
+                           class="layui-input" required>
+                    <!--                        </div>-->
+                    <!--                    </div>-->
+                    <!--                    <div class="layui-form-item">-->
+                    <!--                        <label class="layui-form-label">收益类型</label>-->
+                    <!--                        <div class="layui-input-block">-->
+<!--                    <input type="hidden" name="profit_type" value="2" lay-verify="required" class="layui-input"-->
+<!--                           required>-->
+                    <!--                        </div>-->
+                    <!--                    </div>-->
+                    <!--                    <div class="layui-form-item">-->
+                    <!--                        <label class="layui-form-label">派息类型</label>-->
+                    <!--                        <div class="layui-input-block">-->
+                    <input type="hidden" name="rebate_type" value="1" lay-verify="required" class="layui-input"
+                           required>
+                    <!--                        </div>-->
+                    <!--                    </div>-->
+                    <!--                    <div class="layui-form-item">-->
+                    <!--                        <label class="layui-form-label">是否立马派息一次</label>-->
+                    <!--                        <input type="checkbox" name="is_shortly_rebate" title="启用|停用" lay-skin="switch" value="1"  {if isset($info.is_shortly_rebate) && $info.is_shortly_rebate == 1} checked {/if}>-->
+                    <input type="hidden" name="is_shortly_rebate" value="0" lay-verify="required" class="layui-input"
+                           required>
+                    <!--                    </div>-->
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">排序</label>
+                        <div class="layui-input-block">
+                            <input type="number" name="sort" value="{$info.sort|default=0}" lay-verify="required"
+                                   class="layui-input">
+                            <div class="layui-form-mid layui-word-aux">数字越小越靠前</div>
+                        </div>
+                    </div>
+
+
+                    <div class="form-group">
+                        <div class="col-sm-4 col-sm-offset-6">
+                            <button class="btn btn-primary" type="submit">{:lang("提交")}</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="/static/admin/js/layui/module/xm-select.js"></script>
+<script>
+    $(document).ready(function () {
+        layui.use(['laydate', 'form'], function () {
+            var laydate = layui.laydate;
+            var form = layui.form;
+            var $ = layui.$;
+
+            laydate.render({
+                elem: '#start_time'
+                , type: 'time'
+            });
+            laydate.render({
+                elem: '#end_time'
+                , type: 'time'
+            });
+
+            var typeSelect = document.getElementById('typeSelect');
+            var cycleFormItem = document.getElementById('cycleFormItem');
+            var cycleInput = document.querySelector('input[name="cycle"]');
+
+            function toggleCycleField() {
+                if (!cycleFormItem || !cycleInput) return;
+
+                if (typeSelect.value === '2') {
+                    // 短期：隐藏周期字段，禁用输入（不参与验证和提交）
+                    cycleFormItem.style.display = 'none';
+                    cycleInput.disabled = true;               // 禁用，浏览器不再验证和提交
+                    cycleInput.removeAttribute('required');    // 移除原生 required
+                    cycleInput.removeAttribute('lay-verify');  // 移除 Layui 验证
+                    cycleInput.removeAttribute('min');          // 移除 min 限制
+                    // 值可设为 0 或留空（因为 disabled 不会提交）
+                    cycleInput.value = 0;
+                } else {
+                    // 长期：显示周期字段，启用输入，恢复验证
+                    cycleFormItem.style.display = 'block';
+                    cycleInput.disabled = false;                // 启用
+                    cycleInput.setAttribute('required', 'required');
+                    cycleInput.setAttribute('lay-verify', 'required');
+                    cycleInput.setAttribute('min', '1');
+                    // 如果当前值为空或 0，设为默认 1
+                    if (!cycleInput.value || cycleInput.value == 0) {
+                        cycleInput.value = 1;
+                    }
+                }
+                // 重新渲染 Layui 表单（如果样式受影响）
+                layui.form.render();
+            }
+
+            toggleCycleField();
+
+            form.on('select(profit_type)', function(data){
+                toggleCycleField();
+            });
+        });
+    })
+
+</script>
+{include file="footer" /}

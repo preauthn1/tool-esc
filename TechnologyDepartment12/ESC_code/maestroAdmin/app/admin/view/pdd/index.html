@@ -1,0 +1,76 @@
+{include file="header" /}
+<div class="wrapper wrapper-content animated fadeInRight">
+    <!-- Panel Other -->
+    <div class="ibox float-e-margins">
+        <div class="ibox-title">
+            <h5>{:lang("pdd活动列表")}</h5>
+        </div>
+        <div class="ibox-content">
+            <div class="form-group clearfix col-sm-7">
+                {if authCheck('pdd/add') }
+                <a id="add" href="{:url('pdd/add')}">
+                    <button class="btn btn-outline btn-primary" type="button">{:lang("添加活动")}</button>
+                </a>
+                {/if}
+            </div>
+            <div class="example-wrap">
+                <div class="example">
+                    <table id="cusTable"
+                           data-total-field="total"
+                           data-data-field="data"
+                    >
+                        <thead>
+                        <th data-field="id">{:lang("ID")}</th>
+                        <th data-field="title">{:lang("活动标题")}</th>
+                        <th data-field="start_time">{:lang("开始时间")}</th>
+                        <th data-field="end_time">{:lang("结束时间")}</th>
+                        <th data-field="create_time">{:lang("创建时间")}</th>
+                        <th data-field="status">{:lang("状态")}</th>
+                        <th data-field="operate">{:lang("操作")}</th>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+            <!-- End Example Pagination -->
+        </div>
+    </div>
+</div>
+<!-- End Panel Other -->
+<script type="text/javascript">
+    function queryParams(params) {
+        params.searchText = $('#name').val();
+        return params;
+    }
+
+    $(document).ready(function () {
+        initTable();
+        $("#search").bind("click", initTable);
+    });
+
+    function onLoadSuccess(res) {
+        $("#add").on('click', function (e) {
+            add(e.currentTarget.href)
+            return false;
+        });
+        $("td a").on('click', function (e) {
+            if (e.currentTarget.href.indexOf('javascript') === -1) {
+                add(e.currentTarget.href)
+                return false;
+            }
+            return true;
+        });
+    }
+
+    function add(url) {
+        // 在此处输入 layer 的任意代码
+        layer.open({
+            type: 2,
+            area: ['100%', '100%'],
+            title: '添加/编辑',
+            maxmin: true, // 允许全屏最小化
+            anim: 0, // 0-6 的动画形式，-1 不开启
+            content: url
+        });
+    }
+</script>
+{include file="footer" /}

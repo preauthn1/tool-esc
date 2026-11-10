@@ -1,0 +1,127 @@
+{include file="header" /}
+    <!-- Panel Other -->
+    <div class="ibox float-e-margins">
+        <div class="ibox-title">
+            <h5>{:lang("用户统计")}</h5>
+        </div>
+        <div class="ibox-content">
+            <div class="alert alert-warning" role="alert">
+                数据缓存10分钟, 请勿随意清理缓存，会影响访问速度 <a class="btn btn-link" href='{:url("", ["clear" => 1])}' onclick="this.innerText='清理中...'">清理缓存</a>
+            </div>
+            <div class="example-wrap">
+                <div class="example">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr class="text-center">
+                                <th colspan="2" class="text-center">{:lang("今日新增")}</th>
+                                <th colspan="2" class="text-center">{:lang("本月新增")}</th>
+                                <th colspan="2" class="text-center">{:lang("上月新增")}</th>
+                                <th colspan="4" class="text-center">{:lang("会员人数")}</th>
+                                <th colspan="2" class="text-center">{:lang("余额总数")}</th>
+                            </tr>
+                            <tr>
+                                <th class="text-center">{:lang("正式")}</th>
+                                <th class="text-center">{:lang("虚拟")}</th>
+                                <th class="text-center">{:lang("正式")}</th>
+                                <th class="text-center">{:lang("虚拟")}</th>
+                                <th class="text-center">{:lang("正式")}</th>
+                                <th class="text-center">{:lang("虚拟")}</th>
+                                <th class="text-center">{:lang("正式")}</th>
+                                <th class="text-center">{:lang("虚拟")}</th>
+                                <th class="text-center">{:lang("正常")}</th>
+                                <th class="text-center">{:lang("封号")}</th>
+                                <th class="text-center">{:lang("正式")}</th>
+                                <th class="text-center">{:lang("虚拟")}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="text-center">{$real_today_reg}</td>
+                                <td class="text-center">{$xuni_today_reg}</td>
+                                <td class="text-center">{$real_month_reg}</td>
+                                <td class="text-center">{$xuni_month_reg}</td>
+                                <td class="text-center">{$real_last_month_reg}</td>
+                                <td class="text-center">{$xuni_last_month_reg}</td>
+                                <td class="text-center">{$real_reg}</td>
+                                <td class="text-center">{$xuni_reg}</td>
+                                <td class="text-center">{$status_1_reg}</td>
+                                <td class="text-center">{$status_2_reg}</td>
+                                <td class="text-center">{$real_user_money}</td>
+                                <td class="text-center">{$xuni_user_money}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- End Example Pagination -->
+        </div>
+    </div>
+    <div class="ibox float-e-margins">
+        <div class="ibox-title">
+            <h5>{:lang("数据统计")}</h5>
+        </div>
+        <div class="ibox-content">
+            <div class="example-wrap">
+                <div class="example">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th class="text-center">{:lang("时间日期")}</th>
+                                <th class="text-center">{:lang("充值总额")}</th>
+                                <th class="text-center">{:lang("提现总额")}</th>
+                                <th class="text-center">{:lang("存取差额")}</th>
+                                <th class="text-center">{:lang("拼单商品总额")}</th>
+                                <th class="text-center">{:lang("回购佣金总额")}</th>
+                                <th class="text-center">{:lang("佣金提成总额")}</th>
+                                <th class="text-center">{:lang("手工赠金总和")}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="text-center">今天统计</td>
+                                <td class="text-center">{$today.recharge}</td>
+                                <td class="text-center">{$today.withdraw}</td>
+                                <td class="text-center">{$today.difference}</td>
+                                <td class="text-center">{$today.order_price}</td>
+                                <td class="text-center">{$today.order_gray}</td>
+                                <td class="text-center">{$today.rebate}</td>
+                                <td class="text-center">{$today.handsel}</td>
+                            </tr>
+                            <tr>
+                                <td class="text-center">昨天统计</td>
+                                <td class="text-center">{$yesterday.recharge}</td>
+                                <td class="text-center">{$yesterday.withdraw}</td>
+                                <td class="text-center">{$yesterday.difference}</td>
+                                <td class="text-center">{$yesterday.order_price}</td>
+                                <td class="text-center">{$yesterday.order_gray}</td>
+                                <td class="text-center">{$yesterday.rebate}</td>
+                                <td class="text-center">{$yesterday.handsel}</td>
+                            </tr>
+                            <tr>
+                                <td class="text-center">本月统计</td>
+                                <td class="text-center">{$month.recharge}</td>
+                                <td class="text-center">{$month.withdraw}</td>
+                                <td class="text-center">{$month.difference}</td>
+                                <td class="text-center">{$month.order_price}</td>
+                                <td class="text-center">{$month.order_gray}</td>
+                                <td class="text-center">{$month.rebate}</td>
+                                <td class="text-center">{$month.handsel}</td>
+                            </tr>
+                            <tr>
+                                <td class="text-center">上月统计</td>
+                                <td class="text-center">{$last_month.recharge}</td>
+                                <td class="text-center">{$last_month.withdraw}</td>
+                                <td class="text-center">{$last_month.difference}</td>
+                                <td class="text-center">{$last_month.order_price}</td>
+                                <td class="text-center">{$last_month.order_gray}</td>
+                                <td class="text-center">{$last_month.rebate}</td>
+                                <td class="text-center">{$last_month.handsel}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- End Example Pagination -->
+        </div>
+    </div>
+{include file="footer" /}

@@ -1,0 +1,29 @@
+    {include file="header" /}
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>{:lang("添加")}</h5>
+                </div>
+                <div class="ibox-content">
+                    <form class="form-horizontal m-t" id="dataForm" method="post" action="{:url('add')}">
+                        <input type="hidden" name="id" value="{$info.id}"/>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">{:lang("评论文字")}：</label>
+                            <div class="input-group col-sm-4">
+                                <input type="text" class="form-control" value="{$info.text}" name="text" />
+                                <p class="help-block">{:lang('文字不能超过200个字符')}</p>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-4 col-sm-offset-6">
+                                <button class="btn btn-primary" type="submit">{:lang("提交")}</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+{include file="footer" /}

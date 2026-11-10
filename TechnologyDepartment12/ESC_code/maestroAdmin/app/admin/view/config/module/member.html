@@ -1,0 +1,53 @@
+<div class="form-group">
+    <label class="col-sm-3 control-label">{:lang("会员升级规则")}：</label>
+    <div class="input-group col-sm-4">
+        <input type="text" class="form-control" name="user_level_rule" value="{$config.user_level_rule|intval}">
+        <p class="help-block">
+            0 为按推荐充值会员数<br>
+            1 为按会员充值金额 <br>
+            2 为按会员账户余额或推荐充值会员数 <br>
+            3 为按会员充值总额或邀请有效充值人数升级会员等级<br />
+            4 按会员充值金额及邀请有效充值会员人数同时满足才升级会员等级<br>
+            5 为按会员账户余额及推荐充值会员人数同时满足才升级会员等级 <br>
+        </p>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-sm-3 control-label">{:lang("升级推荐人数类型")}：</label>
+    <div class="input-group col-sm-4">
+        <input type="text" class="form-control" name="user_level_user_type" value="{$config.user_level_user_type|default=0}">
+        <p class="help-block">
+            0 直属下级<br>
+            1 整条线的下级
+        </p>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-sm-3 control-label">{:lang("会员降级规则")}：</label>
+    <div class="input-group col-sm-4">
+        <input type="text" class="form-control" name="user_level_down_rule" value="{$config.user_level_down_rule|default=1}">
+        <p class="help-block">
+            0 为升级后不降级<br>
+            1 按升级规则实时升降级
+        </p>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-sm-3 control-label">{:lang("会员强制完成规则")}：</label>
+    <div class="input-group col-sm-4">
+        <input type="text" class="form-control" name="member_force_todo" value="{$config.member_force_todo|default=0}">
+        <p class="help-block">
+            填写1 注册会员超过5天未充值，则强制跳转到充值页面。
+        </p>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-sm-3 control-label">{:lang("会员等级购买规则")}：</label>
+    <div class="input-group col-sm-4">
+        <input type="text" class="form-control" name="member_buy_rule" value="{$config.member_buy_rule|default=0}">
+        <p class="help-block">
+            0 为可以任意购买等级<br>
+            1 必须逐级购买
+        </p>
+    </div>
+</div>

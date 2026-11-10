@@ -1,0 +1,23 @@
+<div class="form-group">
+    <label class="col-sm-3 control-label">{:lang("拼单模式")}：</label>
+    <div class="input-group col-sm-4">
+        <input type="text" class="form-control" name="grab_order_mode" value="{$config.grab_order_mode|intval}">
+        <p class="help-block">0为CP拼单模式，1为系统抢单模式，2为CP共同完成模式 </p>
+    </div>
+</div>
+{if $config.grab_order_mode eq 1}
+<div class="form-group">
+    <label class="col-sm-3 control-label">{:lang("必须绑定CP")}：</label>
+    <div class="input-group col-sm-4">
+        <input type="text" class="form-control" name="is_must_cp" value="{$config.is_must_cp|default=0}">
+        <p class="help-block">0:否,1是</p>
+    </div>
+</div>
+{/if}
+<div class="form-group">
+    <label class="col-sm-3 control-label">{:lang("用户每天拼单次数")}：</label>
+    <div class="input-group col-sm-4">
+        <input type="text" class="form-control" name="day_order_count" value="{$config.day_order_count|intval}">
+        <p class="help-block">填0为不限制次数</p>
+    </div>
+</div>

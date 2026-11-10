@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>超额单控广告位比例配置</title>
+    <link href="/static/admin/css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
+    <link href="/static/admin/css/font-awesome.min.css?v=4.4.0" rel="stylesheet">
+    <link href="/static/admin/css/animate.min.css" rel="stylesheet">
+    <link href="/static/admin/css/style.min.css?v=4.1.0" rel="stylesheet">
+    <link href="/static/admin/js/layui/css/layui.css" rel="stylesheet">
+    <style>
+        .config-container { display: flex; padding: 20px; }
+        .left-panel { padding-right: 20px; border-right: 1px solid #e6e6e6; overflow-y: auto; max-height: 700px; }
+        .right-panel { flex-grow: 1; padding-left: 20px; overflow-y: auto; max-height: 500px; }
+        .panel-title { font-size: 16px; font-weight: bold; margin-bottom: 15px; }
+        #adSlotTypeList { list-style-type: none; padding: 0; margin: 0; border: 1px solid #f0f0f0;}
+        #adSlotTypeList li { padding: 10px 15px; cursor: pointer; border: 1px solid #f0f0f0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        #adSlotTypeList li:hover, #adSlotTypeList li.selected { background-color: #f0f0f0; color: #007bff; font-weight: bold; }
+        #adSlotTypeList li:last-child { border-bottom: none; }
+        .right-panel .layui-table td, .right-panel .layui-table th { text-align: center; }
+        .right-panel .layui-input { min-width: 100px; }
+        .layui-card-header { font-weight: bold; }
+    </style>
+</head>
+<body class="gray-bg">
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="layui-fluid">
+            <div class="layui-card">
+                <div class="layui-card-header">超额单控广告位比例配置 - 用户ID: {$uid ?? 'N/A'}</div>
+                <div class="layui-card-body">
+                    <div class="config-container">
+                        <div class="left-panel">
+                            <ul id="adSlotTypeList">
+                                <li>加载中...</li>
+                            </ul>
+                        </div>
+                        <div class="right-panel">
+                            <div id="configFormPlaceholder">
+                                <p style="padding-top:20px; text-align:center;">请从左侧选择一个广告位类型进行配置。</p>
+                            </div>
+                            <form class="layui-form" action="" id="configForm" style="display: none;"></form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/admin/js/jquery.min.js?v=2.1.4"></script>
+    <script src="/static/admin/js/bootstrap.min.js?v=3.3.6"></script>
+    <script src="/static/admin/js/layui/layui.js"></script>
+    <script type="text/javascript">
+        layui.use(['form', 'layer'], function () {
+            var form = layui.form;
+            var layer = layui.layer;
+            var $ = layui.jquery;
+
+            var currentUserId = parseInt("{$uid ?? 0}", 10);
+            var allLevelsData = {};
+            var formDataCache = {};
+            var maxMatchCount = 10; // 最大匹配次数
+            var currentSelectedLevelId = null;
+            function generateConfigForm(levelId) {
+                if (levelId === undefined || levelId === null) {
+                    console.log('No levelId provided');
+                    return;
+                }
+
+                currentSelectedLevelId = levelId;
+                var selectedLevelData = allLevelsData[levelId];
+                console.log('Selected level data:', selectedLevelData);
+
+                if (!selectedLevelData) {
+                    $('#configForm').html('<p style="padding-top:20px; text-align:center;">请先选择一个有效的广告位类型。</p>').show();
+                    $('#configFormPlaceholder').hide();
+                    return;
+                }
+
+                $('#configFormPlaceholder').hide();
+                var configForm = $('#configForm').show().empty();
+                var investNum = parseInt(selectedLevelData.invest_num) || 1;
+                var ratios = selectedLevelData.ratio ? JSON.parse(selectedLevelData.ratio) : [];
+                var profitRates = selectedLevelData.profit_rate ? JSON.parse(selectedLevelData.profit_rate) : [];
+                var adCycles = selectedLevelData.ad_cycle ? JSON.parse(selectedLevelData.ad_cycle) : [];
+                var subordinateEffect = selectedLevelData.subordinate == 1; // 获取是否对下级生效的值
+
+                // 如果 ratios 为空，匹配次数默认为 investNum，否则为 ratios.length
+                var matchCount = ratios.length > 0 ? ratios.length : investNum;
+
+                var tableHtml = '<table class="layui-table" id="configTable">' +
+                    '<thead><tr><th>超额单控匹配次数</th><th>超额购买的广告位比例 (%)</th><th>广告位收益率 (%)</th><th>广告位周期</th><th>操作</th></tr></thead>' +
+                    '<tbody>';
+
+              for (var i = 0; i < matchCount; i++) {
+                // 处理广告位周期数据
+                var cycleValue = '';
+                var cycleUnit = 'hour'; // 默认单位为小时
+
+                if (adCycles[i]) {
+                    // 如果已有数据，可能是旧格式(数字)或新格式(对象)
+                    if (typeof adCycles[i] === 'object' && adCycles[i] !== null) {
+                        cycleValue = adCycles[i].value || '';
+                        cycleUnit = adCycles[i].unit || 'hour';
+                    } else {
+                        cycleValue = adCycles[i] || '';
+                    }
+                }
+
+                tableHtml += '<tr data-index="' + i + '">' +
+                  '<td>第' + (i + 1) + '次匹配</td>' +
+                  '<td><input type="number" name="ratios[' + i + ']" class="layui-input ratio-input" ' +
+                  'data-index="' + i + '" data-level-id="' + levelId + '" ' +
+                  'value="' + (ratios[i] || '') + '" ' +
+                  'placeholder="请输入比例值"></td>' +
+                  '<td><input type="number" name="profit_rates[' + i + ']" class="layui-input profit-rate-input" ' +
+                  'data-index="' + i + '" data-level-id="' + levelId + '" ' +
+                  'value="' + (profitRates[i] || '') + '" ' +
+                  'placeholder="请输入收益率"></td>' +
+                  '<td>' +
+                  '<div class="layui-inline" style="width:120px; margin-right:5px;">' +
+                  '<input type="number" name="ad_cycles[' + i + ']" class="layui-input ad-cycle-input" ' +
+                  'data-index="' + i + '" data-level-id="' + levelId + '" ' +
+                  'value="' + cycleValue + '" ' +
+                  'placeholder="请输入周期">' +
+                  '</div>' +
+                  '<div class="layui-inline" style="width:80px;">' +
+                  '<select name="ad_cycle_unit[' + i + ']" class="layui-select ad-cycle-unit" ' +
+                  'data-index="' + i + '" data-level-id="' + levelId + '">' +
+                  '<option value="hour" ' + (cycleUnit === 'hour' ? 'selected' : '') + '>小时</option>' +
+                  '<option value="day" ' + (cycleUnit === 'day' ? 'selected' : '') + '>天</option>' +
+                  '</select>' +
+                  '</div>' +
+                  '</td>' +
+                  '<td><button type="button" class="layui-btn layui-btn-danger layui-btn-sm delete-row-btn" data-index="' + i + '">删除</button></td>' +
+                  '</tr>';
+              }
+
+                tableHtml += '</tbody></table>';
+                tableHtml += '<button type="button" class="layui-btn layui-btn-primary layui-btn-sm" id="addRowBtn">+ 新增匹配次数</button>';
+
+                // 设置复选框的初始状态
+                let checkbox = '<div class="layui-form-item">\n' +
+                    '                        <label class="layui-form-label" style="width: 130px;">是否对下级生效</label>\n' +
+                    '                        <div class="layui-input-inline">\n' +
+                    '                            <div class="layui-form"><input type="checkbox" name="subordinate" value="1" title="开|关" lay-skin="switch" ' +
+                    (subordinateEffect ? 'checked' : '') + ' data-type="subordinate"></div>'+
+                    '                        </div>\n' +
+                    '                    </div>';
+
+
+
+                var saveButtonHtml = '<div class="layui-form-item" style="margin-top: 20px;">' +
+                                   '<div class="layui-input-block">' +
+                                   '<button class="layui-btn" lay-submit lay-filter="saveConfig">保存配置</button>' +
+                                   '</div></div>';
+
+                configForm.html(tableHtml + checkbox + saveButtonHtml);
+                form.render(); // 重新渲染表单，使复选框状态生效
+            }
+
+            $.ajax({
+                url: "{:url('index', ['uid' => $uid ?? 0])}",
+                type: 'GET',
+                dataType: 'json',
+                success: function(res) {
+                    if (res.code === 0 && res.data) {
+                        var levelsData = res.data;
+                        var adSlotTypeListHtml = '';
+
+                        if (levelsData && levelsData.length > 0) {                            levelsData.forEach(function(level) {
+                                allLevelsData[level.level_id] = level;
+                                adSlotTypeListHtml += '<li data-id="' + level.level_id + '">' +
+                                                    level.level_name + '</li>';
+                            });
+                            $('#adSlotTypeList').html(adSlotTypeListHtml);
+
+                            // 直接选中并加载第一个广告位类型
+                            if (levelsData.length > 0) {
+                                var firstLevel = levelsData[0];
+                                var $firstItem = $('#adSlotTypeList li[data-id="' + firstLevel.level_id + '"]');
+                                $firstItem.addClass('selected');
+                                generateConfigForm(firstLevel.level_id);
+                            }
+                        } else {
+                            $('#adSlotTypeList').html('<li>没有可用的广告位类型</li>');
+                            $('#configForm').html('<p style="padding-top:20px; text-align:center;">没有可用的广告位类型，无法进行配置。</p>').show();
+                            $('#configFormPlaceholder').hide();
+                        }
+                    } else {
+                        layer.msg(res.msg || '加载广告位类型数据失败', {icon: 2});
+                        $('#configFormPlaceholder').text('加载广告位类型数据失败。').show();
+                        $('#configForm').hide();
+                    }
+                },
+                error: function(jqXHR, textStatus) {
+                    layer.msg('请求广告位类型数据失败：' + textStatus, {icon: 2});
+                    $('#configFormPlaceholder').text('请求广告位类型数据失败。').show();
+                    $('#configForm').hide();
+                }
+            });            $(document).on('click', '#adSlotTypeList li', function() {
+                var $this = $(this);
+                var adSlotTypeId = $this.data('id');
+
+                console.log('Clicked:', adSlotTypeId, $this.text());
+
+                // 跳过"加载中"和无数据的情况
+                if ($this.text() === '加载中...' || $this.text() === '没有可用的广告位类型') return;
+
+                // 如果已经选中且不是初始点击，则返回
+                if (adSlotTypeId && $this.hasClass('selected')) return;
+
+                $('#adSlotTypeList li').removeClass('selected');
+                $this.addClass('selected');
+                generateConfigForm(adSlotTypeId);
+            });
+          $(document).on('input propertychange', '.ratio-input, .profit-rate-input, .ad-cycle-input', function() {
+            var $input = $(this);
+            var levelId = $input.data('level-id');
+            var index = $input.data('index');
+            var inputClass = $input.attr('class');
+
+            if (!formDataCache[levelId]) {
+              formDataCache[levelId] = {
+                ratios: [],
+                profit_rates: [],
+                ad_cycles: []
+              };
+            }
+
+            if (inputClass.includes('ratio-input')) {
+              formDataCache[levelId].ratios[index] = $input.val();
+            } else if (inputClass.includes('profit-rate-input')) {
+              formDataCache[levelId].profit_rates[index] = $input.val();
+            } else if (inputClass.includes('ad-cycle-input')) {
+              if (!formDataCache[levelId].ad_cycles[index]) {
+                formDataCache[levelId].ad_cycles[index] = {value: '', unit: 'day'};
+              }
+              formDataCache[levelId].ad_cycles[index].value = $input.val();
+            }
+          });
+
+          // 监听周期单位选择变化
+          $(document).on('change', '.ad-cycle-unit', function() {
+            var $select = $(this);
+            var levelId = $select.data('level-id');
+            var index = $select.data('index');
+
+            if (!formDataCache[levelId]) {
+              formDataCache[levelId] = {
+                ratios: [],
+                profit_rates: [],
+                ad_cycles: []
+              };
+            }
+
+            if (!formDataCache[levelId].ad_cycles[index]) {
+              formDataCache[levelId].ad_cycles[index] = {value: '', unit: $select.val()};
+            } else {
+              formDataCache[levelId].ad_cycles[index].unit = $select.val();
+            }
+          });
+
+            form.on('submit(saveConfig)', function(data) {
+                if (!currentUserId) {
+                    layer.alert('用户ID无效，无法保存配置。', {icon: 2});
+                    return false;
+                }
+                var ratios = [];
+                var profitRates = [];
+                var adCycles = [];
+                var hasInvalidInput = false;
+
+                $('.ratio-input[data-level-id="' + currentSelectedLevelId + '"]').each(function() {
+                    var value = $(this).val();
+                    ratios[$(this).data('index')] = value;
+                    if (value !== '' && isNaN(value)) {
+                        hasInvalidInput = true;
+                        return false;
+                    }
+                });
+
+                // 新校验逻辑：要么全部为0，要么总和大于100
+                var totalRatio = 0;
+                var validRatioCount = 0;
+                var allZero = true;
+                for (var i = 0; i < ratios.length; i++) {
+                    var v = ratios[i];
+                    if (v !== '' && !isNaN(v)) {
+                        var num = parseFloat(v);
+                        totalRatio += num;
+                        if (num !== 0) {
+                            allZero = false;
+                        }
+                        validRatioCount++;
+                    }
+                }
+                if (validRatioCount > 0) {
+                    if (!allZero && totalRatio <= 100) {
+                        layer.alert('超额购买的广告位比例要么全部为0，要么总和大于100%', {icon: 2});
+                        return false;
+                    }
+                }
+
+                // 校验广告位收益率不能为空
+                var profitRateEmpty = false;
+                $('.profit-rate-input[data-level-id="' + currentSelectedLevelId + '"]').each(function() {
+                    var value = $(this).val();
+                    profitRates[$(this).data('index')] = value;
+                    if (value === '' || isNaN(value)) {
+                        profitRateEmpty = true;
+                        return false;
+                    }
+                });
+                if (profitRateEmpty) {
+                    layer.alert('广告位收益率不能为空且必须为数字', {icon: 2});
+                    return false;
+                }
+
+                // 校验广告位周期不能为空
+                var adCycleEmpty = false;
+                for (var i = 0; i < $('.ad-cycle-input[data-level-id="' + currentSelectedLevelId + '"]').length; i++) {
+                    var $cycleInput = $('.ad-cycle-input[data-level-id="' + currentSelectedLevelId + '"][data-index="' + i + '"]');
+                    var $cycleUnitSelect = $('.ad-cycle-unit[data-level-id="' + currentSelectedLevelId + '"][data-index="' + i + '"]');
+
+                    var cycleValue = $cycleInput.val();
+                    var cycleUnit = $cycleUnitSelect.val();
+
+                    if (cycleValue === '' || isNaN(cycleValue)) {
+                        adCycleEmpty = true;
+                        break;
+                    }
+
+                    adCycles[i] = {
+                        value: cycleValue,
+                        unit: cycleUnit
+                    };
+                }
+                if (adCycleEmpty) {
+                    layer.alert('广告位周期不能为空且必须为数字', {icon: 2});
+                    return false;
+                }
+
+                if (hasInvalidInput) {
+                    layer.alert('请输入有效的数字，或留空。', {icon: 2});
+                    return false;
+                }
+                var subordinateEffect = $('input[name="subordinate"]').is(':checked') ? 1 : 0;
+                layer.confirm('确定要保存此配置吗？', {icon: 3, title:'确认'}, function(index) {
+                    layer.close(index);
+                    var loading = layer.load(1, {shade: [0.1,'#fff']});
+                    $.ajax({
+                        url: "{:url('edit')}",
+                        type: 'POST',
+                        data: {
+                            user_id: currentUserId,
+                            level_id: currentSelectedLevelId,
+                            ratio: JSON.stringify(ratios),
+                            profit_rate: JSON.stringify(profitRates),
+                            ad_cycle: JSON.stringify(adCycles),
+                            subordinate: subordinateEffect,
+                        },
+                        dataType: 'json',
+                        success: function(res) {
+                            layer.close(loading);
+                            if (res.code === 0) {
+                              layer.msg('配置保存成功!', {icon: 1});
+                              if (allLevelsData[currentSelectedLevelId]) {
+                                allLevelsData[currentSelectedLevelId].ratio = JSON.stringify(ratios);
+                                allLevelsData[currentSelectedLevelId].profit_rate = JSON.stringify(profitRates);
+                                allLevelsData[currentSelectedLevelId].ad_cycle = JSON.stringify(adCycles);
+                                allLevelsData[currentSelectedLevelId].subordinate = subordinateEffect;
+                              }
+                            } else {
+                              layer.alert(res.msg || '保存失败', {icon: 2});
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            layer.close(loading);
+                            layer.alert('保存失败：' + (error || '未知错误'), {icon: 2});
+                        }
+                    });
+                });
+
+                return false;
+            });
+
+            $('#configForm').hide();
+            $('#configFormPlaceholder').show();
+
+          // 动态新增匹配次数
+          $(document).on('click', '#addRowBtn', function () {
+            var $tableBody = $('#configTable tbody');
+            var currentRowCount = $tableBody.find('tr').length;
+
+            if (currentRowCount >= maxMatchCount) {
+              layer.msg('匹配次数最多为' + maxMatchCount + '次', {icon: 2});
+              return;
+            }
+
+            var newIndex = currentRowCount;
+            var newRowHtml = '<tr data-index="' + newIndex + '">' +
+              '<td>第' + (newIndex + 1) + '次匹配</td>' +
+              '<td><input type="number" name="ratios[' + newIndex + ']" class="layui-input ratio-input" ' +
+              'data-index="' + newIndex + '" data-level-id="' + currentSelectedLevelId + '" ' +
+              'placeholder="请输入比例值"></td>' +
+              '<td><input type="number" name="profit_rates[' + newIndex + ']" class="layui-input profit-rate-input" ' +
+              'data-index="' + newIndex + '" data-level-id="' + currentSelectedLevelId + '" ' +
+              'placeholder="请输入收益率"></td>' +
+              '<td>' +
+              '<div class="layui-inline" style="width:120px; margin-right:5px;">' +
+              '<input type="number" name="ad_cycles[' + newIndex + ']" class="layui-input ad-cycle-input" ' +
+              'data-index="' + newIndex + '" data-level-id="' + currentSelectedLevelId + '" ' +
+              'placeholder="请输入周期">' +
+              '</div>' +
+              '<div class="layui-inline" style="width:80px;">' +
+              '<select name="ad_cycle_unit[' + newIndex + ']" class="layui-select ad-cycle-unit" ' +
+              'data-index="' + newIndex + '" data-level-id="' + currentSelectedLevelId + '">' +
+              '<option value="hour">小时</option>' +
+              '<option value="day">天</option>' +
+              '</select>' +
+              '</div>' +
+              '</td>' +
+              '<td><button type="button" class="layui-btn layui-btn-danger layui-btn-sm delete-row-btn" data-index="' + newIndex + '">删除</button></td>' +
+              '</tr>';
+
+            $tableBody.append(newRowHtml);
+            form.render(); // 重新渲染表单
+          });
+
+          // 删除匹配次数
+          $(document).on('click', '.delete-row-btn', function () {
+            var $row = $(this).closest('tr');
+            $row.remove();
+
+            // 更新行号显示
+            $('#configTable tbody tr').each(function (index) {
+              $(this).attr('data-index', index);
+              $(this).find('td:first').text('第' + (index + 1) + '次匹配');
+              $(this).find('input, select').each(function () {
+                var name = $(this).attr('name');
+                if (name) {
+                  var newName = name.replace(/\[\d+\]/, '[' + index + ']');
+                  $(this).attr('name', newName);
+                  $(this).attr('data-index', index);
+                }
+              });
+            });
+          });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,132 @@
+    {include file="header" /}
+    <div class="row">
+        <div class="col-sm-10">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>{:lang("更新库存数量")}</h5>
+                </div>
+                <div class="ibox-content">
+                    上一次库存数量配置：
+                    <div class="example-wrap">
+                        <div class="example">
+                            <table id="stockTable">
+                                <thead>
+                                <th data-field="横幅广告">{:lang("横幅广告")}</th>
+                                <th data-field="插屏广告">{:lang("插屏广告")}</th>
+                                <th data-field="开屏广告">{:lang("开屏广告")}</th>
+                                <th data-field="原生/信息流">{:lang("原生/信息流")}</th>
+                                <th data-field="视频广告">{:lang("视频广告")}</th>
+                                </thead>
+                            </table>
+                        </div>
+                    </div>
+                    <form class="form-horizontal m-t" id="dataForm" method="post" action="{:url('AdvertisSpace/update_stock')}">
+                        <input type="hidden" name="id" value="{$info.id ?? ''}">
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">{:lang("横幅广告")}：</label>
+                            <div class="input-group col-sm-4">
+                                <input id="横幅广告" type="text" class="form-control" name="横幅广告" placeholder="请输入该库存的展示数量"
+                                value="">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">{:lang("插屏广告")}：</label>
+                            <div class="input-group col-sm-4">
+                                <input id="插屏广告" type="text" class="form-control" name="插屏广告" placeholder="请输入该库存的展示数量"
+                                value="">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">{:lang("开屏广告")}：</label>
+                            <div class="input-group col-sm-4">
+                                <input id="开屏广告" type="text" class="form-control" name="开屏广告" placeholder="请输入该库存的展示数量"
+                                value="">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">{:lang("原生/信息流")}：</label>
+                            <div class="input-group col-sm-4">
+                                <input id="原生/信息流" type="text" class="form-control" name="原生/信息流" placeholder="请输入该库存的展示数量"
+                                value="">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">{:lang("视频广告")}：</label>
+                            <div class="input-group col-sm-4">
+                                <input id="视频广告" type="text" class="form-control" name="视频广告" placeholder="请输入该库存的展示数量" 
+                                value="">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-4 col-sm-offset-6">
+                                <button class="btn btn-primary" type="submit">{:lang("提交")}</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+<script>
+    console.log("更新库存")
+    function initStockTable() {
+        //先销毁表格
+        $('#stockTable').bootstrapTable('destroy');
+        //初始化表格,动态从服务器加载数据
+        $("#stockTable").bootstrapTable({
+            method: "get",  //使用get请求到服务器获取数据
+            url: "{:url('query_last_stock')}", //获取数据的地址
+            striped: false,  //表格显示条纹
+            pagination: false, //启动分页
+            pageSize: 10,  //每页显示的记录数
+            pageNumber:1, //当前第几页
+            pageList: [10, 30, 50, 100, 500],  //记录数可选列表
+            sidePagination: "server", //表示服务端请求
+            paginationFirstText: "{:lang('首页')}",
+            paginationPreText: "{:lang('上一页')}",
+            paginationNextText: "{:lang('下一页')}",
+            paginationLastText: "{:lang('尾页')}",
+            queryParamsType : "undefined",
+            clickToSelect: false,  // 是否启用点击选中行
+            selectItemName: "ids",
+            // uniqueId: "id",       // 每一行的唯一标识，一般为主键列
+            // idField: "id",
+            // columns: [{
+            //     checkbox: tableCheckbox,
+            //     visible:  false     // 是否显示复选框
+            // }],
+            queryParams: function(params) {   //设置查询参数
+                if (typeof queryParams === 'function') {
+                    return queryParams(params);
+                }
+
+                return params;
+            },
+            onLoadSuccess: function(res){  //加载成功时执行
+                if(111 == res.code){
+                    window.location.reload();
+                }
+                layui.use(function(){
+                    var form = layui.form;
+                    // 当表单元素被动态插入时，需主动进行组件渲染才能显示
+                    form.render('checkbox'); // 渲染全部表单
+                })
+                if (typeof onLoadSuccess === 'function') {
+                    return onLoadSuccess(res);
+                }
+                layer.msg("{:lang('加载成功')}", {time : 1000});
+            },
+            onLoadError: function(){  //加载失败时执行
+                if (typeof onLoadError === 'function') {
+                    return onLoadError();
+                }
+                layer.msg("{:lang('加载数据失败')}");
+            }
+        });
+    }
+
+    initStockTable();
+</script>
+{include file="footer" /}

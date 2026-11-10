@@ -1,0 +1,9 @@
+<?php
+
+return [
+    'chuanxin' => [
+        "appkey" => "x",
+        "appsecret" => "x",
+        "appcode" => "1000",
+    ],
+];

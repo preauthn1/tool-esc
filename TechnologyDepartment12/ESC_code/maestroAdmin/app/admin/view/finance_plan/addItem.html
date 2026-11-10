@@ -1,0 +1,76 @@
+{include file="header" /}
+<div class="row">
+    <div class="col-sm-12">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h5>{:lang("添加/修改")}</h5>
+            </div>
+            <div class="ibox-content">
+                <form class="form-horizontal m-t" id="dataForm" method="post" action="{:url('addItem')}">
+                    <div id="myTabContent" class="tab-content">
+                        <div class="tab-pane fade in active" id="home">
+                            <input type="hidden" name="id" value="{$info.id}"/>
+                            <input type="hidden" name="plan_id" value="{$plan_id}"/>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label"><span
+                                        class="x-red">*</span>{:lang("排序")}：</label>
+                                <div class="input-group col-sm-4">
+                                    <input type="text" class="form-control" value="{$info.sort}" name="sort"
+                                           required/>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">
+                                    <span class="x-red">*</span>{:lang("投资天数")}
+                                </label>
+                                <div class="input-group col-sm-4">
+                                    <input type="number" min="1" id="cycle" name="cycle" required value="{$info.cycle}" class="form-control">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">
+                                    <span class="x-red">*</span>{:lang("每日收益率")}
+                                </label>
+                                <div class="input-group col-sm-4">
+                                    <input type="number" min="1" id="profit" name="profit" required value="{$info.profit}" class="form-control">
+                                    <span class="input-group-addon">%</span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">
+                                    <span class="x-red">*</span>{:lang("占余额比例")}
+                                </label>
+                                <div class="input-group col-sm-4">
+                                    <input type="number" min="1" id="rate" name="rate" required value="{$info.rate}" class="form-control">
+                                    <span class="input-group-addon">%</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-3 col-sm-offset-3">
+                                <button class="btn btn-primary btn-block" onclick="submitItem()" type="button">{:lang("提交")}</button>
+                            </div>
+                        </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{include file="footer" /}
+<link href="/static/admin/css/css.css" rel="stylesheet">
+<script src="/static/admin/js/move.js"></script>
+<script src="/static/admin/js/publishImg.js"></script>
+<script type="text/javascript">
+    function submitItem(){
+        $("#dataForm").submit();
+    }
+    $(document).ready(function () {
+        var editor = UE.getEditor('container', {
+            serverUrl: "{:url('articles/uploadimg')}",
+        });
+        $('#myTab a').click(function (e) {
+            e.preventDefault()
+            $(this).tab('show')
+        })
+    });
+</script>

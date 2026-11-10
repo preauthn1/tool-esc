@@ -1,0 +1,520 @@
+{include file="header" /}
+<div class="row">
+    <div class="col-sm-10">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h5>
+                    {if condition=" $userId"}
+                    为用户 [{$user.user_name}] 定制广告计划配置
+                    {else}
+                    编辑广告计划
+                    {/if}
+                </h5>
+            </div>
+            <div class="ibox-content">
+                <style>
+                    /* 添加天数配置区域的滚动样式 */
+                    .days-config-scroll {
+                        max-height: 1780px;
+                        overflow-y: auto;
+                        padding-right: 10px;
+                    }
+
+                    /* 确保表格在滚动区域内保持合适的宽度 */
+                    .days-config-scroll .layui-table {
+                        width: 100%;
+                    }
+
+                    /* 设置表单标签宽度为100px */
+                    .layui-form-label {
+                        width: 100px;
+                    }
+
+                    /* 调整输入框左侧间距以匹配标签新宽度 */
+                    .layui-input-block {
+                        margin-left: 130px;
+                    }
+
+                    legend {
+                        border-bottom: none;
+                        width: fit-content;
+                    }
+                </style>
+                <form class="layui-form" id="adPlanForm" lay-filter="adPlanForm">
+                    <!-- 如果是编辑模式，添加一个隐藏的ID字段 -->
+                    {if condition="!empty($adPlan->id)"}
+                    <input type="hidden" name="id" value="{$adPlan->id}">
+                    {/if}
+
+                    <!-- 如果是用户定制模式，添加用户ID隐藏字段 -->
+                    {if condition=" $userId"}
+                    <input type="hidden" name="user_id" value="{$userId}">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">用户信息</label>
+                        <div class="layui-input-block">
+                            <input type="text" readonly class="layui-input"
+                                value="用户ID: {$user.id}, 账号: {$user.user_name}">
+                        </div>
+                    </div>
+
+                    <!-- 新增调整生效范围选项 -->
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">生效范围</label>
+                        <div class="layui-input-block">
+                            <input type="radio" name="apply_scope" value="personal" title="仅个人" checked>
+                            <input type="radio" name="apply_scope" value="team" title="个人及代理线">
+                            <div class="layui-form-mid layui-word-aux">选择本次调整的生效范围</div>
+                        </div>
+                    </div>
+                    {/if}
+
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">计划名称</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="name" required lay-verify="required" placeholder="请输入计划名称"
+                                autocomplete="off" class="layui-input" value="{$adPlan->name}" {if
+                                condition=" $userId" }readonly{/if}>
+                            {if condition=" $userId"}
+                            <div class="layui-form-mid layui-word-aux">用户定制模式下不可修改基本信息</div>
+                            {/if}
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">计划周期</label>
+                        <div class="layui-input-block">
+                            <input type="number" name="period" required lay-verify="required" placeholder="请输入计划周期"
+                                autocomplete="off" class="layui-input" value="{$adPlan->period}" {if
+                                condition="!empty($adPlan->id)" }readonly{/if}>
+                            {if condition="!empty($adPlan->id)"}
+                            <div class="layui-form-mid layui-word-aux">编辑模式下不可直接修改周期，请使用下方"添加天数"按钮</div>
+                            {/if}
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">下一个计划</label>
+                        <div class="layui-input-block">
+                            <select name="next_id">
+                                <option value="">请选择下一个计划</option>
+                                {volist name="plans" id="plan"}
+                                {if condition="$plan.id != $adPlan->id"}
+                                <option value="{$plan.id}" {if condition="$adPlan->next_id == $plan.id" }selected{/if}>
+                                    {$plan.name}</option>
+                                {/if}
+                                {/volist}
+                            </select>
+                        </div>
+                    </div>
+                    {if condition=" !$userId"}
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">排序</label>
+                        <div class="layui-input-block">
+                            <input type="number" name="sort" required lay-verify="required" placeholder="请输入排序"
+                                autocomplete="off" class="layui-input" value="{$adPlan->sort}">
+                            <div class="layui-form-mid layui-word-aux">数字越小越靠前</div>
+                        </div>
+                    </div>
+                    {/if}
+                    <!-- Days Configuration Section -->
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">天数配置</label>
+                        <div class="layui-input-block">
+                            <div class="layui-tab layui-tab-brief" lay-filter="timeSlotTab">
+                                <ul class="layui-tab-title">
+                                    {volist name="timeSlots" id="timeSlot"}
+                                    <li {eq name="$i" value="1" }class="layui-this" {/eq}>{$timeSlot.start_time} -
+                                        {$timeSlot.end_time}</li>
+                                    {/volist}
+                                </ul>
+                                <div class="layui-tab-content">
+                                    {volist name="timeSlots" id="timeSlot"}
+                                    <div class="layui-tab-item {eq name=" $i" value="1" }layui-show{/eq}">
+                                        <div id="daysConfig_{$timeSlot.id}" class="days-config-scroll">
+                                            <!-- 修改循环结束条件，移除多余的+1 -->
+                                            {for start="1" end="$adPlan.day_count" step="1" name="dayIndex"}
+                                            <fieldset class="layui-elem-field">
+                                                <legend>
+                                                    第{$dayIndex}天
+                                                    <!-- 移除静态条件判断，删除按钮将通过JS动态控制 -->
+                                                    <button type="button"
+                                                        class="layui-btn layui-btn-xs layui-btn-danger remove-day-btn"
+                                                        data-day="{$dayIndex}" style="display:none;">
+                                                        <i class="layui-icon">&#xe640;</i> 删除
+                                                    </button>
+                                                </legend>
+                                                <div class="layui-field-box">
+                                                    <table class="layui-table">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>广告位类型</th>
+                                                                <th>广告位占余额比例</th>
+                                                                <th>广告位收益率</th>
+                                                                <th>广告位周期</th>
+                                                                <th>广告位周期类型</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            {volist name="levels" id="slotType"}
+                                                            <tr>
+                                                                <td>{$slotType.level_name}</td>
+                                                                <td>
+                                                                    <div class="layui-input-group">
+                                                                        <input type="text"
+                                                                            name="days_config[{$dayIndex}][{$timeSlot.id}][{$slotType.level_id}][invest_rate]"
+                                                                            class="layui-input" lay-verify="decimal2"
+                                                                            value="{$adPlan.days_config[$dayIndex][$timeSlot.id][$slotType.level_id]['invest_rate'] ?: $slotType.invest_rate}">
+                                                                        <div
+                                                                            class="layui-input-split layui-input-suffix">
+                                                                            %
+                                                                        </div>
+                                                                    </div>
+                                                                </td>
+                                                                <td>
+                                                                    <div class="layui-input-group">
+                                                                        <input type="text"
+                                                                            name="days_config[{$dayIndex}][{$timeSlot.id}][{$slotType.level_id}][invest_profit]"
+                                                                            class="layui-input" lay-verify="decimal2"
+                                                                            value="{$adPlan.days_config[$dayIndex][$timeSlot.id][$slotType.level_id]['invest_profit'] ?: $slotType.invest_profit}">
+                                                                        <div
+                                                                            class="layui-input-split layui-input-suffix">
+                                                                            %
+                                                                        </div>
+                                                                    </div>
+                                                                </td>
+                                                                <!-- 新增广告位周期 -->
+                                                                <td>
+                                                                    <div class="layui-input-group">
+                                                                        <input type="number"
+                                                                            name="days_config[{$dayIndex}][{$timeSlot.id}][{$slotType.level_id}][invest_day]"
+                                                                            class="layui-input" lay-verify="required"
+                                                                            value="{$adPlan.days_config[$dayIndex][$timeSlot.id][$slotType.level_id]['invest_day'] ?: $slotType.invest_day }" min="1">
+                                                                    </div>
+                                                                </td>
+                                                                <!-- 新增广告位周期类型 -->
+                                                                <td>
+                                                                    <select name="days_config[{$dayIndex}][{$timeSlot.id}][{$slotType.level_id}][invest_period_type]" lay-verify="required">
+                                                                        <option value="day" {eq name="$adPlan.days_config[$dayIndex][$timeSlot.id][$slotType.level_id]['invest_period_type']|default=$slotType.invest_period_type" value="day"}selected{/eq}>天</option>
+                                                                        <option value="hour" {eq name="$adPlan.days_config[$dayIndex][$timeSlot.id][$slotType.level_id]['invest_period_type']|default=$slotType.invest_period_type" value="hour"}selected{/eq}>小时</option>
+                                                                        <option value="minute" {eq name="$adPlan.days_config[$dayIndex][$timeSlot.id][$slotType.level_id]['invest_period_type']|default=$slotType.invest_period_type" value="minute"}selected{/eq}>分钟</option>
+                                                                    </select>
+                                                                </td>
+                                                            </tr>
+                                                            {/volist}
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </fieldset>
+                                            {/for}
+                                        </div>
+                                    </div>
+                                    {/volist}
+                                </div>
+                            </div>
+                            {if condition=" !$userId"}
+                            <button type="button" class="layui-btn layui-btn-primary" id="addDayBtn">添加天数</button>
+                            {/if}
+                        </div>
+                    </div>
+                    {if condition=" !$userId"}
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">状态</label>
+                        <div class="layui-input-block">
+                            <input type="checkbox" name="status" value="1" lay-skin="switch" lay-text="启用|禁用" {if
+                                condition="$adPlan->status == 1" }checked{/if}>
+                        </div>
+                    </div>
+                    {/if}
+                    <div class="layui-form-item">
+                        <div class="layui-input-block">
+                            <button class="layui-btn" lay-submit lay-filter="save">保存</button>
+                            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{include file="footer" /}
+<!-- 保留原有的js代码 -->
+<script>
+    layui.use(['form', 'layer', 'element'], function () {
+        var form = layui.form,
+            layer = layui.layer,
+            element = layui.element;
+
+        // Custom validation rules
+        form.verify({
+            required: function (value, item) {
+                if (!value) {
+                    return '此项为必填项';
+                }
+            },
+            decimal2: function (value, item) {
+                if (!/^[0-9]+(\.[0-9]{1,2})?$/.test(value)) {
+                    return '请输入最多两位小数的数字';
+                }
+            }
+        });
+
+        // Listen for form submission
+        form.on('submit(save)', function (data) {
+            var loadIndex = layer.load(2); // 显示加载动画
+            $.ajax({
+                url: '{:url("ad_plan/edit")}',
+                type: 'POST',
+                data: data.field,
+                dataType: 'json',
+                success: function (res) {
+                    layer.close(loadIndex); // 关闭加载动画
+                    if (res.code === 1) {
+                        layer.msg(res.msg, { icon: 1, time: 1500 }, function () {
+                            // 如果是在iframe中，则关闭当前iframe
+                            var index = parent.layer.getFrameIndex(window.name);
+                            if (index) {
+                                parent.layer.close(index); // 关闭弹窗
+                                // 如果父页面有表格，刷新表格 - 修正表格ID
+                                if (parent.layui && parent.layui.table) {
+                                    parent.layui.table.reload('planTable');
+                                }
+                            } else {
+                                // 独立页面则设置一个标记并跳转回列表
+                                localStorage.setItem('adPlanNeedRefresh', 'true');
+                                window.location.href = '{:url("ad_plan/index")}';
+                            }
+                        });
+                    } else {
+                        layer.msg(res.msg || '保存失败，请重试', { icon: 2 });
+                    }
+                },
+                error: function (xhr) {
+                    layer.close(loadIndex); // 关闭加载动画
+                    layer.msg('网络错误，请检查网络连接', { icon: 2 });
+                    console.error('AJAX Error: ', xhr);
+                }
+            });
+            return false; // 阻止表单默认提交
+        });
+
+        // Period input change event - Modified to handle existing configs
+        $('input[name="period"]').on('change', function () {
+            // 只在新增模式下启用此功能
+            {if condition="empty($adPlan->id)"}
+            var newPeriod = parseInt($(this).val());
+            if (isNaN(newPeriod) || newPeriod <= 0) {
+                layer.msg('请输入有效的计划周期', { icon: 2 });
+                return;
+            }
+
+            var currentDays = $('#daysConfig_{$timeSlots[0]['id']} fieldset').length;
+
+            // If new period is greater than current, add new days
+            if (newPeriod > currentDays) {
+                for (var i = currentDays; i < newPeriod; i++) {
+                    {volist name = "timeSlots" id = "timeSlot" }
+                    var newDayConfig = `
+                        <fieldset class="layui-elem-field">
+                            <legend>第${i + 1}天</legend>
+                            <div class="layui-field-box">
+                                <table class="layui-table">
+                                    <thead>
+                                        <tr>
+                                            <th>广告位类型</th>
+                                            <th>广告位占余额比例</th>
+                                            <th>广告位收益率</th>
+                                            <th>广告位周期</th>
+                                            <th>广告位周期类型</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {volist name="levels" id="slotType"}
+                                        <tr>
+                                            <td>{$slotType.level_name}</td>
+                                            <td>
+                                                <div class="layui-input-group">
+                                                    <input type="text" name="days_config[${i + 1}][{$timeSlot.id}][{$slotType.level_id}][invest_rate]" class="layui-input" lay-verify="decimal2" value="{$slotType.invest_rate}">
+                                                    <div class="layui-input-split layui-input-suffix">
+                                                        %
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="layui-input-group">
+                                                    <input type="text" name="days_config[${i + 1}][{$timeSlot.id}][{$slotType.level_id}][invest_profit]" class="layui-input" lay-verify="decimal2" value="{$slotType.invest_profit}">
+                                                    <div class="layui-input-split layui-input-suffix">
+                                                        %
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="layui-input-group">
+                                                    <input type="number" name="days_config[${i + 1}][{$timeSlot.id}][{$slotType.level_id}][invest_day]" class="layui-input" lay-verify="required" value="{$slotType.invest_day}" min="1">
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <select name="days_config[${i + 1}][{$timeSlot.id}][{$slotType.level_id}][invest_period_type]" lay-verify="required">
+                                                    <option value="day" {eq name="$slotType.invest_period_type|default='day'" value="day"}selected{/eq}>天</option>
+                                                    <option value="hour" {eq name="$slotType.invest_period_type" value="hour"}selected{/eq}>小时</option>
+                                                    <option value="minute" {eq name="$slotType.invest_period_type" value="minute"}selected{/eq}>分钟</option>
+                                                </select>
+                                            </td>
+                                        </tr>
+                                        {/volist}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </fieldset>
+                    `;
+                    $('#daysConfig_{$timeSlot.id}').append(newDayConfig);
+                    {/volist}
+                }
+            } else if (newPeriod < currentDays) {
+                // If new period is less than current, remove excess days
+                for (var i = currentDays - 1; i >= newPeriod; i--) {
+                    {volist name = "timeSlots" id = "timeSlot" }
+                    $('#daysConfig_{$timeSlot.id} fieldset').eq(i).remove();
+                    {/volist}
+                }
+            }
+
+            form.render(); // Re-render the form to apply styles
+            applyValidation(); // 应用验证规则到新增字段
+            updateDeleteButtons(); // 更新删除按钮显示
+            {/if}
+        });
+
+        // Add day button event - Update period input value
+        $('#addDayBtn').on('click', function () {
+            var dayCount = $('#daysConfig_{$timeSlots[0]['id']} fieldset').length;
+
+            // Add a new day configuration to each time slot tab
+            {volist name = "timeSlots" id = "timeSlot" }
+            var newDayConfig = `
+                <fieldset class="layui-elem-field">
+                    <legend>第${dayCount + 1}天 <button type="button"
+                                                        class="layui-btn layui-btn-xs layui-btn-danger remove-day-btn"
+                                                        data-day="${dayCount + 1}" style="display:none;">
+                                                        <i class="layui-icon">&#xe640;</i> 删除
+                                                    </button></legend>
+                    <div class="layui-field-box">
+                        <table class="layui-table">
+                            <thead>
+                                <tr>
+                                    <th>广告位类型</th>
+                                    <th>广告位占余额比例</th>
+                                    <th>广告位收益率</th>
+                                    <th>广告位周期</th>
+                                    <th>广告位周期类型</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {volist name="levels" id="slotType"}
+                                <tr>
+                                    <td>{$slotType.level_name}</td>
+                                    <td>
+                                        <div class="layui-input-group">
+                                            <input type="text" name="days_config[${dayCount + 1}][{$timeSlot.id}][{$slotType.level_id}][invest_rate]" class="layui-input" lay-verify="decimal2" value="{$slotType.invest_rate}">
+                                            <div class="layui-input-split layui-input-suffix">
+                                                %
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="layui-input-group">
+                                            <input type="text" name="days_config[${dayCount + 1}][{$timeSlot.id}][{$slotType.level_id}][invest_profit]" class="layui-input" lay-verify="decimal2" value="{$slotType.invest_profit}">
+                                            <div class="layui-input-split layui-input-suffix">
+                                                %
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="layui-input-group">
+                                            <input type="number" name="days_config[${dayCount + 1}][{$timeSlot.id}][{$slotType.level_id}][invest_day]" class="layui-input" lay-verify="required" value="{$slotType.invest_day}" min="1">
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <select name="days_config[${dayCount + 1}][{$timeSlot.id}][{$slotType.level_id}][invest_period_type]" lay-verify="required">
+                                            <option value="day" {eq name="$slotType.invest_period_type|default='day'" value="day"}selected{/eq}>天</option>
+                                            <option value="hour" {eq name="$slotType.invest_period_type" value="hour"}selected{/eq}>小时</option>
+                                            <option value="minute" {eq name="$slotType.invest_period_type" value="minute"}selected{/eq}>分钟</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                {/volist}
+                            </tbody>
+                        </table>
+                    </div>
+                </fieldset>
+            `;
+            $('#daysConfig_{$timeSlot.id}').append(newDayConfig);
+            {/volist}
+
+            // Update the period input to match the new day count
+            $('input[name="period"]').val(dayCount + 1);
+
+            form.render(); // Re-render the form to apply styles
+            applyValidation(); // 应用验证规则到新增字段
+            updateDeleteButtons(); // 更新删除按钮显示
+        });
+
+        // 删除最后一天的配置
+        $(document).on('click', '.remove-day-btn', function (e) {
+            e.preventDefault();
+            var dayToRemove = parseInt($(this).data('day'));
+            var currentDayCount = $('#daysConfig_{$timeSlots[0]['id']} fieldset').length;
+
+            if (currentDayCount <= 1) {
+                layer.msg('至少需要保留一天的配置', { icon: 2 });
+                return;
+            }
+
+            layer.confirm('确定要删除第' + dayToRemove + '天的配置吗？', { icon: 3, title: '提示' }, function (index) {
+                // 移除所有时间段下的该天配置
+                {volist name = "timeSlots" id = "timeSlot" }
+                $('#daysConfig_{$timeSlot.id} fieldset').eq(dayToRemove - 1).remove();
+                {/volist}
+
+                // 更新周期值
+                var newPeriod = currentDayCount - 1;
+                $('input[name="period"]').val(newPeriod);
+
+                layer.close(index);
+                layer.msg('删除成功', { icon: 1 });
+
+                // 更新删除按钮显示
+                updateDeleteButtons();
+            });
+        });
+
+        // 修改现有输入框的验证
+        function applyValidation() {
+            $('input[name^="days_config"][name$="[invest_rate]"]').attr('lay-verify', 'decimal2');
+            $('input[name^="days_config"][name$="[invest_profit]"]').attr('lay-verify', 'decimal2');
+            $('input[name^="days_config"][name$="[invest_day]"]').attr('lay-verify', 'required');
+            $('select[name^="days_config"][name$="[invest_period_type]"]').attr('lay-verify', 'required');
+            form.render();
+        }
+
+        // 更新删除按钮显示
+        function updateDeleteButtons() {
+            // 所有时间段都需要更新
+            {volist name = "timeSlots" id = "timeSlot"}
+            // 隐藏所有删除按钮
+            $('#daysConfig_{$timeSlot.id} .remove-day-btn').hide();
+            // 只显示最后一天的删除按钮
+            var lastDay = $('#daysConfig_{$timeSlot.id} fieldset').length;
+            if (lastDay > 1) { // 如果有多于1天，才显示删除按钮
+                $('#daysConfig_{$timeSlot.id} fieldset:last-child .remove-day-btn').show();
+            }
+            {/volist}
+        }
+
+        // 页面加载时更新删除按钮
+        updateDeleteButtons();
+
+        // 应用验证规则到现有字段
+        applyValidation();
+    });
+</script>
+</body>
+
+</html>

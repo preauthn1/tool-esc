@@ -1,0 +1,220 @@
+<div class="form-group">
+    <label class="col-sm-3 control-label">{:lang("系统货币类型")}：</label>
+    <div class="input-group col-sm-4">
+        <div class="layui-form">
+            <input type="radio" name="sys_currency_type" lay-filter="sys_currency_type" value="1" title="虚拟币" {if $config['sys_currency_type'] == 1}checked{/if}>
+            <input type="radio" name="sys_currency_type" lay-filter="sys_currency_type" value="2" title="货币" {if $config['sys_currency_type'] == 2}checked{/if}>
+            <p class="help-block">sys_currency_type：系统货币类型:虚拟币单位默认是USDT，货币单位自行设置。</p>
+        </div>
+    </div>
+</div>
+<div id="sys_currency_type" style="display:{if $config['sys_currency_type'] == 2}block{else}none{/if};">
+
+<div class="form-group">
+    <label class="col-sm-3 control-label">{:lang("货币单位")}：</label>
+    <div class="input-group col-sm-4">
+        <input type="text" class="form-control" id="fiat_currency_unit" name="fiat_currency_unit" value="{$config.fiat_currency_unit|default='USDT'}">
+        <p class="help-block">fiat_currency_unit：货币单位（如：USD）。</p>
+    </div>
+</div>
+
+
+<div class="form-group">
+    <label class="col-sm-3 control-label">{:lang("货币符号")}：</label>
+    <div class="input-group col-sm-4">
+        <input type="text" class="form-control" id="fiat_currency_symbol" name="fiat_currency_symbol" value="{$config.fiat_currency_symbol|default='$'}">
+        <p class="help-block">fiat_currency_symbol：货币符号（如：$）。</p>
+    </div>
+</div>
+    <div class="form-group">
+        <label class="col-sm-3 control-label">{:lang("汇率")}：</label>
+        <div class="input-group col-sm-4">
+            <input type="text" class="form-control" id="fiat_currency_rate" name="fiat_currency_rate" value="{$config.fiat_currency_rate|default='0.1449'}">
+            <p class="help-block">fiat_currency_rate：1平台币=$</p>
+        </div>
+    </div>
+</div>
+<!--<div class="form-group">-->
+<!--    <label class="col-sm-3 control-label">{:lang("系统玩法")}：</label>-->
+<!--    <div class="input-group col-sm-4">-->
+<!--        <div class="layui-form">-->
+<!--            <input type="radio" name="system_play_type" value="1" title="升级做任务" {if $config['sys_currency_type'] == 1}checked{/if}>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--</div>-->
+<div class="form-group">
+    <label class="col-sm-3 control-label">{:lang("用户端是否开启谷歌验证器")}：</label>
+    <div class="input-group col-sm-4">
+        <div class="layui-form">
+            <input type="radio" name="google_secret_status" value="1" title="开启" {if $config['google_secret_status'] == 1}checked{/if}>
+            <input type="radio" name="google_secret_status" value="0" title="关闭" {if $config['google_secret_status'] == 0}checked{/if}>
+        </div>
+        <p class="help-block">google_secret_status：用户端是否开启谷歌验证器。</p>
+    </div>
+</div>
+
+<div class="form-group">
+    <label class="col-sm-3 control-label">{:lang("佣金账户是否可转到基础账户")}：</label>
+    <div class="input-group col-sm-4">
+        <div class="layui-form">
+            <input type="radio" name="is_brokerage_to_basic" value="1" title="开启" {if $config['is_brokerage_to_basic'] == 1}checked{/if}>
+            <input type="radio" name="is_brokerage_to_basic" value="0" title="关闭" {if $config['is_brokerage_to_basic'] == 0}checked{/if}>
+        </div>
+        <p class="help-block">is_brokerage_to_basic：佣金账户是否可转到基础账户。</p>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-sm-3 control-label">{:lang("是否开启投资")}：</label>
+    <div class="input-group col-sm-4">
+        <div class="layui-form">
+            <input type="radio" name="invest_status" value="1" title="开启" {if $config['invest_status'] == 1}checked{/if}>
+            <input type="radio" name="invest_status" value="0" title="关闭" {if $config['invest_status'] == 0}checked{/if}>
+        </div>
+        <p class="help-block">invest_status：是否开启投资。</p>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-sm-3 control-label">{:lang("皮肤样式")}：</label>
+    <div class="input-group col-sm-4">
+        <div class="layui-form">
+            <select name="sys_theme_style">
+                <option value="shop01" {if $config['sys_theme_style'] == 'shop01'} selected {/if}>(默认)皮肤1</option>
+                <option value="shop02" {if $config['sys_theme_style'] == 'shop02'} selected {/if}>皮肤2</option>
+                <option value="shop03" {if $config['sys_theme_style'] == 'shop03'} selected {/if}>皮肤3</option>
+                <option value="shop04" {if $config['sys_theme_style'] == 'shop04'} selected {/if}>皮肤4</option>
+                <option value="shop05" {if $config['sys_theme_style'] == 'shop05'} selected {/if}>皮肤5</option>
+                <option value="shop06" {if $config['sys_theme_style'] == 'shop06'} selected {/if}>皮肤6</option>
+<!--                <option value="shop07" {if $config['sys_theme_style'] == 'shop07'} selected {/if}>皮肤7</option>-->
+<!--                <option value="shop08" {if $config['sys_theme_style'] == 'shop08'} selected {/if}>皮肤8</option>-->
+                <option value="shop09" {if $config['sys_theme_style'] == 'shop09'} selected {/if}>皮肤9</option>
+                <option value="shop10" {if $config['sys_theme_style'] == 'shop10'} selected {/if}>皮肤10</option>
+                <option value="shop11" {if $config['sys_theme_style'] == 'shop11'} selected {/if}>皮肤11</option>
+                <option value="shop15" {if $config['sys_theme_style'] == 'shop15'} selected {/if}>皮肤15</option>
+                <option value="shop17" {if $config['sys_theme_style'] == 'shop17'} selected {/if}>皮肤17</option>
+                <option value="shop18" {if $config['sys_theme_style'] == 'shop18'} selected {/if}>皮肤18</option>
+            </select>
+        </div>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-sm-3 control-label">{:lang("皮肤颜色")}：</label>
+    <div class="input-group col-sm-4">
+        <div class="layui-form">
+            <select name="sys_theme_color">
+                <option value="0" {if $config['sys_theme_color'] == '0'} selected {/if}>(默认)蓝色</option>
+                <option value="1"  {if $config['sys_theme_color'] == '1'} selected {/if}>颜色1</option>
+                <option value="2"  {if $config['sys_theme_color'] == '2'} selected {/if}>颜色2</option>
+                <option value="3"  {if $config['sys_theme_color'] == '3'} selected {/if}>颜色3</option>
+                <option value="4"  {if $config['sys_theme_color'] == '4'} selected {/if}>颜色4</option>
+            </select>
+        </div>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-sm-3 control-label">{:lang("网站使用时区")}：</label>
+    <div class="input-group col-sm-4">
+        <div class="layui-form">
+            <select >
+                <option value="Pacific/Wake" {if $config['sys_data_time'] == 'Pacific/Wake'} selected {/if}>(GMT-12:00) 国际日期线西</option>
+                <option value="Pacific/Apia"  {if $config['sys_data_time'] == 'Pacific/Apia'} selected {/if}>(GMT-11:00) 萨摩亚、中途岛</option>
+                <option value="Pacific/Honolulu"  {if $config['sys_data_time'] == 'Pacific/Honolulu'} selected {/if}>(GMT-10:00) 夏威夷</option>
+                <option value="America/Anchorage"  {if $config['sys_data_time'] == 'America/Anchorage'} selected {/if}>(GMT-09:00) 阿拉斯加</option>
+                <option value="America/Los_Angeles"  {if $config['sys_data_time'] == 'America/Los_Angeles'} selected {/if}>(GMT-08:00) 太平洋时间（美国和加拿大）</option>
+                <option value="America/Chihuahua" {if $config['sys_data_time'] == 'America/Chihuahua'} selected {/if} >(GMT-07:00) 奇瓦瓦、拉巴斯</option>
+                <option value="America/Managua"  {if $config['sys_data_time'] == 'America/Managua'} selected {/if}>(GMT-06:00) 中美洲</option>
+                <option value="America/Chicago"  {if $config['sys_data_time'] == 'America/Chicago'} selected {/if}>(GMT-06:00) 中部时间（美国和加拿大）</option>
+                <option value="America/Mexico_City"  {if $config['sys_data_time'] == 'America/Mexico_City'} selected {/if}>(GMT-06:00) 墨西哥城</option>
+                <option value="America/Bogota"  {if $config['sys_data_time'] == 'America/Bogota'} selected {/if}>(GMT-05:00) 波哥大</option>
+                <option value="America/New_York"  {if $config['sys_data_time'] == 'America/New_York'} selected {/if}>(GMT-05:00) 美国东部时间</option>
+                <option value="America/Halifax"  {if $config['sys_data_time'] == 'America/Halifax'} selected {/if}>(GMT-04:00) 大西洋时间（加拿大）</option>
+                <option value="America/Caracas"  {if $config['sys_data_time'] == 'America/Caracas'} selected {/if}>(GMT-04:00) 加拉加斯</option>
+                <option value="America/Santiago"  {if $config['sys_data_time'] == 'America/Santiago'} selected {/if}>(GMT-04:00) 圣地亚哥</option>
+                <option value="America/St_Johns" {if $config['sys_data_time'] == 'America/St_Johns'} selected {/if} >(GMT-03:30) 纽芬兰</option>
+                <option value="America/Godthab" {if $config['sys_data_time'] == 'America/Godthab'} selected {/if} >(GMT-03:00) 格陵兰岛</option>
+                <option value="America/Sao_Paulo" {if $config['sys_data_time'] == 'America/Sao_Paulo'} selected {/if} >(GMT-03:00) 圣保罗</option>
+                <option value="America/Noronha"  {if $config['sys_data_time'] == 'America/Noronha'} selected {/if}>(GMT-02:00) 大西洋中部</option>
+                <option value="Atlantic/Azores"  {if $config['sys_data_time'] == 'Atlantic/Azores'} selected {/if}>(GMT-01:00) 亚速尔群岛</option>
+                <option value="Europe/London"  {if $config['sys_data_time'] == 'Europe/London'} selected {/if}>(GMT) 伦敦</option>
+                <option value="Europe/Paris" {if $config['sys_data_time'] == 'Europe/Paris'} selected {/if} >(GMT+01:00) 马德里、巴黎</option>
+                <option value="Europe/Berlin"  {if $config['sys_data_time'] == 'Europe/Berlin'} selected {/if}>(GMT+01:00) 罗马</option>
+                <option value="Europe/Helsinki" {if $config['sys_data_time'] == 'Europe/Helsinki'} selected {/if}>(GMT+02:00) 赫尔辛基</option>
+                <option value="Asia/Jerusalem"  {if $config['sys_data_time'] == 'Asia/Jerusalem'} selected {/if}>(GMT+02:00) 耶路撒冷</option>
+                <option value="Europe/Moscow"  {if $config['sys_data_time'] == 'Europe/Moscow'} selected {/if}>(GMT+03:00) 莫斯科、圣彼得堡</option>
+                <option value="Asia/Tehran"  {if $config['sys_data_time'] == 'Asia/Tehran'} selected {/if}>(GMT+03:30) 德黑兰</option>
+                <option value="Asia/Tbilisi"  {if $config['sys_data_time'] == 'Asia/Tbilisi'} selected {/if}>(GMT+04:00) 第比利斯、巴库</option>
+                <option value="Asia/Kabul" {if $config['sys_data_time'] == 'Asia/Kabul'} selected {/if} >(GMT+04:30) 喀布尔</option>
+                <option value="Asia/Karachi"  {if $config['sys_data_time'] == 'Asia/Karachi'} selected {/if}>(GMT+05:00) 伊斯兰堡、卡拉奇</option>
+                <option value="Asia/Calcutta"  {if $config['sys_data_time'] == 'Asia/Calcutta'} selected {/if}>(GMT+05:30) 孟买、新德里</option>
+                <option value="Asia/Katmandu"  {if $config['sys_data_time'] == 'Asia/Katmandu'} selected {/if}>(GMT+05:45) 加德满都</option>
+                <option value="Asia/Dhaka"  {if $config['sys_data_time'] == 'Asia/Dhaka'} selected {/if}>(GMT+06:00) 达卡、阿斯塔纳</option>
+                <option value="Asia/Rangoon"  {if $config['sys_data_time'] == 'Asia/Rangoon'} selected {/if}>(GMT+06:30) 仰光</option>
+                <option value="Asia/Bangkok"  {if $config['sys_data_time'] == 'Asia/Bangkok'} selected {/if}>(GMT+07:00) 曼谷、河内</option>
+                <option value="Asia/Hong_Kong" {if $config['sys_data_time'] == 'Asia/Hong_Kong'} selected {/if}>(GMT+08:00) 北京、新加坡</option>
+                <option value="Asia/Seoul"  {if $config['sys_data_time'] == 'Asia/Seoul'} selected {/if}>(GMT+09:00) 首尔</option>
+                <option value="Asia/Tokyo"  {if $config['sys_data_time'] == 'Asia/Tokyo'} selected {/if}>(GMT+09:00) 东京</option>
+                <option value="Australia/Adelaide"  {if $config['sys_data_time'] == 'Australia/Adelaide'} selected {/if}>(GMT+09:30) 阿德莱德</option>
+                <option value="Australia/Sydney"  {if $config['sys_data_time'] == 'Australia/Sydney'} selected {/if}>(GMT+10:00) 堪培拉、悉尼、墨尔本</option>
+                <option value="Asia/Magadan"  {if $config['sys_data_time'] == 'Asia/Magadan'} selected {/if}>(GMT+11:00) 马加丹、所罗门群岛</option>
+                <option value="Pacific/Auckland"  {if $config['sys_data_time'] == 'Pacific/Auckland'} selected {/if}>(GMT+12:00) 奥克兰、惠灵顿</option>
+                <option value="Pacific/Fiji"  {if $config['sys_data_time'] == 'Pacific/Fiji'} selected {/if}>(GMT+12:00) 斐济、马歇尔岛</option>
+                <option value="Pacific/Tongatapu"  {if $config['sys_data_time'] == 'Pacific/Tongatapu'} selected {/if}>(GMT+13:00) 努库阿洛法</option>
+            </select>
+        </div>
+        <p class="help-block">sys_data_time：网站当前使用的时区，请根据您的运营需要进行调整。</p>
+    </div>
+</div>
+<!--<div class="form-group">-->
+<!--    <label class="col-sm-3 control-label">{:lang("语音提醒开关")}：</label>-->
+<!--    <div class="input-group col-sm-4">-->
+<!--        <div class="layui-form">-->
+<!--            <input type="radio" name="voice_reminder" value="1" title="开启" {if $config['voice_reminder'] == 1}checked{/if}>-->
+<!--            <input type="radio" name="voice_reminder" value="0" title="关闭" {if $config['voice_reminder'] == 0}checked{/if}>-->
+            <input type="hidden" name="voice_reminder" value="0" title="关闭">
+<!--        </div>-->
+<!--        <p class="help-block">voice_reminder：语音提醒开关。</p>-->
+<!--    </div>-->
+<!--</div>-->
+
+<!--<div class="form-group">-->
+<!--    <label class="col-sm-3 control-label">{:lang("提币订单是否重复提醒")}：</label>-->
+<!--    <div class="input-group col-sm-4">-->
+<!--        <div class="layui-form">-->
+<!--            <input type="radio" name="is_repeat_withdraw_voice" value="1" title="开启" {if $config['is_repeat_withdraw_voice'] == 1}checked{/if}>-->
+<!--            <input type="radio" name="is_repeat_withdraw_voice" value="0" title="关闭" {if $config['is_repeat_withdraw_voice'] == 0}checked{/if}>-->
+            <input type="hidden" name="is_repeat_withdraw_voice" value="0" title="关闭">
+<!--        </div>-->
+<!--        <p class="help-block">is_repeat_withdraw_voice：提币订单是否重复提醒，开启后，有未完成的提币订单会重复提醒。</p>-->
+<!--    </div>-->
+<!--</div>-->
+<div class="form-group">
+    <label class="col-sm-3 control-label">{:lang("充值语音文件")}：</label>
+    <div class="input-group col-sm-4">
+        <input name="recharge_voice_file" placeholder="请上传文件" class="form-control" id="recharge_voice_file" value="{$config.recharge_voice_file}" type="text" />
+        <span class="input-group-btn">
+            <button type="button" class="btn btn-primary" id="uploaderRechargeVoice">
+                <i class="layui-icon">&#xe67c;</i>{:lang("上传")}
+            </button>
+        </span>
+    </div>
+</div>
+
+<div class="form-group">
+    <label class="col-sm-3 control-label">{:lang("提现语音文件")}：</label>
+    <div class="input-group col-sm-4">
+        <input name="withdraw_voice_file" placeholder="请上传文件" class="form-control" id="withdraw_voice_file" value="{$config.withdraw_voice_file}" type="text" />
+        <span class="input-group-btn">
+            <button type="button" class="btn btn-primary" id="uploaderWithdrawVoice">
+                <i class="layui-icon">&#xe67c;</i>{:lang("上传")}
+            </button>
+        </span>
+    </div>
+</div>
+
+
+<div class="form-group">
+    <label class="col-sm-3 control-label">{:lang("官网地址")}：</label>
+    <div class="input-group col-sm-4">
+        <input type="text" class="form-control" id="official_website_url" name="official_website_url" value="{:lang($config.official_website_url)}">
+        <p class="help-block">official_website_url：官网地址。</p>
+    </div>
+</div>

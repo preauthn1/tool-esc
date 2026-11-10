@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>系统设置</title>
+    <link rel="shortcut icon" href="{$admin_icon|toMedia}">
+    <link href="/static/admin/css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
+    <link href="/static/admin/css/font-awesome.min.css?v=4.4.0" rel="stylesheet">
+    <link href="/static/admin/css/animate.min.css" rel="stylesheet">
+    <link href="/static/admin/css/plugins/iCheck/custom.css" rel="stylesheet">
+    <link href="/static/admin/css/style.min.css?v=4.1.0" rel="stylesheet">
+    <link href="/static/admin/js/plugins/bootstrap-tagsinput/bootstrap-tagsinput.css" rel="stylesheet">
+    <link href="/static/admin/js/layui/css/layui.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+         <!-- 添加隐藏字段，用于存储合并后的数据 -->
+            <input type="hidden" name="offline_pay_account" id="offline_pay_account" value="">
+        <table class="table table-bordered" id="accountTable">
+            <thead>
+                <tr>
+                    <th>通道</th>
+                    <th>类型</th>
+                    <th>姓名</th>
+                    <th>账户</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- 数据行在此添加 -->
+            </tbody>
+        </table>
+        <button type="button" class="btn btn-secondary" id="addRowBtn">添加一行</button>
+    </div>
+
+    <!-- 添加提交按钮 -->
+    <div class="form-group">
+        <div class="col-sm-4 col-sm-offset-6">
+            <button type="button" id="submitBtn" class="btn btn-primary">{:lang('保存')}</button>
+        </div>
+    </div>
+<script src="/static/admin/js/jquery.min.js?v=2.1.4"></script>
+<script src="/static/admin/js/layui/layui.js"></script>
+<script type="text/javascript">
+$(function() {
+    // 从PHP后端获取的offline_pay_account数据
+    var offlinePayAccounts = {$offline_pay_account|json_encode|raw};
+
+    // 初始化表格数据
+    offlinePayAccounts.forEach(function(account) {
+        const newRow = `<tr>
+            <td><input type="text" class="form-control" name="channel" value="${account.channel}" /></td>
+            <td>
+              <input type="text" class="form-control" name="type" value="${account.type}" />
+            </td>
+            <td><input type="text" class="form-control" name="name" value="${account.name}" /></td>
+            <td><input type="text" class="form-control" name="account" value="${account.account}" /></td>
+            <td><button type="button" class="btn btn-danger delete-row-btn">删除</button></td>
+        </tr>`;
+        $('#accountTable tbody').append(newRow);
+    });
+    // 添加一行功能
+    $('#addRowBtn').click(function() {
+        const newRow = `<tr>
+            <td><input type="text" class="form-control" name="channel" /></td>
+            <td>
+               <input type="text" class="form-control" name="type" />
+            </td>
+            <td><input type="text" class="form-control" name="name" /></td>
+            <td><input type="text" class="form-control" name="account" /></td>
+            <td><button type="button" class="btn btn-danger delete-row-btn">删除</button></td>
+        </tr>`;
+        $('#accountTable tbody').append(newRow);
+});
+
+    // 删除一行功能
+    $('#accountTable').on('click', '.delete-row-btn', function() {
+        $(this).closest('tr').remove();
+    });
+
+    // 提交数据
+    $('#submitBtn').click(function() {
+        const data = [];
+        $('#accountTable tbody tr').each(function() {
+            const channel = $(this).find('input[name="channel"]').val();
+            const type = $(this).find('input[name="type"]').val();
+            const name = $(this).find('input[name="name"]').val();
+            const account = $(this).find('input[name="account"]').val();
+            data.push({ channel, type, name, account });
+        });
+        console.warn(data)
+        $('#offline_pay_account').val(JSON.stringify(data));
+        // 这里你可以使用AJAX或者直接提交表单，提交到指定的URL
+
+
+        // 显示加载提示
+        var loadIndex = layer.load(1, {
+            shade: [0.3, '#fff']
+        });
+
+        // 发送AJAX请求
+        $.ajax({
+            url: '{:url("config/index")}',
+            type: 'POST',
+            data: {
+                offline_pay_account: $('#offline_pay_account').val()
+            },
+            dataType: 'json',
+            success: function(res) {
+                layer.close(loadIndex);
+                if (res.code == 1) {
+                    layer.msg(res.msg || '保存成功', {icon: 1, time: 1500}, function() {
+                        // 如果需要刷新页面或跳转，可以在这里添加代码
+                        // 例如：window.location.reload();
+                    });
+                } else {
+                    layer.msg(res.msg || '保存失败', {icon: 2});
+                }
+            },
+            error: function() {
+                layer.close(loadIndex);
+                layer.msg('网络错误，请稍后重试', {icon: 2});
+            }
+        });
+    });
+});
+</script>
+</body>
+</html>
+

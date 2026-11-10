@@ -1,0 +1,134 @@
+{include file="header" /}
+<!-- Panel Other -->
+<div class="ibox float-e-margins">
+    <div class="ibox-title">
+        <h5>羊毛党</h5>
+    </div>
+    <div class="ibox-content">
+        <div id="toolbar">
+            <div id="stats" style=' float: left; padding: 8px 12px'></div>
+        </div>
+        <form id='commentForm' role="form" method="post" class="form-inline pull-right" target="_blank" onkeydown="if (event.keyCode == 13) { return false; }">
+            <div class="content clearfix m-b">
+                <div class="form-group layui-form">
+                    <label>{:lang("所属代理")}：</label>
+                    <div class="layui-inline">
+                        <select lay-search="" id="leader1" name="leader1">
+                            <option value="">所有</option>
+                            {foreach name="agent" item="vo"}
+                            <option value="{$vo.id}">{$vo.id}/{$vo.user_name}{$vo.remark? '('.$vo.remark.')' : ''}
+                            </option>
+                            {/foreach}
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>{:lang("用户类型")}：</label>
+                    <select class="form-control" id="user_type" name="user_type">
+                        <option value="-1">{:lang("所有")}</option>
+                        <option value="1" {if $user_type== 1}selected{
+                        /if}>{:lang("充值大于提现")}</option>
+                        <option value="2" {if $user_type== 2}selected{
+                        /if}>{:lang("提现大于充值")}</option>
+                        <option value="3" {if $user_type== 3}selected{
+                        /if}>{:lang("从未充值")}</option>
+                        <option value="4" {if $user_type== 4}selected{
+                        /if}>{:lang("活跃用户")}</option>
+                        <option value="5" {if $user_type== 4}selected{
+                        /if}>{:lang("今日活跃用户")}</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>{:lang("用户类型")}：</label>
+                    <select class="form-control" id="is_xuni" name="is_xuni">
+                        <option value="-1">{:lang("所有")}</option>
+                        <option value="1">{:lang("虚拟用户")}</option>
+                        <option value="0">{:lang("真实用户")}</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>{:lang("用户名称")}：</label>
+                    <input type="text" class="form-control" id="user_name" name="user_name" value="{$user_name|default=''}"
+                           placeholder="{:lang('用户名')}">
+                </div>
+                <div class="form-group">
+                    <label>{:lang("用户ID")}：</label>
+                    <input type="text" class="form-control" id="user_id" name="user_id" value="{$user_id|default=''}"
+                           placeholder="{:lang('用户ID')}">
+                </div>
+                <div class="form-group">
+                    <input type="hidden" value="1" name="export"/>
+                    <button class="btn btn-primary" type="button" style="margin-top:5px" id="search"><strong>{:lang('搜索')}</strong>
+                    </button>
+                    <button class="btn btn-danger" type="submit" style="margin-top:5px" id="export"><strong>{:lang("导出")}</strong>
+                    </button>
+                </div>
+            </div>
+        </form>
+        <div class="example-wrap">
+            <div class="example">
+                <table id="cusTable">
+                    <thead>
+                    <th data-field="id">{:lang("ID")}</th>
+                    <th data-field="user_name">{:lang("用户名")}</th>
+                    <th data-field="top_leader_remark">{:lang("所属代理")}</th>
+                    <th data-field="recharge_money">{:lang("充值金额")}</th>
+                    <th data-field="total_withdrawal">{:lang("提现金额")}</th>
+                    <th data-field="recharge_withdrawal">{:lang("充提差")}</th>
+                    <th data-field="user_money">{:lang("用户钱包余额")}</th>
+                    <th data-field="balance_money">{:lang("AI智能托管")}</th>
+                    <th data-field="frozen_money">{:lang("冻结金额")}</th>
+                    <th data-field="total_purchased_finance_money">{:lang("广告位冻结金额")}</th>
+                    <th data-field="finance_product_order_count">{:lang("购买广告位次数")}</th>
+                    <th data-field="is_xuni_text">{:lang("虚拟账户")}</th>
+                    </thead>
+                </table>
+            </div>
+        </div>
+        <!-- End Example Pagination -->
+    </div>
+</div>
+
+<script type="text/javascript">
+  index_url = "{:url('econnoisseur')}"
+
+  function queryParams(params) {   //设置查询参数
+    params.type = $('#type').val();
+    params.user_name = $('#user_name').val();
+    params.user_id = $('#user_id').val();
+    params.user_type = $('#user_type').val();
+    params.leader1 = $('#leader1').val();
+    params.is_xuni = $('#is_xuni').val();
+    return params;
+  }
+
+  function onLoadSuccess(res) {
+    var stathtml = '';
+    if (res.stat) {
+      $.each(res.stat, function (i, v) {
+        stathtml += '<span class="label label-success">' + v.text + '：' + v.total + '</span> ';
+      });
+    }
+    $("#stats").html(stathtml);
+
+  }
+
+  $(document).ready(function () {
+    layui.use('laydate', function () {
+      var laydate = layui.laydate;
+      laydate.render({
+        elem: '#start_time'
+        , trigger: 'click'
+      });
+      laydate.render({
+        elem: '#end_time'
+        , trigger: 'click'
+      });
+    });
+    initTable();
+    $("#search").on("click", function () {
+      initTable();
+    });
+  });
+</script>
+{include file="footer" /}

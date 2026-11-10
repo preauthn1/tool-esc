@@ -1,0 +1,24 @@
+<div class="form-group">
+    <h1 class="col-sm-3 control-label">转盘活动</h1>
+</div>
+<div class="form-group">
+    <label class="col-sm-3 control-label">{:lang("转盘开关")}：</label>
+    <div class="input-group col-sm-4">
+        <input class="form-control" type="text" name="zp_enable" value="{$config.zp_enable}" />
+        <p class="help-block">1为开启，0为关闭。</p>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-sm-3 control-label">{:lang("转盘每次抽奖金额")}：</label>
+    <div class="input-group col-sm-4">
+        <input class="form-control" type="text" name="zp_expend" value="{$config.zp_expend|default=0}" />
+        <p class="help-block">每次抽奖消耗金额，默认无花费。</p>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-sm-3 control-label">{:lang("规则说明")}：</label>
+    <div class="input-group col-sm-4">
+        <textarea class="form-control" name="zp_rules" rows='6'>{$config['zp_rules']}</textarea>
+        <p class="help-block">每行设置一个，以&lt;br&gt;结尾换行</p>
+    </div>
+</div>

@@ -1,0 +1,138 @@
+{include file="header" /}
+<div class="row">
+    <div class="col-sm-8">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h5>{:lang("添加/修改")}</h5>
+            </div>
+            <div class="ibox-content">
+                <form class="form-horizontal m-t" id="dataForm" method="post" action="{:url('add')}">
+                    <input type="hidden" name="id" value="{$info.id|default=''}">
+                    <input type="hidden" name="user_id" value="{$info.user_id|default=''}">
+                    <input type="hidden" name="level_id" value="{$info.level_id|default=''}">
+{/*                    <div class="form-group">*/}
+{/*                        <label class="col-sm-3 control-label">{:lang("基础单个任务收益金额")&cc;：</label>*/}
+{/*                        <div class="input-group col-sm-4">*/}
+{/*                            <input id="income" type="text" class="form-control" name="income" required=""*/}
+{/*                                   aria-required="true" value="{$info.income|default=0.00&cc;">*/}
+{/*                        </div>*/}
+{/*                    </div>*/}
+{/*                    <div class="form-group">*/}
+{/*                        <label class="col-sm-3 control-label">{:lang("每个活跃用户增加金额")&cc;：</label>*/}
+{/*                        <div class="input-group col-sm-4">*/}
+{/*                            <input id="active_income" type="text" class="form-control" name="active_income" required=""*/}
+{/*                                   aria-required="true" value="{$info.active_income|default=0.00&cc;">*/}
+{/*                        </div>*/}
+{/*                    </div>*/}
+{/*                    <div class="form-group">*/}
+{/*                        <label class="col-sm-3 control-label">{:lang("最高单个任务收益金额")&cc;：</label>*/}
+{/*                        <div class="input-group col-sm-4">*/}
+{/*                            <input id="income_max" type="text" class="form-control" name="income_max" required=""*/}
+{/*                                   aria-required="true" value="{$info.income_max|default=0.00&cc;">*/}
+{/*                        </div>*/}
+{/*                    </div>*/}
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">{:lang("广告位占余额比例")}：</label>
+                        <div class="input-group col-sm-4">
+                            <input id="invest_rate" type="text" class="form-control" name="invest_rate" required=""
+                                   aria-required="true" value="{$info.invest_rate|default=0}">
+                            <span class="input-group-addon">%</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">{:lang("每个活跃用户增加比例")}：</label>
+                        <div class="input-group col-sm-4">
+                            <input id="active_rate" type="text" class="form-control" name="active_rate" required=""
+                                   aria-required="true" value="{$info.active_rate|default=0}">
+                            <span class="input-group-addon">%</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">{:lang("最高广告位比例")}：</label>
+                        <div class="input-group col-sm-4">
+                            <input id="invest_max_rate" type="text" class="form-control" name="invest_max_rate" required=""
+                                   aria-required="true" value="{$info.invest_max_rate|default=0}">
+                            <span class="input-group-addon">%</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">{:lang("广告位个数")}：</label>
+                        <div class="input-group col-sm-4">
+                            <input id="invest_num" type="text" class="form-control" name="invest_num" required=""
+                                   aria-required="true" value="{$info.invest_num|default=0}">
+                                   <span class="input-group-addon">个</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">{:lang("收益率")}：</label>
+                        <div class="input-group col-sm-4">
+                            <input id="invest_profit" type="text" class="form-control" name="invest_profit" required=""
+                                   aria-required="true" value="{$info.invest_profit|default=0}">
+                            <span class="input-group-addon">%</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">{:lang("广告位周期")}：</label>
+                        <div class="input-group col-sm-4">
+                            <input id="invest_day" type="text" class="form-control" name="invest_day" required=""
+                                   aria-required="true" value="{$info.invest_day|default=0}">
+                            <span class="input-group-addon">
+                                <select name="invest_period_type" id="invest_period_type">
+                                    <option value="day" {if isset($info.invest_period_type) && ($info.invest_period_type eq 'day' || empty($info.invest_period_type))} selected {/if}>{:lang("天")}</option>
+                                    <option value="hour" {if isset($info.invest_period_type) && $info.invest_period_type eq 'hour'} selected {/if}>{:lang("小时")}</option>
+                                </select>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-4 col-sm-offset-6">
+                            <button class="btn btn-primary" type="submit">{:lang("提交")}</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    $(document).ready(function(){
+        // 单张上传图片
+        layui.use('upload', function(){
+            var upload = layui.upload;
+            //上传驾照正面
+            var uploadInst = upload.render({
+                elem: '#test1' //绑定元素
+                ,url: "{:url('upload/upload')}" //上传接口
+                ,done: function(res){
+                    //上传完毕回调
+                    $("#original_img").val(res.data.path);
+                    $("#sm").html('<img src="' + res.data.src + '" />');
+                }
+                ,error: function(){
+                    //请求异常回调
+                }
+            });
+        });
+    });
+
+    layui.use('laydate', function(){
+        var laydate = layui.laydate;
+
+        //时间选择器
+        laydate.render({
+            elem: '#unlock_time_start',
+            type: 'time',
+            format: 'HH:mm:ss'
+        });
+
+        laydate.render({
+            elem: '#unlock_time_end',
+            type: 'time',
+            format: 'HH:mm:ss'
+        });
+    });
+</script>
+{include file="footer" /}
